@@ -1,19 +1,23 @@
-<a href="https://softserve.academy/"><div align="center"><img src="https://github.com/ita-social-projects/StreetCode/blob/master/StreetCodeLogo.jpg" title="SoftServe IT Academy" alt="SoftServe IT Academy"></div></a>
+<a href="https://softserve.academy/"><div align="center"><img src="https://github.com/project-studying-dotnet/Streetcode-Server-May-2025/blob/main/StreetCodeLogo.jpg" title="SoftServe IT Academy" alt="SoftServe IT Academy"></div></a>
 
 # Streetcode
 This is a Back-end part of our Streetcode project.
-Front-end part: https://github.com/ita-social-projects/streetcode-client_Admin-Full
+Front-end part: https://github.com/project-studying-dotnet/Streetcode_Client-Admin
 >### **Vision**
 >The largest platform about the history of Ukraine, built in the space of cities.
 
 >### **Mission**
 >To fill the gaps in the historical memory of Ukrainians.
 
-[![Build Status](https://img.shields.io/travis/ita-social-projects/Streetcode-Admin/master?style=flat-square)](https://travis-ci.org/github/ita-social-projects/Streetcode-Admin)
-[![Coverage Status](https://img.shields.io/gitlab/coverage/ita-social-projects/Streetcode-Admin/master?style=flat-square)](https://coveralls.io)
-[![Github Issues](https://img.shields.io/github/issues/ita-social-projects/Streetcode-Admin?style=flat-square)](https://github.com/ita-social-projects/Streetcode-Admin/issues)
-[![Pending Pull-Requests](https://img.shields.io/github/issues-pr/ita-social-projects/Streetcode-Admin?style=flat-square)](https://github.com/ita-social-projects/Streetcode-Admin/pulls)
+[![Github Issues](https://img.shields.io/github/issues/project-studying-dotnet/Streetcode-Server-May-2025?style=flat-square)](https://github.com/project-studying-dotnet/Streetcode-Server-May-2025/issues)
+[![Pending Pull-Requests](https://img.shields.io/github/issues-pr/project-studying-dotnet/Streetcode-Server-May-2025?style=flat-square)](https://github.com/project-studying-dotnet/Streetcode-Server-May-2025/pulls)
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=project-studying-dotnet_Streetcode-Server-May-2025&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=project-studying-dotnet_Streetcode-Server-May-2025)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=project-studying-dotnet_Streetcode-Server-May-2025&metric=coverage)](https://sonarcloud.io/summary/new_code?id=project-studying-dotnet_Streetcode-Server-May-2025)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=project-studying-dotnet_Streetcode-Server-May-2025&metric=bugs)](https://sonarcloud.io/summary/new_code?id=project-studying-dotnet_Streetcode-Server-May-2025)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=project-studying-dotnet_Streetcode-Server-May-2025&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=project-studying-dotnet_Streetcode-Server-May-2025)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=project-studying-dotnet_Streetcode-Server-May-2025&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=project-studying-dotnet_Streetcode-Server-May-2025)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=project-studying-dotnet_Streetcode-Server-May-2025&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=project-studying-dotnet_Streetcode-Server-May-2025)
 ---
 
 ## Table of Contents 
@@ -65,11 +69,11 @@ api.secret=${API_SECRET}
 ### Clone
   Clone this repo to your local machine using:
   ```
-https://github.com/ita-social-projects/StreetCode
+https://github.com/project-studying-dotnet/Streetcode-Server-May-2025
   ```
   Or if your have an associated SSH key:
   ```
-git@github.com:ita-social-projects/StreetCode.git
+git@github.com:project-studying-dotnet/Streetcode-Server-May-2025.git
   ```
 
 ### Setup
@@ -148,11 +152,11 @@ Gitflow is an alternative Git branching model that involves the use of feature b
 
 #### Step 1
 
-- First step is checkout to `developer` branch and pull the recent changes.
+- First step is checkout to `develop` branch and pull the recent changes.
 
 #### Step 2
 
-- 🍴 Fork this repo from `developer` branch and name it! A short, descriptive branch name enables your collaborators to see ongoing work at a glance. For example, `increase-test-timeout` or `add-code-of-conduct`. 
+- 🍴 Fork this repo from `develop` branch and name it! A short, descriptive branch name enables your collaborators to see ongoing work at a glance. For example, `increase-test-timeout` or `add-code-of-conduct`. 
 
 #### Step 3
 
@@ -166,11 +170,11 @@ For example, `fix typo` or `increase rate limit`. Note: you don't need to commit
 
 #### Step 5
 
-- Before creating pull request you need to check the `developer` branch state! To avoid conflicts, you should merge `developer` branch to your local branch! And resolve your local conflicts. Mini manual: checkout to your local branch and write in console `git merge developer`.
+- Before creating pull request you need to check the `develop` branch state! To avoid conflicts, you should merge `develop` branch to your local branch! And resolve your local conflicts. Mini manual: checkout to your local branch and write in console `git merge develop`.
 
 #### Step 6
 
-- 🔃 Create a new pull request using <a href="https://github.com/ita-social-projects/Streetcode_Client-Admin.git" target="_blank">*this link*</a>.
+- 🔃 Create a new pull request using <a href="https://github.com/project-studying-dotnet/Streetcode-Server-May-2025.git" target="_blank">*this link*</a>.
 
 #### Step 7
 
@@ -178,7 +182,7 @@ For example, `fix typo` or `increase rate limit`. Note: you don't need to commit
 
 #### Step 8
 
-- :tada: After 3 approved reviews, merge your pull request with `developer` branch! Also, it is important to wait for your scrum master to approve your changes. If there are some conflicts, resolve them, again.
+- :tada: After 3 approved reviews, merge your pull request with `develop` branch! Also, it is important to wait for your scrum master to approve your changes. If there are some conflicts, resolve them, again.
 
 #### Step 9
 
@@ -192,11 +196,11 @@ Some fixes will be needed due to the nature of Gitflow. You would have to do a '
 
 #### Step 1 
 
-- :fire: To implement an urgent change, a Hotfix branch is created off the `developer` branch to test and implement the fix.
+- :fire: To implement an urgent change, a Hotfix branch is created off the `develop` branch to test and implement the fix.
 
 #### Step 2
 
-- :dancer: Once it’s complete, the Hotfix is merged with the `developer` branch.
+- :dancer: Once it’s complete, the Hotfix is merged with the `develop` branch.
 
 ### Issue flow
 
