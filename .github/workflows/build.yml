@@ -28,7 +28,7 @@ jobs:
         with:
           dotnet-version: 6.0.x
       - name: Install dotnet-coverage
-        run: dotnet tool install --global dotnet-coverage
+        run: dotnet tool install --global dotnet-coverage --version 17.13.1
       - name: Install dotnet-sonarscanner
         run: dotnet tool install --global dotnet-sonarscanner
 
