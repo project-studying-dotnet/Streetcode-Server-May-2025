@@ -26,9 +26,9 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 6.0.x
+          dotnet-version: 8.0.x
       - name: Install dotnet-coverage
-        run: dotnet tool install --global dotnet-coverage --version 17.13.1
+        run: dotnet tool install --global dotnet-coverage 
       - name: Install dotnet-sonarscanner
         run: dotnet tool install --global dotnet-sonarscanner
 
