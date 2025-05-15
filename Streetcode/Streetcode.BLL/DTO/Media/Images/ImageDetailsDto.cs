@@ -2,7 +2,7 @@
 
 namespace Streetcode.BLL.DTO.Media.Images
 {
-    public class ImageDetailsDto
+    public class ImageDetailsDTO
     {
         public int Id { get; set; }
 
