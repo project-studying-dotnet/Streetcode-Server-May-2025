@@ -9,5 +9,5 @@ public class ImageDTO
     public string? BlobName { get; set; }
     public string? Base64 { get; set; }
     public string? MimeType { get; set; }
-    public ImageDetailsDto? ImageDetails { get; set; }
+    public ImageDetailsDTO? ImageDetails { get; set; }
 }
