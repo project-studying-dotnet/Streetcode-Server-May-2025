@@ -25,7 +25,7 @@ namespace Streetcode.BLL.MediatR.Sources.SourceLinkCategory.GetAll
             _logger = logger;
         }
 
-        public async Task<Result<IEnumerable<SourceLinkCategoryDTO>>> Handle(GetAllCategoriesQuery request, CancellationToken cancellationtoken)
+        public async Task<Result<IEnumerable<SourceLinkCategoryDTO>>> Handle(GetAllCategoriesQuery request, CancellationToken cancellationToken)
         {
             var allCategories = await _repositoryWrapper.SourceCategoryRepository.GetAllAsync(
                 include: cat => cat.Include(img => img.Image) !);
