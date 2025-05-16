@@ -73,7 +73,6 @@ public class GetAllStreetcodesHandler : IRequestHandler<GetAllStreetcodesQuery, 
         string filter)
     {
         var filterParams = filter.Split(':');
-        var filterColumn = filterParams[0];
         var filterValue = filterParams[1];
 
         streetcodes = streetcodes
