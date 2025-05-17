@@ -35,7 +35,7 @@ namespace Streetcode.BLL.MediatR.Newss.Create
                 newNews.ImageId = null;
             }
 
-            var entity = _repositoryWrapper.NewsRepository.Create(newNews);
+            var entity = await _repositoryWrapper.NewsRepository.CreateAsync(newNews);
             var resultIsSuccess = await _repositoryWrapper.SaveChangesAsync() > 0;
             if(resultIsSuccess)
             {
