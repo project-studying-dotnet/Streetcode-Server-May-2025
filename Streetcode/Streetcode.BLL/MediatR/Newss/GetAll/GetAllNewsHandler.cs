@@ -38,7 +38,7 @@ namespace Streetcode.BLL.MediatR.Newss.GetAll
 
             var newsDTOs = _mapper.Map<IEnumerable<NewsDTO>>(news);
 
-            newsDTOs
+            newsDTOs = newsDTOs
                 .Where(dto => dto.Image is not null)
                 .Select(dto =>
                 {
