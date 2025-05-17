@@ -38,12 +38,9 @@ namespace Streetcode.BLL.MediatR.Newss.SortedByDateTime
 
             var newsDTOs = _mapper.Map<IEnumerable<NewsDTO>>(news).OrderByDescending(x => x.CreationDate).ToList();
 
-            foreach (var dto in newsDTOs)
+            foreach (var dto in newsDTOs.Where(dto => dto.Image is not null))
             {
-                if (dto.Image is not null)
-                {
-                    dto.Image.Base64 = _blobService.FindFileInStorageAsBase64(dto.Image.BlobName);
-                }
+                dto.Image!.Base64 = _blobService.FindFileInStorageAsBase64(dto.Image.BlobName!);
             }
 
             return Result.Ok(newsDTOs);
