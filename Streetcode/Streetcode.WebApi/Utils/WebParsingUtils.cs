@@ -206,13 +206,15 @@ public class WebParsingUtils
             Console.WriteLine("\n" + addressRow);
             Console.WriteLine($"Coordinates[{latitude}-{longitude}]");
 
-            var newRow = string.Empty;
+            var newRowBuilder = new StringBuilder();
             for (int i = 0; i <= AddressColumn; i++)
             {
-                newRow += $"{row[i]};";
+                newRowBuilder.Append($"{row[i]};");
             }
 
-            newRow += $"{latitude};{longitude}";
+            newRowBuilder.Append($"{latitude};{longitude}");
+
+            string newRow = newRowBuilder.ToString();
             Console.WriteLine(newRow);
 
             await File.AppendAllTextAsync(csvPath, newRow + "\n", Encoding.GetEncoding(1251));
