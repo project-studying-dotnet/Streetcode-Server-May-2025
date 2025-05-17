@@ -74,7 +74,7 @@ public class GetTextByIdHandlerTests
         // Assert
         Assert.True(result.IsFailed);
 
-        VerifyMocksCalledOnce(true);
+        VerifyMocksCalledOnce(false);
     }
 
     private static (TextEntity, TextDTO, int) CreateValidTextEntityAndDto()
