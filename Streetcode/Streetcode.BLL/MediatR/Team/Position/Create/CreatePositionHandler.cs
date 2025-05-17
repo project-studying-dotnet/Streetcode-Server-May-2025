@@ -30,7 +30,7 @@ namespace Streetcode.BLL.MediatR.Team.Create
 
             try
             {
-                _repository.SaveChanges();
+                await _repository.SaveChangesAsync();
             }
             catch (Exception ex)
             {
