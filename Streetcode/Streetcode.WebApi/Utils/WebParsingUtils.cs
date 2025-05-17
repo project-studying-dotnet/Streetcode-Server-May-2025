@@ -102,7 +102,6 @@ public class WebParsingUtils
 
     public async Task ParseZipFileFromWebAsync()
     {
-        var projRootDirectory = Directory.GetParent(Environment.CurrentDirectory)?.FullName!;
         var zipPath = $"houses.zip";
         var extractTo = $"/root/build/StreetCode/Streetcode/Streetcode.DAL";
 

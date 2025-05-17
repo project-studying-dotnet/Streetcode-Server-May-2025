@@ -72,7 +72,6 @@ public static class ServiceCollectionExtensions
 
         services.AddHangfireServer();
 
-        var corsConfig = configuration.GetSection("CORS").Get<CorsConfiguration>();
         services.AddCors(opt =>
         {
             opt.AddDefaultPolicy(policy =>
