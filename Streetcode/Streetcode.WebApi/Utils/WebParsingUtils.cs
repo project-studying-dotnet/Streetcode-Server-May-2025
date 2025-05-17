@@ -168,7 +168,7 @@ public class WebParsingUtils
         var alreadyParsedRowsToWrite = allLinesFromDataCsv.Distinct().ToList();
 
         var remainsToParse = forParsingRows.Except(alreadyParsedRows)
-            .Select(x => x.Split(';').ToList()).ToList()
+            .Select(x => x.Split(';').ToList())
             .Take(20) // TODO take it of if you want to start global parse
             .ToList();
 
