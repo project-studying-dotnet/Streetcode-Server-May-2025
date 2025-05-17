@@ -3,6 +3,7 @@ using Xunit;
 using Moq;
 using FluentAssertions;
 using AutoMapper;
+using FluentResults;
 using MediatR;
 using Microsoft.EntityFrameworkCore.Query;
 using Streetcode.BLL.Interfaces.Logging;
@@ -19,82 +20,79 @@ public class CreateNewsHandlerTests
     private readonly Mock<IMapper> _mapper;
     private readonly Mock<IRepositoryWrapper> _repositoryWrapper;
     private readonly Mock<ILoggerService> _loggerService;
-    
+    private readonly CreateNewsHandler _handler;
+
     public CreateNewsHandlerTests()
     {
-        this._mapper = new Mock<IMapper>();
-        this._repositoryWrapper = new Mock<IRepositoryWrapper>();
-        this._loggerService = new Mock<ILoggerService>();
+        _mapper = new Mock<IMapper>();
+        _repositoryWrapper = new Mock<IRepositoryWrapper>();
+        _loggerService = new Mock<ILoggerService>();
+        _handler = new CreateNewsHandler(_mapper.Object, _repositoryWrapper.Object, _loggerService.Object);
     }
 
     [Fact]
-    public async Task ShouldReturnCorrectType_CorrectInput()
+    public async Task Handler_ShouldReturnCorrectType_CorrectInput()
     {
-        var newsDto = this.GetNewsDto();
-        
-        this.SetUpMockMapper();
-        this.SetUpMockRepositoryCreate();
-        this.SetUpMockRepositorySaveChanges(1);
-        
-        var handler = new CreateNewsHandler(this._mapper.Object, this._repositoryWrapper.Object, this._loggerService.Object);
-        
-        var result = await handler.Handle(new CreateNewsCommand(newsDto), CancellationToken.None);
+        // Arrange
+        var news = GetNews();
+        var newsDto = GetNewsDto();
+        _mapper.Setup(x => x.Map<News>(It.IsAny<NewsDTO>()))
+            .Returns(news);
+        _mapper.Setup(x => x.Map<NewsDTO>(It.IsAny<News>()))
+            .Returns(newsDto);
+        _repositoryWrapper.Setup(x => x.NewsRepository.Create(news))
+            .Returns(news);
+        SetUpMockRepositorySaveChanges(1);
 
-        result.Value.Should().BeOfType<NewsDTO>();
+        // Act
+        var result = await _handler.Handle(new CreateNewsCommand(GetNewsDto()), CancellationToken.None);
+
+        // Assert
+        _repositoryWrapper.Verify(x => x.NewsRepository.Create(news), Times.Once);
+        _repositoryWrapper.Verify(x => x.SaveChangesAsync(), Times.Once);
+        result.Value.Should().BeEquivalentTo(newsDto);
+        result.IsSuccess.Should().BeTrue();
     }
 
     [Fact]
-    public async Task ShouldReturnErrorMessage_IncorrectInput()
+    public async Task Handler_ShouldReturnErrorMessage_IncorrectInput()
     {
-        var newsDto = new NewsDTO() { };
+        // Arrange
+        var newsDto = new NewsDTO();
         var errorMessage = "Cannot convert null to news";
+        _mapper.Setup(x => x.Map<News>(It.IsAny<NewsDTO>()))
+            .Returns((News)null);
 
-        this.SetUpMockMapperReturnsNull();
-        
-        var handler = new CreateNewsHandler(this._mapper.Object, this._repositoryWrapper.Object, this._loggerService.Object);
-        
-        var result = await handler.Handle(new CreateNewsCommand(newsDto), CancellationToken.None);
-        
+        // Act
+        var result = await _handler.Handle(new CreateNewsCommand(newsDto), CancellationToken.None);
+
+        // Assert
         result.IsSuccess.Should().BeFalse();
         result.Errors.Should().ContainSingle().Which.Message.Should().Be(errorMessage);
     }
 
     [Fact]
-    public async Task ShouldReturnSuccess_CorrectCreatedNews()
+    public async Task Handler_ShouldReturnErrorMessage_WhenSaveChangesIsFalse()
     {
-        var newsDto = this.GetNewsDto();
-        
-        this.SetUpMockMapper();
-        this.SetUpMockRepositoryCreate();
-        this.SetUpMockRepositorySaveChanges(1);
-        
-        var handler = new CreateNewsHandler(this._mapper.Object, this._repositoryWrapper.Object, this._loggerService.Object);
-        
-        var result = await handler.Handle(new CreateNewsCommand(newsDto), CancellationToken.None);
-        
-        result.IsSuccess.Should().BeTrue();
-    }
+        // Arrange
+        var news = GetNews();
+        _mapper.Setup(x => x.Map<News>(It.IsAny<NewsDTO>()))
+            .Returns(news);
+        _repositoryWrapper.Setup(x => x.NewsRepository.Create(news))
+            .Returns(news);
+        SetUpMockRepositorySaveChanges(0);
 
-    [Fact]
-    public async Task ShouldReturnErrorMessage_WhenSaveChangesIsFalse()
-    {
-        var newsDto = this.GetNewsDto();
-        
-        this.SetUpMockMapper();
-        this.SetUpMockRepositoryCreate();
-        this.SetUpMockRepositorySaveChanges(0);
-        
-        var handler = new CreateNewsHandler(this._mapper.Object, this._repositoryWrapper.Object, this._loggerService.Object);
-        
-        var result = await handler.Handle(new CreateNewsCommand(newsDto), CancellationToken.None);
+        // Act
+        var result = await _handler.Handle(new CreateNewsCommand(GetNewsDto()), CancellationToken.None);
 
-        result.IsSuccess.Should().BeFalse();
+        // Assert
+        result.IsFailed.Should().BeTrue();
         result.Errors.Should().ContainSingle().Which.Message.Should().Be("Failed to create a news");
     }
 
     private NewsDTO GetNewsDto()
     {
-        return new NewsDTO()
+        return new NewsDTO
         {
             Id = 1,
             Title = "Title",
@@ -107,7 +105,7 @@ public class CreateNewsHandlerTests
 
     private News GetNews()
     {
-        return new News()
+        return new News
         {
             Id = 1,
             Title = "Title",
@@ -118,34 +116,9 @@ public class CreateNewsHandlerTests
         };
     }
 
-    private News GetIncorectNews()
-    {
-        return new News() { };
-    }
-
-    private void SetUpMockMapper()
-    {
-        this._mapper.Setup(x => x.Map<News>(It.IsAny<NewsDTO>()))
-            .Returns(this.GetNews());
-        this._mapper.Setup(x => x.Map<NewsDTO>(It.IsAny<News>()))
-            .Returns(this.GetNewsDto());
-    }
-
-    private void SetUpMockMapperReturnsNull()
-    {
-        this._mapper.Setup(x => x.Map<News>(It.IsAny<NewsDTO>()))
-            .Returns(this.GetIncorectNews);
-    }
-
     private void SetUpMockRepositorySaveChanges(int number)
     {
-        this._repositoryWrapper.Setup(x => x.SaveChangesAsync())
+        _repositoryWrapper.Setup(x => x.SaveChangesAsync())
             .ReturnsAsync(number);
-    }
-
-    private void SetUpMockRepositoryCreate()
-    {
-        this._repositoryWrapper.Setup(x => x.NewsRepository.Create(It.IsAny<News>()))
-            .Returns(this.GetNews());
     }
 }

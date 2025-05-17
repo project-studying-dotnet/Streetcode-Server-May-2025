@@ -28,7 +28,7 @@ namespace Streetcode.BLL.MediatR.Newss.Update
             var news = _mapper.Map<News>(request.news);
             if (news is null)
             {
-                const string errorMsg = $"Cannot convert null to news";
+                const string errorMsg = "Cannot convert null to news";
                 _logger.LogError(request, errorMsg);
                 return Result.Fail(new Error(errorMsg));
             }
