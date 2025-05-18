@@ -25,7 +25,7 @@ public class CreateCoordinateHandler : IRequestHandler<CreateCoordinateCommand, 
             return Result.Fail(new Error("Cannot convert null to streetcodeCoordinate"));
         }
 
-        _repositoryWrapper.StreetcodeCoordinateRepository.Create(streetcodeCoordinate);
+        await _repositoryWrapper.StreetcodeCoordinateRepository.CreateAsync(streetcodeCoordinate);
 
         var resultIsSuccess = await _repositoryWrapper.SaveChangesAsync() > 0;
         return resultIsSuccess ? Result.Ok(Unit.Value) : Result.Fail(new Error("Failed to create a streetcodeCoordinate"));
