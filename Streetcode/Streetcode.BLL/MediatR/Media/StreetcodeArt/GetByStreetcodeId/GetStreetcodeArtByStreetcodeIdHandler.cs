@@ -45,9 +45,9 @@ namespace Streetcode.BLL.MediatR.Media.StreetcodeArt.GetByStreetcodeId
                 predicate: s => s.StreetcodeId == request.StreetcodeId,
                 include: art => art
                     .Include(a => a.Art)
-                    .Include(i => i.Art.Image) !);
+                    .ThenInclude(a => a.Image));
 
-            if (art is null)
+            if (!art.Any())
             {
                 string errorMsg = $"Cannot find an art with corresponding streetcode id: {request.StreetcodeId}";
                 _logger.LogError(request, errorMsg);
@@ -55,10 +55,19 @@ namespace Streetcode.BLL.MediatR.Media.StreetcodeArt.GetByStreetcodeId
             }
 
             var artsDto = _mapper.Map<IEnumerable<StreetcodeArtDTO>>(art);
+            if (artsDto is null)
+            {
+                string errorMsg = $"Unable to map art data for streetcode id: {request.StreetcodeId}";
+                _logger.LogError(request, errorMsg);
+                return Result.Fail(new Error(errorMsg));
+            }
 
             foreach (var artDto in artsDto)
             {
-                artDto.Art.Image.Base64 = _blobService.FindFileInStorageAsBase64(artDto.Art.Image.BlobName);
+                if (artDto.Art?.Image != null && !string.IsNullOrEmpty(artDto.Art.Image.BlobName))
+                {
+                    artDto.Art.Image.Base64 = _blobService.FindFileInStorageAsBase64(artDto.Art.Image.BlobName);
+                }
             }
 
             return Result.Ok(artsDto);

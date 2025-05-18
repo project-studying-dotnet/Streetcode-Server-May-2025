@@ -35,11 +35,11 @@ namespace Streetcode.BLL.MediatR.Newss.Update
 
             var response = _mapper.Map<NewsDTO>(news);
 
-            if (news.Image is not null)
+            if (news.Image is not null && response.Image != null)
             {
-                response.Image.Base64 = _blobSevice.FindFileInStorageAsBase64(response.Image.BlobName);
+                response.Image.Base64 = response.Image.BlobName != null ? _blobSevice.FindFileInStorageAsBase64(response.Image.BlobName) : null;
             }
-            else
+            else if (response.ImageId != null)
             {
                 var img = await _repositoryWrapper.ImageRepository.GetFirstOrDefaultAsync(x => x.Id == response.ImageId);
                 if (img != null)
