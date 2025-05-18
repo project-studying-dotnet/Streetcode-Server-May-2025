@@ -236,7 +236,7 @@ public class WebParsingUtils
 
         // this part of code truncates Toponyms table
         _streetcodeContext.Set<Toponym>().RemoveRange(_streetcodeContext.Set<Toponym>());
-        _streetcodeContext.SaveChanges();
+        await _streetcodeContext.SaveChangesAsync();
 
         foreach (var row in rows)
         {
