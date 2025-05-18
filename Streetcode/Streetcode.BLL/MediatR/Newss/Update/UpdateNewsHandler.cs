@@ -35,9 +35,9 @@ namespace Streetcode.BLL.MediatR.Newss.Update
 
             var response = _mapper.Map<NewsDTO>(news);
 
-            if (news.Image is not null && response.Image != null)
+            if (news.Image is not null && response.Image != null && response.Image.BlobName != null)
             {
-                response.Image.Base64 = response.Image.BlobName != null ? _blobSevice.FindFileInStorageAsBase64(response.Image.BlobName) : null;
+                response.Image.Base64 = _blobSevice.FindFileInStorageAsBase64(response.Image.BlobName);
             }
             else if (response.ImageId != null)
             {

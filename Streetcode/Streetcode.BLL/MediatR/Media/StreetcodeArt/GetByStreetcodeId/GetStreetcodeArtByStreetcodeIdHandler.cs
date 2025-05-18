@@ -44,8 +44,8 @@ namespace Streetcode.BLL.MediatR.Media.StreetcodeArt.GetByStreetcodeId
             .GetAllAsync(
                 predicate: s => s.StreetcodeId == request.StreetcodeId,
                 include: art => art
-                    .Include(a => a.Art)
-                    .ThenInclude(a => a.Image));
+                    .Include(a => a.Art!)
+                    .ThenInclude(a => a!.Image!));
 
             if (!art.Any())
             {

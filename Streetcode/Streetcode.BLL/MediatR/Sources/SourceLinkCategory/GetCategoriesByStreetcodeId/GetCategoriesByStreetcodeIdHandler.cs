@@ -44,7 +44,7 @@ public class GetCategoriesByStreetcodeIdHandler : IRequestHandler<GetCategoriesB
 
         foreach (var srcCategory in mappedSrcCategories)
         {
-            if (srcCategory.Image?.BlobName is not null)
+            if (srcCategory.Image is { BlobName: not null })
             {
                 srcCategory.Image.Base64 = _blobService.FindFileInStorageAsBase64(srcCategory.Image.BlobName);
             }
