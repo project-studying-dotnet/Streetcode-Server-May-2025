@@ -1188,29 +1188,27 @@ namespace Streetcode.WebApi.Extensions
                                         StreetcodeId = 2
                                     });
                                 await dbContext.SaveChangesAsync();
-                                dbContext.ImageDetailses.AddRange(new[]
-                                {
-                                     new ImageDetails()
-                                     {
-                                         ImageId = 6,
-                                         Alt = "Additional inforamtaion for  wow-fact photo 1"
-                                     },
-                                     new ImageDetails()
-                                     {
-                                         ImageId = 16,
-                                         Alt = "Additional inforamtaion for  wow-fact photo 2"
-                                     },
-                                     new ImageDetails()
-                                     {
-                                         ImageId = 17,
-                                         Alt = "Additional inforamtaion for  wow-fact photo 3"
-                                     },
-                                     new ImageDetails()
-                                     {
-                                         ImageId = 19,
-                                         Alt = "Additional inforamtaion for  wow-fact photo 3"
-                                     },
-                                });
+                                dbContext.ImageDetailses.AddRange(
+                                    new ImageDetails
+                                    {
+                                        ImageId = 6,
+                                        Alt = "Additional inforamtaion for  wow-fact photo 1"
+                                    },
+                                    new ImageDetails
+                                    {
+                                        ImageId = 16,
+                                        Alt = "Additional inforamtaion for  wow-fact photo 2"
+                                    },
+                                    new ImageDetails
+                                    {
+                                        ImageId = 17,
+                                        Alt = "Additional inforamtaion for  wow-fact photo 3"
+                                    },
+                                    new ImageDetails
+                                    {
+                                        ImageId = 19,
+                                        Alt = "Additional inforamtaion for  wow-fact photo 3"
+                                    });
                             }
 
                             if (!dbContext.SourceLinks.Any())
