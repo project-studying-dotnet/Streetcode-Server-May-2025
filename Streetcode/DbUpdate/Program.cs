@@ -1,4 +1,6 @@
-﻿using DbUp;
+﻿namespace DbUpdate;
+
+using DbUp;
 using Microsoft.Extensions.Configuration;
 
 public class Program
@@ -25,7 +27,7 @@ public class Program
         pathToScript = Console.ReadLine();
 
         pathToScript = migrationPath;
-        
+
         var upgrader =
             DeployChanges.To
                 .SqlDatabase(connectionString)

@@ -57,7 +57,6 @@ public class WebParsingUtils
 
         var clientHandler = new HttpClientHandler();
         clientHandler.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-        clientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
 
         var retryPolicy = Policy.Handle<Exception>().WaitAndRetryAsync(
             3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
@@ -102,7 +101,6 @@ public class WebParsingUtils
 
     public async Task ParseZipFileFromWebAsync()
     {
-        var projRootDirectory = Directory.GetParent(Environment.CurrentDirectory)?.FullName!;
         var zipPath = $"houses.zip";
         var extractTo = $"/root/build/StreetCode/Streetcode/Streetcode.DAL";
 
@@ -169,7 +167,7 @@ public class WebParsingUtils
         var alreadyParsedRowsToWrite = allLinesFromDataCsv.Distinct().ToList();
 
         var remainsToParse = forParsingRows.Except(alreadyParsedRows)
-            .Select(x => x.Split(';').ToList()).ToList()
+            .Select(x => x.Split(';').ToList())
             .Take(20) // TODO take it of if you want to start global parse
             .ToList();
 
@@ -206,13 +204,15 @@ public class WebParsingUtils
             Console.WriteLine("\n" + addressRow);
             Console.WriteLine($"Coordinates[{latitude}-{longitude}]");
 
-            var newRow = string.Empty;
+            var newRowBuilder = new StringBuilder();
             for (int i = 0; i <= AddressColumn; i++)
             {
-                newRow += $"{row[i]};";
+                newRowBuilder.Append($"{row[i]};");
             }
 
-            newRow += $"{latitude};{longitude}";
+            newRowBuilder.Append($"{latitude};{longitude}");
+
+            string newRow = newRowBuilder.ToString();
             Console.WriteLine(newRow);
 
             await File.AppendAllTextAsync(csvPath, newRow + "\n", Encoding.GetEncoding(1251));
@@ -235,7 +235,7 @@ public class WebParsingUtils
 
         // this part of code truncates Toponyms table
         _streetcodeContext.Set<Toponym>().RemoveRange(_streetcodeContext.Set<Toponym>());
-        _streetcodeContext.SaveChanges();
+        await _streetcodeContext.SaveChangesAsync();
 
         foreach (var row in rows)
         {
@@ -319,139 +319,47 @@ public class WebParsingUtils
     // Following method returns name of the street optimized in such kind of way that will allow OSM Nominatim find its coordinates
     private static (string, string) OptimizeStreetname(string streetname)
     {
-        if (streetname.IndexOf("пров. ", StringComparison.Ordinal) != -1)
+        var nameOptimizations = new Dictionary<string, string>
         {
-            return (streetname.Substring(streetname.IndexOf(" ") + 1), "провулок");
+            { "пров. ",  "провулок" },
+            { "проїзд ",  "проїзд" },
+            { "вул. ",  "вулиця" },
+            { "просп. ",  "проспект" },
+            { "тупик ",  "тупик" },
+            { "пл. ",  "площа" },
+            { "майдан ",  "майдан" },
+            { "узвіз ",  "узвіз" },
+            { "дорога ",  "дорога" },
+            { "парк ",  "парк" },
+            { "м-р ",  "мікрорайон" },
+            { "алея ",  "алея" },
+            { "хутір ",  "хутір" },
+            { "кв-л ",  "квартал" },
+            { "урочище ",  "урочище" },
+            { "набережна ",  "набережна" },
+            { "селище ",  "селище" },
+            { "лінія ",  "лінія" },
+            { "шлях ",  "шлях" },
+            { "спуск ",  "спуск" },
+            { "завулок ",  "завулок" },
+            { "острів ",  "острів" },
+            { "бульв. ",  "бульвар" },
+            { "шосе ",  "шосе" },
+            { "містечко ",  "містечко" },
+            { "в’їзд ",  "в’їзд" },
+        };
+
+        foreach (var item in nameOptimizations)
+        {
+            if (streetname.Contains(item.Key))
+            {
+                return (streetname.Substring(streetname.IndexOf(" ") + 1), item.Value);
+            }
         }
 
-        if (streetname.IndexOf("проїзд ", StringComparison.Ordinal) != -1)
-        {
-            return (streetname.Substring(streetname.IndexOf(" ") + 1), "проїзд");
-        }
-
-        if (streetname.IndexOf("вул. ", StringComparison.Ordinal) != -1)
-        {
-            return (streetname.Substring(streetname.IndexOf(" ") + 1), "вулиця");
-        }
-
-        if (streetname.IndexOf("просп. ", StringComparison.Ordinal) != -1)
-        {
-            return (streetname.Substring(streetname.IndexOf(" ") + 1), "проспект");
-        }
-
-        if (streetname.IndexOf("тупик ", StringComparison.Ordinal) != -1)
-        {
-            return (streetname.Substring(streetname.IndexOf(" ") + 1), "тупик");
-        }
-
-        if (streetname.IndexOf("пл. ", StringComparison.Ordinal) != -1)
-        {
-            return (streetname.Substring(streetname.IndexOf(" ") + 1), "площа");
-        }
-
-        if (streetname.IndexOf("майдан ", StringComparison.Ordinal) != -1)
-        {
-            return (streetname.Substring(streetname.IndexOf(" ") + 1), "майдан");
-        }
-
-        if (streetname.IndexOf("узвіз ", StringComparison.Ordinal) != -1)
-        {
-            return (streetname.Substring(streetname.IndexOf(" ") + 1), "узвіз");
-        }
-
-        if (streetname.IndexOf("дорога ", StringComparison.Ordinal) != -1)
-        {
-            return (streetname.Substring(streetname.IndexOf(" ") + 1), "дорога");
-        }
-
-        if (streetname.IndexOf("парк ", StringComparison.Ordinal) != -1)
-        {
-            return (streetname.Substring(streetname.IndexOf(" ") + 1), "парк");
-        }
-
-        if (streetname.IndexOf("жилий масив ", StringComparison.Ordinal) != -1)
+        if (streetname.Contains("жилий масив "))
         {
             return (streetname.Substring(streetname.IndexOf(" ", streetname.IndexOf(" ") + 1) + 1), "парк");
-        }
-
-        if (streetname.IndexOf("м-р ", StringComparison.Ordinal) != -1)
-        {
-            return (streetname.Substring(streetname.IndexOf(" ") + 1), "мікрорайон");
-        }
-
-        if (streetname.IndexOf("алея ", StringComparison.Ordinal) != -1)
-        {
-            return (streetname.Substring(streetname.IndexOf(" ") + 1), "алея");
-        }
-
-        if (streetname.IndexOf("хутір ", StringComparison.Ordinal) != -1)
-        {
-            return (streetname.Substring(streetname.IndexOf(" ") + 1), "хутір");
-        }
-
-        if (streetname.IndexOf("кв-л ", StringComparison.Ordinal) != -1)
-        {
-            return (streetname.Substring(streetname.IndexOf(" ") + 1), "квартал");
-        }
-
-        if (streetname.IndexOf("урочище ", StringComparison.Ordinal) != -1)
-        {
-            return (streetname.Substring(streetname.IndexOf(" ") + 1), "урочище");
-        }
-
-        if (streetname.IndexOf("набережна ", StringComparison.Ordinal) != -1)
-        {
-            return (streetname.Substring(streetname.IndexOf(" ") + 1), "набережна");
-        }
-
-        if (streetname.IndexOf("селище ", StringComparison.Ordinal) != -1)
-        {
-            return (streetname.Substring(streetname.IndexOf(" ") + 1), "селище");
-        }
-
-        if (streetname.IndexOf("лінія ", StringComparison.Ordinal) != -1)
-        {
-            return (streetname.Substring(streetname.IndexOf(" ") + 1), "лінія");
-        }
-
-        if (streetname.IndexOf("шлях ", StringComparison.Ordinal) != -1)
-        {
-            return (streetname.Substring(streetname.IndexOf(" ") + 1), "шлях");
-        }
-
-        if (streetname.IndexOf("спуск ", StringComparison.Ordinal) != -1)
-        {
-            return (streetname.Substring(streetname.IndexOf(" ") + 1), "спуск");
-        }
-
-        if (streetname.IndexOf("завулок ", StringComparison.Ordinal) != -1)
-        {
-            return (streetname.Substring(streetname.IndexOf(" ") + 1), "завулок");
-        }
-
-        if (streetname.IndexOf("острів ", StringComparison.Ordinal) != -1)
-        {
-            return (streetname.Substring(streetname.IndexOf(" ") + 1), "острів");
-        }
-
-        if (streetname.IndexOf("бульв. ", StringComparison.Ordinal) != -1)
-        {
-            return (streetname.Substring(streetname.IndexOf(" ") + 1), "бульвар");
-        }
-
-        if (streetname.IndexOf("шосе ", StringComparison.Ordinal) != -1)
-        {
-            return (streetname.Substring(streetname.IndexOf(" ") + 1), "шосе");
-        }
-
-        if (streetname.IndexOf("містечко ", StringComparison.Ordinal) != -1)
-        {
-            return (streetname.Substring(streetname.IndexOf(" ") + 1), "містечко");
-        }
-
-        if (streetname.IndexOf("в’їзд ", StringComparison.Ordinal) != -1)
-        {
-            return (streetname.Substring(streetname.IndexOf(" ") + 1), "в’їзд");
         }
 
         return (string.Empty, string.Empty);

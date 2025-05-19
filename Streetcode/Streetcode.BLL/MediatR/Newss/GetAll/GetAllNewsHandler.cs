@@ -38,13 +38,14 @@ namespace Streetcode.BLL.MediatR.Newss.GetAll
 
             var newsDTOs = _mapper.Map<IEnumerable<NewsDTO>>(news);
 
-            foreach (var dto in newsDTOs)
-            {
-                if(dto.Image is not null)
+            newsDTOs = newsDTOs
+                .Where(dto => dto.Image is not null)
+                .Select(dto =>
                 {
-                    dto.Image.Base64 = _blobService.FindFileInStorageAsBase64(dto.Image.BlobName);
-                }
-            }
+                    dto.Image!.Base64 = _blobService.FindFileInStorageAsBase64(dto.Image.BlobName!);
+                    return dto;
+                })
+                .ToList();
 
             return Result.Ok(newsDTOs);
         }

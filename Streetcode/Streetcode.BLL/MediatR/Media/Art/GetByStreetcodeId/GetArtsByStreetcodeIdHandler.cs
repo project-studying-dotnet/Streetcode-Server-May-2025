@@ -50,8 +50,6 @@ namespace Streetcode.BLL.MediatR.Media.Art.GetByStreetcodeId
                 return Result.Fail(new Error(errorMsg));
             }
 
-            var imageIds = arts.Where(a => a.Image != null).Select(a => a.Image!.Id);
-
             var artsDto = _mapper.Map<IEnumerable<ArtDTO>>(arts);
             foreach (var artDto in artsDto)
             {
