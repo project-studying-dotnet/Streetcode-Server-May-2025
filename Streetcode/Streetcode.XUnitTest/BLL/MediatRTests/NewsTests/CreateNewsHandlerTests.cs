@@ -40,15 +40,15 @@ public class CreateNewsHandlerTests
             .Returns(news);
         _mapper.Setup(x => x.Map<NewsDTO>(It.IsAny<News>()))
             .Returns(newsDto);
-        _repositoryWrapper.Setup(x => x.NewsRepository.Create(news))
-            .Returns(news);
+        _repositoryWrapper.Setup(x => x.NewsRepository.CreateAsync(news))
+            .ReturnsAsync(news);
         SetUpMockRepositorySaveChanges(1);
 
         // Act
         var result = await _handler.Handle(new CreateNewsCommand(GetNewsDto()), CancellationToken.None);
 
         // Assert
-        _repositoryWrapper.Verify(x => x.NewsRepository.Create(news), Times.Once);
+        _repositoryWrapper.Verify(x => x.NewsRepository.CreateAsync(news), Times.Once);
         _repositoryWrapper.Verify(x => x.SaveChangesAsync(), Times.Once);
         result.Value.Should().BeEquivalentTo(newsDto);
         result.IsSuccess.Should().BeTrue();
