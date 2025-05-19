@@ -92,6 +92,8 @@ public class DeleteNewsHandlerTests
         var testNews = GetNews();
         var errorMessage = "Failed to delete news";
         SetUpMockRepositoryGetFirstOrDefaultAsync(testNews);
+        _repositoryWrapper.Setup(r => r.ImageRepository.Delete(testNews.Image));
+        _repositoryWrapper.Setup(r => r.NewsRepository.Delete(testNews));
         SetUpMockRepositorySaveChangesAsync(0);
 
         // Act
