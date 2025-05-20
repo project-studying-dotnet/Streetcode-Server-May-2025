@@ -44,10 +44,10 @@ namespace Streetcode.BLL.MediatR.Media.StreetcodeArt.GetByStreetcodeId
             .GetAllAsync(
                 predicate: s => s.StreetcodeId == request.StreetcodeId,
                 include: art => art
-                    .Include(a => a.Art)
-                    .Include(i => i.Art.Image) !);
+                    .Include(a => a.Art!)
+                    .ThenInclude(a => a!.Image!));
 
-            if (art is null)
+            if (!art.Any())
             {
                 string errorMsg = $"Cannot find an art with corresponding streetcode id: {request.StreetcodeId}";
                 _logger.LogError(request, errorMsg);
@@ -55,6 +55,12 @@ namespace Streetcode.BLL.MediatR.Media.StreetcodeArt.GetByStreetcodeId
             }
 
             var artsDto = _mapper.Map<IEnumerable<StreetcodeArtDTO>>(art);
+            if (artsDto is null)
+            {
+                string errorMsg = $"Unable to map art data for streetcode id: {request.StreetcodeId}";
+                _logger.LogError(request, errorMsg);
+                return Result.Fail(new Error(errorMsg));
+            }
 
             foreach (var artDto in artsDto)
             {
