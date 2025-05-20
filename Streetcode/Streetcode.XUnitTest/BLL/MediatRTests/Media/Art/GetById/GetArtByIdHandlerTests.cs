@@ -66,10 +66,10 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Media.Art.GetById
                .ReturnsAsync((ArtEntity)null);
 
             var query = new GetArtByIdQuery(1);
+            var expectedMessage = $"Cannot find an art with corresponding id: {query.Id}";
 
             // Act
             var result = await _handler.Handle(query, CancellationToken.None);
-            var expectedMessage = $"Cannot find an art with corresponding id: {query.Id}";
 
             // Assert
             Assert.False(result.IsSuccess);
