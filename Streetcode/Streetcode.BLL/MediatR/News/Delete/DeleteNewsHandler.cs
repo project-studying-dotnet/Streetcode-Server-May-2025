@@ -5,7 +5,7 @@ using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.DAL.Entities.News;
 using Streetcode.DAL.Repositories.Interfaces.Base;
 
-namespace Streetcode.BLL.MediatR.Newss.Delete
+namespace Streetcode.BLL.MediatR.News.Delete
 {
     public class DeleteNewsHandler : IRequestHandler<DeleteNewsCommand, Result<Unit>>
     {

@@ -6,7 +6,7 @@ using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.DAL.Entities.News;
 using Streetcode.DAL.Repositories.Interfaces.Base;
 
-namespace Streetcode.BLL.MediatR.Newss.Create
+namespace Streetcode.BLL.MediatR.News.Create
 {
     public class CreateNewsHandler : IRequestHandler<CreateNewsCommand, Result<NewsDTO>>
     {
@@ -22,7 +22,7 @@ namespace Streetcode.BLL.MediatR.Newss.Create
 
         public async Task<Result<NewsDTO>> Handle(CreateNewsCommand request, CancellationToken cancellationToken)
         {
-            var newNews = _mapper.Map<News>(request.newNews);
+            var newNews = _mapper.Map<DAL.Entities.News.News>(request.newNews);
             if (newNews is null)
             {
                 const string errorMsg = "Cannot convert null to news";

@@ -8,7 +8,7 @@ using Streetcode.DAL.Repositories.Interfaces.Base;
 using Microsoft.EntityFrameworkCore;
 using Streetcode.BLL.Interfaces.Logging;
 
-namespace Streetcode.BLL.MediatR.Newss.GetNewsAndLinksByUrl
+namespace Streetcode.BLL.MediatR.News.GetNewsAndLinksByUrl
 {
     public class GetNewsAndLinksByUrlHandler : IRequestHandler<GetNewsAndLinksByUrlQuery, Result<NewsDTOWithURLs>>
     {

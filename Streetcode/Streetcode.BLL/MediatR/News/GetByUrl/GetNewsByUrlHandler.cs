@@ -8,15 +8,15 @@ using Streetcode.DAL.Repositories.Interfaces.Base;
 using Microsoft.EntityFrameworkCore;
 using Streetcode.BLL.Interfaces.Logging;
 
-namespace Streetcode.BLL.MediatR.Newss.GetById
+namespace Streetcode.BLL.MediatR.News.GetByUrl
 {
-    public class GetNewsByIdHandler : IRequestHandler<GetNewsByIdQuery, Result<NewsDTO>>
+    public class GetNewsByUrlHandler : IRequestHandler<GetNewsByUrlQuery, Result<NewsDTO>>
     {
         private readonly IMapper _mapper;
         private readonly IRepositoryWrapper _repositoryWrapper;
         private readonly IBlobService _blobService;
         private readonly ILoggerService _logger;
-        public GetNewsByIdHandler(IMapper mapper, IRepositoryWrapper repositoryWrapper, IBlobService blobService, ILoggerService logger)
+        public GetNewsByUrlHandler(IMapper mapper, IRepositoryWrapper repositoryWrapper, IBlobService blobService, ILoggerService logger)
         {
             _mapper = mapper;
             _repositoryWrapper = repositoryWrapper;
@@ -24,16 +24,16 @@ namespace Streetcode.BLL.MediatR.Newss.GetById
             _logger = logger;
         }
 
-        public async Task<Result<NewsDTO>> Handle(GetNewsByIdQuery request, CancellationToken cancellationToken)
+        public async Task<Result<NewsDTO>> Handle(GetNewsByUrlQuery request, CancellationToken cancellationToken)
         {
-            int id = request.id;
+            string url = request.url;
             var newsDTO = _mapper.Map<NewsDTO>(await _repositoryWrapper.NewsRepository.GetFirstOrDefaultAsync(
-                predicate: sc => sc.Id == id,
+                predicate: sc => sc.URL == url,
                 include: scl => scl
                     .Include(sc => sc.Image)));
             if(newsDTO is null)
             {
-                string errorMsg = $"No news by entered Id - {id}";
+                string errorMsg = $"No news by entered Url - {url}";
                 _logger.LogError(request, errorMsg);
                 return Result.Fail(errorMsg);
             }

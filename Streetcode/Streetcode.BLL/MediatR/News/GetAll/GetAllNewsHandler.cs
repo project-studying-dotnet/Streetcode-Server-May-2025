@@ -3,21 +3,21 @@ using FluentResults;
 using MediatR;
 using Streetcode.BLL.DTO.News;
 using Streetcode.BLL.Interfaces.BlobStorage;
-using Microsoft.EntityFrameworkCore;
 using Streetcode.DAL.Repositories.Interfaces.Base;
+using Microsoft.EntityFrameworkCore;
 using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.BLL.DTO.AdditionalContent.Subtitles;
 
-namespace Streetcode.BLL.MediatR.Newss.SortedByDateTime
+namespace Streetcode.BLL.MediatR.News.GetAll
 {
-    public class SortedByDateTimeHandler : IRequestHandler<SortedByDateTimeQuery, Result<List<NewsDTO>>>
+    public class GetAllNewsHandler : IRequestHandler<GetAllNewsQuery, Result<IEnumerable<NewsDTO>>>
     {
         private readonly IRepositoryWrapper _repositoryWrapper;
         private readonly IMapper _mapper;
         private readonly IBlobService _blobService;
         private readonly ILoggerService _logger;
 
-        public SortedByDateTimeHandler(IRepositoryWrapper repositoryWrapper, IMapper mapper, IBlobService blobService, ILoggerService logger)
+        public GetAllNewsHandler(IRepositoryWrapper repositoryWrapper, IMapper mapper, IBlobService blobService, ILoggerService logger)
         {
             _repositoryWrapper = repositoryWrapper;
             _mapper = mapper;
@@ -25,7 +25,7 @@ namespace Streetcode.BLL.MediatR.Newss.SortedByDateTime
             _logger = logger;
         }
 
-        public async Task<Result<List<NewsDTO>>> Handle(SortedByDateTimeQuery request, CancellationToken cancellationToken)
+        public async Task<Result<IEnumerable<NewsDTO>>> Handle(GetAllNewsQuery request, CancellationToken cancellationToken)
         {
             var news = await _repositoryWrapper.NewsRepository.GetAllAsync(
                 include: cat => cat.Include(img => img.Image));
@@ -36,7 +36,7 @@ namespace Streetcode.BLL.MediatR.Newss.SortedByDateTime
                 return Result.Fail(errorMsg);
             }
 
-            var newsDTOs = _mapper.Map<IEnumerable<NewsDTO>>(news).OrderByDescending(x => x.CreationDate).ToList();
+            var newsDTOs = _mapper.Map<IEnumerable<NewsDTO>>(news);
 
             newsDTOs = newsDTOs
                 .Where(dto => dto.Image is not null)

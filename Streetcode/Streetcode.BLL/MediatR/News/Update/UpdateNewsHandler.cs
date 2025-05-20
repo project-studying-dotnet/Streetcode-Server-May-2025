@@ -7,7 +7,7 @@ using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.DAL.Entities.News;
 using Streetcode.DAL.Repositories.Interfaces.Base;
 
-namespace Streetcode.BLL.MediatR.Newss.Update
+namespace Streetcode.BLL.MediatR.News.Update
 {
     public class UpdateNewsHandler : IRequestHandler<UpdateNewsCommand, Result<NewsDTO>>
     {
@@ -25,10 +25,10 @@ namespace Streetcode.BLL.MediatR.Newss.Update
 
         public async Task<Result<NewsDTO>> Handle(UpdateNewsCommand request, CancellationToken cancellationToken)
         {
-            var news = _mapper.Map<News>(request.news);
+            var news = _mapper.Map<DAL.Entities.News.News>(request.news);
             if (news is null)
             {
-                const string errorMsg = $"Cannot convert null to news";
+                const string errorMsg = "Cannot convert null to news";
                 _logger.LogError(request, errorMsg);
                 return Result.Fail(new Error(errorMsg));
             }
