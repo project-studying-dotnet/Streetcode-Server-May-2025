@@ -47,7 +47,7 @@ public class GetAllToponymsHandler : IRequestHandler<GetAllToponymsQuery,
         return Result.Ok(response);
     }
 
-    private void FindStreetcodesWithMatchTitle(
+    private static void FindStreetcodesWithMatchTitle(
         ref IQueryable<Toponym> toponyms,
         string title)
     {

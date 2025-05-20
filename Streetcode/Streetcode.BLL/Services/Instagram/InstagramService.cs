@@ -43,7 +43,7 @@ namespace Streetcode.BLL.Services.Instagram
             return posts;
         }
 
-        public IEnumerable<InstagramPost> RemoveVideoMediaType(IEnumerable<InstagramPost> posts)
+        public static IEnumerable<InstagramPost> RemoveVideoMediaType(IEnumerable<InstagramPost> posts)
         {
             return posts.Where(p => p.MediaType != "VIDEO").Take(postLimit);
         }
