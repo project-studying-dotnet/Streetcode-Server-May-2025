@@ -40,7 +40,7 @@ namespace Streetcode.BLL.MediatR.Sources.SourceLinkCategory.GetAll
 
             foreach (var dto in dtos)
             {
-                dto.Image.Base64 = _blobService.FindFileInStorageAsBase64(dto.Image.BlobName);
+                dto.Image.Base64 = await _blobService.FindFileInStorageAsBase64Async(dto.Image.BlobName);
             }
 
             return Result.Ok(dtos);

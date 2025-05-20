@@ -38,14 +38,16 @@ namespace Streetcode.BLL.MediatR.News.GetAll
 
             var newsDTOs = _mapper.Map<IEnumerable<NewsDTO>>(news);
 
-            newsDTOs = newsDTOs
+            var tasks = newsDTOs
                 .Where(dto => dto.Image is not null)
-                .Select(dto =>
+                .Select(async dto =>
                 {
-                    dto.Image!.Base64 = _blobService.FindFileInStorageAsBase64(dto.Image.BlobName!);
+                    dto.Image!.Base64 = await _blobService.FindFileInStorageAsBase64Async(dto.Image.BlobName!);
                     return dto;
                 })
                 .ToList();
+
+            var processedNewsDTOs = await Task.WhenAll(tasks);
 
             return Result.Ok(newsDTOs);
         }

@@ -40,7 +40,7 @@ namespace Streetcode.BLL.MediatR.News.GetByUrl
 
             if (newsDTO.Image is not null)
             {
-                newsDTO.Image.Base64 = _blobService.FindFileInStorageAsBase64(newsDTO.Image.BlobName);
+                newsDTO.Image.Base64 = await _blobService.FindFileInStorageAsBase64Async(newsDTO.Image.BlobName);
             }
 
             return Result.Ok(newsDTO);

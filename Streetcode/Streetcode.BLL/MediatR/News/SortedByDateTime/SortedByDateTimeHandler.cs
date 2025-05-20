@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Threading.Tasks;
+using AutoMapper;
 using FluentResults;
 using MediatR;
 using Streetcode.BLL.DTO.News;
@@ -38,14 +39,16 @@ namespace Streetcode.BLL.MediatR.News.SortedByDateTime
 
             var newsDTOs = _mapper.Map<IEnumerable<NewsDTO>>(news).OrderByDescending(x => x.CreationDate).ToList();
 
-            newsDTOs = newsDTOs
+            var tasks = newsDTOs
                 .Where(dto => dto.Image is not null)
-                .Select(dto =>
+                .Select(async dto =>
                 {
-                    dto.Image!.Base64 = _blobService.FindFileInStorageAsBase64(dto.Image.BlobName!);
+                    dto.Image!.Base64 = await _blobService.FindFileInStorageAsBase64Async(dto.Image.BlobName!);
                     return dto;
                 })
-                .ToList();
+            .ToList();
+
+            var processedNewsDTOs = await Task.WhenAll(tasks);
 
             return Result.Ok(newsDTOs);
         }

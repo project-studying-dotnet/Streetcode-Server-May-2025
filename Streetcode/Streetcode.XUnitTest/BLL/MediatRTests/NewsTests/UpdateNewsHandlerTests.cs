@@ -219,7 +219,7 @@ public class UpdateNewsHandlerTests
 
     private void SetUpMockBlobService(string base64String)
     {
-        _blobService.Setup(x => x.FindFileInStorageAsBase64(It.IsAny<string>()))
-            .Returns(base64String);
+        _blobService.Setup(x => x.FindFileInStorageAsBase64Async(It.IsAny<string>()))
+            .ReturnsAsync(base64String);
     }
 }

@@ -40,7 +40,7 @@ public class GetImageByIdHandler : IRequestHandler<GetImageByIdQuery, Result<Ima
         var imageDto = _mapper.Map<ImageDTO>(image);
         if(imageDto.BlobName != null)
         {
-            imageDto.Base64 = _blobService.FindFileInStorageAsBase64(image.BlobName);
+            imageDto.Base64 = await _blobService.FindFileInStorageAsBase64Async(image.BlobName);
         }
 
         return Result.Ok(imageDto);

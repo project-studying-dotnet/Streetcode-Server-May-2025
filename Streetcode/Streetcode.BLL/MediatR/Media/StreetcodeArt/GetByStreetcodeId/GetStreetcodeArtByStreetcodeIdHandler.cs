@@ -64,10 +64,7 @@ namespace Streetcode.BLL.MediatR.Media.StreetcodeArt.GetByStreetcodeId
 
             foreach (var artDto in artsDto)
             {
-                if (artDto.Art?.Image != null && !string.IsNullOrEmpty(artDto.Art.Image.BlobName))
-                {
-                    artDto.Art.Image.Base64 = _blobService.FindFileInStorageAsBase64(artDto.Art.Image.BlobName);
-                }
+                artDto.Art.Image.Base64 = await _blobService.FindFileInStorageAsBase64Async(artDto.Art.Image.BlobName);
             }
 
             return Result.Ok(artsDto);
