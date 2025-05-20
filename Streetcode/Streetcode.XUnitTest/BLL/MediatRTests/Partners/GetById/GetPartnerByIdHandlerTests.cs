@@ -68,7 +68,7 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Partners.GetById
                .ReturnsAsync((PartnerEntity)null);
 
             var query = new GetPartnerByIdQuery(1);
-            var expectedMessage = $"Cannot find a partner with corresponding id: {query.Id}";
+            var expectedMessage = $"Cannot find any partner with corresponding id: {query.Id}";
 
             // Act
             var result = await _handler.Handle(query, CancellationToken.None);

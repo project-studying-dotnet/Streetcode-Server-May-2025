@@ -36,8 +36,8 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Partners.GetAll
 
             _repositoryWrapperMock
                 .Setup(r => r.PartnersRepository.GetAllAsync(
-                    It.IsAny<Expression<Func<Partner, bool>>>(),
-                    It.IsAny<Func<IQueryable<Partner>, IIncludableQueryable<Partner, object>>>()))
+                    It.IsAny<Expression<Func<PartnerEntity, bool>>>(),
+                    It.IsAny<Func<IQueryable<PartnerEntity>, IIncludableQueryable<PartnerEntity, object>>>()))
                 .ReturnsAsync(partners);
 
             _mapperMock
@@ -102,7 +102,7 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Partners.GetAll
             // Assert
             Assert.False(result.IsSuccess);
             Assert.Equal(expectedMessage, result.Errors.First().Message);
-            _loggerMock.Verify(l => l.LogError(new GetAllPartnersQuery(), expectedMessage), Times.Once);
+            _loggerMock.Verify(l => l.LogError(query, expectedMessage), Times.Once);
             _mapperMock.Verify(m => m.Map<IEnumerable<PartnerDTO>>(It.IsAny<IEnumerable<PartnerEntity>>()), Times.Never);
         }
     }
