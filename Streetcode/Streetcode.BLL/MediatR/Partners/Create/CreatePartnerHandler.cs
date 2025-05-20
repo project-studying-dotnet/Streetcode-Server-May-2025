@@ -28,13 +28,13 @@ namespace Streetcode.BLL.MediatR.Partners.Create
             {
                 newPartner.Streetcodes.Clear();
                 newPartner = await _repositoryWrapper.PartnersRepository.CreateAsync(newPartner);
-                _repositoryWrapper.SaveChanges();
+                await _repositoryWrapper.SaveChangesAsync();
                 var streetcodeIds = request.newPartner.Streetcodes.Select(s => s.Id).ToList();
                 newPartner.Streetcodes.AddRange(await _repositoryWrapper
                     .StreetcodeRepository
                     .GetAllAsync(s => streetcodeIds.Contains(s.Id)));
 
-                _repositoryWrapper.SaveChanges();
+                await _repositoryWrapper.SaveChangesAsync();
                 return Result.Ok(_mapper.Map<PartnerDTO>(newPartner));
             }
             catch(Exception ex)

@@ -29,7 +29,7 @@ namespace Streetcode.BLL.MediatR.AdditionalContent.Tag.Create
 
             try
             {
-                _repositoryWrapper.SaveChanges();
+                await _repositoryWrapper.SaveChangesAsync();
             }
             catch(Exception ex)
             {

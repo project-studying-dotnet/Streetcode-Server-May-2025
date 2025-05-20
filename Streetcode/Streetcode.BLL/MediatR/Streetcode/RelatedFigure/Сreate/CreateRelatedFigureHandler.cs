@@ -46,7 +46,7 @@ public class CreateRelatedFigureHandler : IRequestHandler<CreateRelatedFigureCom
             TargetId = targetEntity.Id,
         };
 
-        _repositoryWrapper.RelatedFigureRepository.Create(relation);
+        await _repositoryWrapper.RelatedFigureRepository.CreateAsync(relation);
 
         var resultIsSuccess = await _repositoryWrapper.SaveChangesAsync() > 0;
         if(resultIsSuccess)

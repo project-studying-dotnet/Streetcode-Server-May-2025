@@ -114,7 +114,6 @@ namespace Streetcode.BLL.MediatR.Streetcode.Streetcode.GetByFilter
 
                         results.Add(CreateFilterResult(art.Streetcode, streetcodeArt.Description, "Арт-галерея", "art-gallery"));
                     });
-                    continue;
                 }
             }
 
