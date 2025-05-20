@@ -44,15 +44,15 @@ public class GetAllNewsHandlerTests
         _mockMapper.Setup(x => x.Map<IEnumerable<NewsDTO>>(It.IsAny<IEnumerable<News>>()))
             .Returns(GetNewsDtoCollection());
         var base64Image = "base64Image";
-        _mockBlobService.Setup(x => x.FindFileInStorageAsBase64(It.IsAny<string>()))
-            .Returns(base64Image);
+        _mockBlobService.Setup(x => x.FindFileInStorageAsBase64Async(It.IsAny<string>()))
+            .ReturnsAsync(base64Image);
 
         // Act
         var result = await _handler.Handle(new GetAllNewsQuery(), CancellationToken.None);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        _mockBlobService.Verify(x => x.FindFileInStorageAsBase64(It.IsAny<string>()), Times.Exactly(2));
+        _mockBlobService.Verify(x => x.FindFileInStorageAsBase64Async(It.IsAny<string>()), Times.Exactly(2));
         result.Value.Where(x => x.Image is not null)
             .All(x => x.Image.Base64 == base64Image).Should().BeTrue();
     }

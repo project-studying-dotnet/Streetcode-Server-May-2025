@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Streetcode.DAL.Repositories.Interfaces.Base;
 using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.BLL.DTO.AdditionalContent.Subtitles;
+using System.Threading.Tasks;
 
 namespace Streetcode.BLL.MediatR.News.SortedByDateTime
 {
@@ -38,14 +39,16 @@ namespace Streetcode.BLL.MediatR.News.SortedByDateTime
 
             var newsDTOs = _mapper.Map<IEnumerable<NewsDTO>>(news).OrderByDescending(x => x.CreationDate).ToList();
 
-            newsDTOs = newsDTOs
+            var tasks = newsDTOs
                 .Where(dto => dto.Image is not null)
-                .Select(dto =>
+                .Select(async dto =>
                 {
-                    dto.Image!.Base64 = _blobService.FindFileInStorageAsBase64(dto.Image.BlobName!);
+                    dto.Image!.Base64 = await _blobService.FindFileInStorageAsBase64Async(dto.Image.BlobName!);
                     return dto;
                 })
-                .ToList();
+            .ToList();
+
+            var processedNewsDTOs = await Task.WhenAll(tasks);
 
             return Result.Ok(newsDTOs);
         }

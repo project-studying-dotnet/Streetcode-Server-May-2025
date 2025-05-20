@@ -44,7 +44,7 @@ public class GetAudioByStreetcodeIdQueryHandler : IRequestHandler<GetAudioByStre
         {
             AudioDTO audioDto = _mapper.Map<AudioDTO>(streetcode.Audio);
             audioDto = _mapper.Map<AudioDTO>(streetcode.Audio);
-            audioDto.Base64 = _blobService.FindFileInStorageAsBase64(audioDto.BlobName);
+            audioDto.Base64 = await _blobService.FindFileInStorageAsBase64Async(audioDto.BlobName);
             result.WithValue(audioDto);
         }
 

@@ -38,7 +38,7 @@ public class GetAllAudiosHandler : IRequestHandler<GetAllAudiosQuery, Result<IEn
         var audioDtos = _mapper.Map<IEnumerable<AudioDTO>>(audios);
         foreach (var audio in audioDtos)
         {
-            audio.Base64 = _blobService.FindFileInStorageAsBase64(audio.BlobName);
+            audio.Base64 = await _blobService.FindFileInStorageAsBase64Async(audio.BlobName);
         }
 
         return Result.Ok(audioDtos);

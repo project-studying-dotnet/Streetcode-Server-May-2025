@@ -36,7 +36,7 @@ public class DeleteAudioHandler : IRequestHandler<DeleteAudioCommand, Result<Uni
 
         if (resultIsSuccess)
         {
-            _blobService.DeleteFileInStorage(audio.BlobName);
+            await _blobService.DeleteFileInStorageAsync(audio.BlobName);
         }
 
         if (resultIsSuccess)

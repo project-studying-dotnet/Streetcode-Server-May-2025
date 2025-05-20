@@ -36,7 +36,7 @@ public class GetAudioByIdHandler : IRequestHandler<GetAudioByIdQuery, Result<Aud
 
         var audioDto = _mapper.Map<AudioDTO>(audio);
 
-        audioDto.Base64 = _blobService.FindFileInStorageAsBase64(audioDto.BlobName);
+        audioDto.Base64 = await _blobService.FindFileInStorageAsBase64Async(audioDto.BlobName);
 
         return Result.Ok(audioDto);
     }

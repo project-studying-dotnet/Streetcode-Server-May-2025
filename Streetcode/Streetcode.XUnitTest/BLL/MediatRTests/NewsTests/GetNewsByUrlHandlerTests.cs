@@ -43,7 +43,7 @@ public class GetNewsByUrlHandlerTests
 
         var result = await _handler.Handle(new GetNewsByUrlQuery(news.URL), CancellationToken.None);
 
-        _mockBlobService.Verify(x => x.FindFileInStorageAsBase64(It.IsAny<string>()), Times.Once);
+        _mockBlobService.Verify(x => x.FindFileInStorageAsBase64Async(It.IsAny<string>()), Times.Once);
         _mockRepository.Verify(r => r.NewsRepository.GetFirstOrDefaultAsync(
             It.IsAny<Expression<Func<News, bool>>>(),
             It.IsAny<Func<IQueryable<News>, IIncludableQueryable<News, object>>>()));
@@ -64,7 +64,7 @@ public class GetNewsByUrlHandlerTests
         var result = await _handler.Handle(new GetNewsByUrlQuery(news.URL), CancellationToken.None);
 
         // Asser
-        _mockBlobService.Verify(x => x.FindFileInStorageAsBase64(It.IsAny<string>()), Times.Never);
+        _mockBlobService.Verify(x => x.FindFileInStorageAsBase64Async(It.IsAny<string>()), Times.Never);
         _mockRepository.Verify(r => r.NewsRepository.GetFirstOrDefaultAsync(
             It.IsAny<Expression<Func<News, bool>>>(),
             It.IsAny<Func<IQueryable<News>, IIncludableQueryable<News, object>>>()));
@@ -145,7 +145,7 @@ public class GetNewsByUrlHandlerTests
 
     private void SetUpMockBlobService(string base64String)
     {
-        _mockBlobService.Setup(x => x.FindFileInStorageAsBase64(It.IsAny<string>()))
-            .Returns(base64String);
+        _mockBlobService.Setup(x => x.FindFileInStorageAsBase64Async(It.IsAny<string>()))
+            .ReturnsAsync(base64String);
     }
 }
