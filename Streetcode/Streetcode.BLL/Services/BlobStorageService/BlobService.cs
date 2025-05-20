@@ -114,7 +114,7 @@ public class BlobService : IBlobService
         return paths.Select(p => Path.GetFileName(p));
     }
 
-    private string HashFunction(string createdFileName)
+    private static string HashFunction(string createdFileName)
     {
         using (var hash = SHA256.Create())
         {

@@ -21,7 +21,7 @@ public class StreetcodeProfile : Profile
                 .MapFrom(e => e.Images.Select(i => i.Id).LastOrDefault()));
     }
 
-    private StreetcodeType GetStreetcodeType(StreetcodeContent streetcode)
+    private static StreetcodeType GetStreetcodeType(StreetcodeContent streetcode)
     {
         if(streetcode is EventStreetcode)
         {

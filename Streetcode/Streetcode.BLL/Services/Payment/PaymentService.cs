@@ -43,7 +43,7 @@ namespace Streetcode.BLL.Services.Payment
                     Body: await response.Content.ReadAsStringAsync());
         }
 
-        private T JsonToObject<T>(string body)
+        private static T JsonToObject<T>(string body)
         {
             return JsonConvert.DeserializeObject<T>(body);
         }
