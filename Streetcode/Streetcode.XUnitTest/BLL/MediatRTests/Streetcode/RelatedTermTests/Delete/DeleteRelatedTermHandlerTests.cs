@@ -60,41 +60,49 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Streetcode.RelatedTermTests.Dele
             return await handler.Handle(command, CancellationToken.None);
         }
 
-        // --- Successful Deletion Tests ---
 
         [Fact]
         public async Task Handle_ExistingTerm_ShouldReturnSuccessResult()
         {
+            // Arrange
             var existingWord = "ExistingWord";
             var foundEntity = new RelatedTerm { Id = 1, Word = existingWord, TermId = 1 };
             var mappedDto = new RelatedTermDTO { Id = 1, Word = existingWord, TermId = 1 };
 
+            // Act
             var result = await ArrangeAndActAsync(existingWord, foundEntity, 1, mappedDto);
 
+            // Assert
             result.IsSuccess.Should().BeTrue();
         }
 
         [Fact]
         public async Task Handle_ExistingTerm_ShouldReturnCorrectDtoValue()
         {
+            // Arrange
             var existingWord = "ExistingWord";
             var foundEntity = new RelatedTerm { Id = 1, Word = existingWord, TermId = 1 };
             var mappedDto = new RelatedTermDTO { Id = 1, Word = existingWord, TermId = 1 };
 
+            // Act
             var result = await ArrangeAndActAsync(existingWord, foundEntity, 1, mappedDto);
 
+            // Assert
             result.Value.Should().BeEquivalentTo(mappedDto);
         }
 
         [Fact]
         public async Task Handle_ExistingTerm_ShouldCallGetFirstOrDefaultAsync()
         {
+            // Arrange
             var existingWord = "ExistingWord";
             var foundEntity = new RelatedTerm { Id = 1, Word = existingWord, TermId = 1 };
             var mappedDto = new RelatedTermDTO { Id = 1, Word = existingWord, TermId = 1 };
 
+            // Act
             await ArrangeAndActAsync(existingWord, foundEntity, 1, mappedDto);
 
+            // Assert
             _mockRelatedTermRepository.Verify(
                 repo => repo.GetFirstOrDefaultAsync(It.IsAny<Expression<System.Func<RelatedTerm, bool>>>(), null),
                 Times.Once);
@@ -103,81 +111,101 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Streetcode.RelatedTermTests.Dele
         [Fact]
         public async Task Handle_ExistingTerm_ShouldCallRelatedTermRepositoryDelete()
         {
+            // Arrange
             var existingWord = "ExistingWord";
             var foundEntity = new RelatedTerm { Id = 1, Word = existingWord, TermId = 1 };
             var mappedDto = new RelatedTermDTO { Id = 1, Word = existingWord, TermId = 1 };
 
+            // Act
             await ArrangeAndActAsync(existingWord, foundEntity, 1, mappedDto);
 
+            // Assert
             _mockRelatedTermRepository.Verify(repo => repo.Delete(foundEntity), Times.Once);
         }
 
         [Fact]
         public async Task Handle_ExistingTerm_ShouldCallRepositoryWrapperSaveChangesAsync()
         {
+            // Arrange
             var existingWord = "ExistingWord";
             var foundEntity = new RelatedTerm { Id = 1, Word = existingWord, TermId = 1 };
             var mappedDto = new RelatedTermDTO { Id = 1, Word = existingWord, TermId = 1 };
 
+            // Act
             await ArrangeAndActAsync(existingWord, foundEntity, 1, mappedDto);
 
+            // Assert
             _mockRepositoryWrapper.Verify(repo => repo.SaveChangesAsync(), Times.Once);
         }
 
         [Fact]
         public async Task Handle_ExistingTerm_ShouldCallMapperToMapEntityToDto()
         {
+            // Arrange
             var existingWord = "ExistingWord";
             var foundEntity = new RelatedTerm { Id = 1, Word = existingWord, TermId = 1 };
             var mappedDto = new RelatedTermDTO { Id = 1, Word = existingWord, TermId = 1 };
 
+            // Act
             await ArrangeAndActAsync(existingWord, foundEntity, 1, mappedDto);
 
+            // Assert
             _mockMapper.Verify(m => m.Map<RelatedTermDTO>(foundEntity), Times.Once);
         }
 
         [Fact]
         public async Task Handle_ExistingTerm_ShouldNotCallLoggerError()
         {
+            // Arrange
             var existingWord = "ExistingWord";
             var foundEntity = new RelatedTerm { Id = 1, Word = existingWord, TermId = 1 };
             var mappedDto = new RelatedTermDTO { Id = 1, Word = existingWord, TermId = 1 };
 
+            // Act
             await ArrangeAndActAsync(existingWord, foundEntity, 1, mappedDto);
 
+            // Assert
             _mockLogger.Verify(logger => logger.LogError(It.IsAny<DeleteRelatedTermCommand>(), It.IsAny<string>()), Times.Never);
         }
 
-        // --- Term Not Found Tests ---
 
         [Fact]
         public async Task Handle_TermNotFound_ShouldReturnFailureResult()
         {
+            // Arrange
             var wordToFind = "NonExistingWord";
 
+            // Act
             var result = await ArrangeAndActAsync(wordToFind, null);
 
+            // Assert
             result.IsFailed.Should().BeTrue();
         }
 
         [Fact]
         public async Task Handle_TermNotFound_ShouldContainCorrectErrorMessage()
         {
+            // Arrange
             var wordToFind = "NonExistingWord";
             var expectedErrorMessage = $"Cannot find a related term: {wordToFind}";
 
+            // Act
             var result = await ArrangeAndActAsync(wordToFind, null);
 
+            // Assert
             result.Errors.Should().ContainSingle(e => e.Message == expectedErrorMessage);
         }
 
         [Fact]
         public async Task Handle_TermNotFound_ShouldCallGetFirstOrDefaultAsync()
         {
+            // Arrange
             var wordToFind = "NonExistingWord";
 
+            // Act
             await ArrangeAndActAsync(wordToFind, null);
 
+            // Assert
             _mockRelatedTermRepository.Verify(
                 repo => repo.GetFirstOrDefaultAsync(It.IsAny<Expression<System.Func<RelatedTerm, bool>>>(), null),
                 Times.Once);
@@ -186,82 +214,102 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Streetcode.RelatedTermTests.Dele
         [Fact]
         public async Task Handle_TermNotFound_ShouldNotCallRelatedTermRepositoryDelete()
         {
+            // Arrange
             var wordToFind = "NonExistingWord";
 
+            // Act
             await ArrangeAndActAsync(wordToFind, null);
 
+            // Assert
             _mockRelatedTermRepository.Verify(repo => repo.Delete(It.IsAny<RelatedTerm>()), Times.Never);
         }
 
         [Fact]
         public async Task Handle_TermNotFound_ShouldNotCallRepositoryWrapperSaveChangesAsync()
         {
+            // Arrange
             var wordToFind = "NonExistingWord";
 
+            // Act
             await ArrangeAndActAsync(wordToFind, null);
 
+            // Assert
             _mockRepositoryWrapper.Verify(repo => repo.SaveChangesAsync(), Times.Never);
         }
 
         [Fact]
         public async Task Handle_TermNotFound_ShouldNotCallMapperToMapEntityToDto()
         {
+            // Arrange
             var wordToFind = "NonExistingWord";
 
+            // Act
             await ArrangeAndActAsync(wordToFind, null);
 
+            // Assert
             _mockMapper.Verify(m => m.Map<RelatedTermDTO>(It.IsAny<RelatedTerm>()), Times.Never);
         }
 
         [Fact]
         public async Task Handle_TermNotFound_ShouldCallLoggerError()
         {
+            // Arrange
             var wordToFind = "NonExistingWord";
             var expectedErrorMessage = $"Cannot find a related term: {wordToFind}";
 
+            // Act
             await ArrangeAndActAsync(wordToFind, null);
 
+            // Assert
             _mockLogger.Verify(
                 logger => logger.LogError(It.IsAny<DeleteRelatedTermCommand>(), expectedErrorMessage),
                 Times.Once);
         }
 
-        // --- Error Saving Changes Tests ---
 
         [Fact]
         public async Task Handle_SaveChangesAsyncReturnsZero_ShouldReturnFailureResult()
         {
+            // Arrange
             var existingWord = "ExistingWord";
             var foundEntity = new RelatedTerm { Id = 1, Word = existingWord, TermId = 1 };
             var mappedDto = new RelatedTermDTO { Id = 1, Word = existingWord, TermId = 1 };
 
+            // Act
             var result = await ArrangeAndActAsync(existingWord, foundEntity, 0, mappedDto);
 
+            // Assert
             result.IsFailed.Should().BeTrue();
         }
 
         [Fact]
         public async Task Handle_SaveChangesAsyncReturnsZero_ShouldContainCorrectErrorMessage()
         {
+            // Arrange
             var existingWord = "ExistingWord";
             var foundEntity = new RelatedTerm { Id = 1, Word = existingWord, TermId = 1 };
             var mappedDto = new RelatedTermDTO { Id = 1, Word = existingWord, TermId = 1 };
             var expectedErrorMessage = "Failed to delete a related term";
 
+            // Act
             var result = await ArrangeAndActAsync(existingWord, foundEntity, 0, mappedDto);
 
+            // Assert
             result.Errors.Should().ContainSingle(e => e.Message == expectedErrorMessage);
         }
 
         [Fact]
         public async Task Handle_SaveChangesAsyncReturnsZero_ShouldCallGetFirstOrDefaultAsync()
         {
+            // Arrange
             var existingWord = "ExistingWord";
             var foundEntity = new RelatedTerm { Id = 1, Word = existingWord, TermId = 1 };
             var mappedDto = new RelatedTermDTO { Id = 1, Word = existingWord, TermId = 1 };
 
+            // Act
             await ArrangeAndActAsync(existingWord, foundEntity, 0, mappedDto);
 
+            // Assert
             _mockRelatedTermRepository.Verify(
                 repo => repo.GetFirstOrDefaultAsync(It.IsAny<Expression<System.Func<RelatedTerm, bool>>>(), null),
                 Times.Once);
@@ -270,87 +318,107 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Streetcode.RelatedTermTests.Dele
         [Fact]
         public async Task Handle_SaveChangesAsyncReturnsZero_ShouldCallRelatedTermRepositoryDelete()
         {
+            // Arrange
             var existingWord = "ExistingWord";
             var foundEntity = new RelatedTerm { Id = 1, Word = existingWord, TermId = 1 };
             var mappedDto = new RelatedTermDTO { Id = 1, Word = existingWord, TermId = 1 };
 
+            // Act
             await ArrangeAndActAsync(existingWord, foundEntity, 0, mappedDto);
 
+            // Assert
             _mockRelatedTermRepository.Verify(repo => repo.Delete(foundEntity), Times.Once);
         }
 
         [Fact]
         public async Task Handle_SaveChangesAsyncReturnsZero_ShouldCallRepositoryWrapperSaveChangesAsync()
         {
+            // Arrange
             var existingWord = "ExistingWord";
             var foundEntity = new RelatedTerm { Id = 1, Word = existingWord, TermId = 1 };
             var mappedDto = new RelatedTermDTO { Id = 1, Word = existingWord, TermId = 1 };
 
+            // Act
             await ArrangeAndActAsync(existingWord, foundEntity, 0, mappedDto);
 
+            // Assert
             _mockRepositoryWrapper.Verify(repo => repo.SaveChangesAsync(), Times.Once);
         }
 
         [Fact]
         public async Task Handle_SaveChangesAsyncReturnsZero_ShouldCallMapperToMapEntityToDto()
         {
+            // Arrange
             var existingWord = "ExistingWord";
             var foundEntity = new RelatedTerm { Id = 1, Word = existingWord, TermId = 1 };
             var mappedDto = new RelatedTermDTO { Id = 1, Word = existingWord, TermId = 1 };
 
+            // Act
             await ArrangeAndActAsync(existingWord, foundEntity, 0, mappedDto);
 
+            // Assert
             _mockMapper.Verify(m => m.Map<RelatedTermDTO>(foundEntity), Times.Once);
         }
 
         [Fact]
         public async Task Handle_SaveChangesAsyncReturnsZero_ShouldCallLoggerError()
         {
+            // Arrange
             var existingWord = "ExistingWord";
             var foundEntity = new RelatedTerm { Id = 1, Word = existingWord, TermId = 1 };
             var mappedDto = new RelatedTermDTO { Id = 1, Word = existingWord, TermId = 1 };
             var expectedErrorMessage = "Failed to delete a related term";
 
+            // Act
             await ArrangeAndActAsync(existingWord, foundEntity, 0, mappedDto);
 
+            // Assert
             _mockLogger.Verify(
                 logger => logger.LogError(It.IsAny<DeleteRelatedTermCommand>(), expectedErrorMessage),
                 Times.Once);
         }
 
-        // --- Error Mapping Entity to DTO after successful save Tests ---
 
         [Fact]
         public async Task Handle_MapEntityToDtoReturnsNull_ShouldReturnFailureResult()
         {
+            // Arrange
             var existingWord = "ExistingWord";
             var foundEntity = new RelatedTerm { Id = 1, Word = existingWord, TermId = 1 };
 
+            // Act
             var result = await ArrangeAndActAsync(existingWord, foundEntity, 1, null); // mappedDtoResult is null
 
+            // Assert
             result.IsFailed.Should().BeTrue();
         }
 
         [Fact]
         public async Task Handle_MapEntityToDtoReturnsNull_ShouldContainCorrectErrorMessage()
         {
+            // Arrange
             var existingWord = "ExistingWord";
             var foundEntity = new RelatedTerm { Id = 1, Word = existingWord, TermId = 1 };
             var expectedErrorMessage = "Failed to delete a related term";
 
+            // Act
             var result = await ArrangeAndActAsync(existingWord, foundEntity, 1, null); // mappedDtoResult is null
 
+            // Assert
             result.Errors.Should().ContainSingle(e => e.Message == expectedErrorMessage);
         }
 
         [Fact]
         public async Task Handle_MapEntityToDtoReturnsNull_ShouldCallGetFirstOrDefaultAsync()
         {
+            // Arrange
             var existingWord = "ExistingWord";
             var foundEntity = new RelatedTerm { Id = 1, Word = existingWord, TermId = 1 };
 
+            // Act
             await ArrangeAndActAsync(existingWord, foundEntity, 1, null);
 
+            // Assert
             _mockRelatedTermRepository.Verify(
                 repo => repo.GetFirstOrDefaultAsync(It.IsAny<Expression<System.Func<RelatedTerm, bool>>>(), null),
                 Times.Once);
@@ -359,45 +427,57 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Streetcode.RelatedTermTests.Dele
         [Fact]
         public async Task Handle_MapEntityToDtoReturnsNull_ShouldCallRelatedTermRepositoryDelete()
         {
+            // Arrange
             var existingWord = "ExistingWord";
             var foundEntity = new RelatedTerm { Id = 1, Word = existingWord, TermId = 1 };
 
+            // Act
             await ArrangeAndActAsync(existingWord, foundEntity, 1, null);
 
+            // Assert
             _mockRelatedTermRepository.Verify(repo => repo.Delete(foundEntity), Times.Once);
         }
 
         [Fact]
         public async Task Handle_MapEntityToDtoReturnsNull_ShouldCallRepositoryWrapperSaveChangesAsync()
         {
+            // Arrange
             var existingWord = "ExistingWord";
             var foundEntity = new RelatedTerm { Id = 1, Word = existingWord, TermId = 1 };
 
+            // Act
             await ArrangeAndActAsync(existingWord, foundEntity, 1, null);
-
+            
+            // Assert
             _mockRepositoryWrapper.Verify(repo => repo.SaveChangesAsync(), Times.Once);
         }
 
         [Fact]
         public async Task Handle_MapEntityToDtoReturnsNull_ShouldCallMapperToMapEntityToDto()
         {
+            // Arrange
             var existingWord = "ExistingWord";
             var foundEntity = new RelatedTerm { Id = 1, Word = existingWord, TermId = 1 };
 
+            // Act
             await ArrangeAndActAsync(existingWord, foundEntity, 1, null);
 
+            // Assert
             _mockMapper.Verify(m => m.Map<RelatedTermDTO>(foundEntity), Times.Once);
         }
 
         [Fact]
         public async Task Handle_MapEntityToDtoReturnsNull_ShouldCallLoggerError()
         {
+            // Arrange
             var existingWord = "ExistingWord";
             var foundEntity = new RelatedTerm { Id = 1, Word = existingWord, TermId = 1 };
             var expectedErrorMessage = "Failed to delete a related term";
 
+            // Act
             await ArrangeAndActAsync(existingWord, foundEntity, 1, null);
 
+            // Assert
             _mockLogger.Verify(
                 logger => logger.LogError(It.IsAny<DeleteRelatedTermCommand>(), expectedErrorMessage),
                 Times.Once);

@@ -116,34 +116,43 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Streetcode.RelatedTermTests.Crea
         [Fact]
         public async Task Handle_ValidCommand_ShouldReturnSuccessResult()
         {
+            // Arrange
             var relatedTermDtoToCreate = new RelatedTermDTO { Id = 0, Word = "ТестовеСлово", TermId = 5 };
             var relatedTermEntityToCreate = new RelatedTerm { Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
             var createdRelatedTermDtoResult = new RelatedTermDTO { Id = 1, Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
 
+            // Act
             var result = await ArrangeAndActAsync(relatedTermDtoToCreate, relatedTermEntityToCreate, createdRelatedTermDtoResult);
 
+            // Assert
             result.IsSuccess.Should().BeTrue();
         }
 
         [Fact]
         public async Task Handle_ValidCommand_ShouldReturnCorrectDtoValue()
         {
+            // Arrange
             var relatedTermDtoToCreate = new RelatedTermDTO { Id = 0, Word = "ТестовеСлово", TermId = 5 };
             var relatedTermEntityToCreate = new RelatedTerm { Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
             var createdRelatedTermDtoResult = new RelatedTermDTO { Id = 1, Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
 
-            var result = await ArrangeAndActAsync(relatedTermDtoToCreate, relatedTermEntityToCreate, createdRelatedTermDtoResult);
+            // Act
 
+            var result = await ArrangeAndActAsync(relatedTermDtoToCreate, relatedTermEntityToCreate, createdRelatedTermDtoResult);
+            
+            // Assert
             result.Value.Should().BeEquivalentTo(createdRelatedTermDtoResult);
         }
 
         [Fact]
         public async Task Handle_ValidCommand_ShouldCallMapperToMapDtoToEntity()
         {
+            // Arrange
             var relatedTermDtoToCreate = new RelatedTermDTO { Id = 0, Word = "ТестовеСлово", TermId = 5 };
             var relatedTermEntityToCreate = new RelatedTerm { Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
             var createdRelatedTermDtoResult = new RelatedTermDTO { Id = 1, Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
 
+            // Act
             await ArrangeAndActAsync(relatedTermDtoToCreate, relatedTermEntityToCreate, createdRelatedTermDtoResult);
 
             _mockMapper.Verify(m => m.Map<RelatedTerm>(relatedTermDtoToCreate), Times.Once);
@@ -152,10 +161,12 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Streetcode.RelatedTermTests.Crea
         [Fact]
         public async Task Handle_ValidCommand_ShouldCallRelatedTermRepositoryGetAllAsync()
         {
+            // Arrange
             var relatedTermDtoToCreate = new RelatedTermDTO { Id = 0, Word = "ТестовеСлово", TermId = 5 };
             var relatedTermEntityToCreate = new RelatedTerm { Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
             var createdRelatedTermDtoResult = new RelatedTermDTO { Id = 1, Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
 
+            // Act
             await ArrangeAndActAsync(relatedTermDtoToCreate, relatedTermEntityToCreate, createdRelatedTermDtoResult);
 
             _mockRelatedTermRepository.Verify(
@@ -166,12 +177,15 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Streetcode.RelatedTermTests.Crea
         [Fact]
         public async Task Handle_ValidCommand_ShouldCallRepositoryWrapperSaveChangesAsync()
         {
+            // Arrange
             var relatedTermDtoToCreate = new RelatedTermDTO { Id = 0, Word = "ТестовеСлово", TermId = 5 };
             var relatedTermEntityToCreate = new RelatedTerm { Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
             var createdRelatedTermDtoResult = new RelatedTermDTO { Id = 1, Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
 
+            // Act
             await ArrangeAndActAsync(relatedTermDtoToCreate, relatedTermEntityToCreate, createdRelatedTermDtoResult);
 
+            // Assert
             _mockRepositoryWrapper.Verify(repo => repo.SaveChangesAsync(), Times.Once);
         }
 
@@ -179,12 +193,15 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Streetcode.RelatedTermTests.Crea
         [Fact]
         public async Task Handle_ValidCommand_ShouldNotCallLoggerError()
         {
+            // Arrange
             var relatedTermDtoToCreate = new RelatedTermDTO { Id = 0, Word = "ТестовеСлово", TermId = 5 };
             var relatedTermEntityToCreate = new RelatedTerm { Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
             var createdRelatedTermDtoResult = new RelatedTermDTO { Id = 1, Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
 
+            // Act
             await ArrangeAndActAsync(relatedTermDtoToCreate, relatedTermEntityToCreate, createdRelatedTermDtoResult);
 
+            // Assert
             _mockLogger.Verify(logger => logger.LogError(It.IsAny<CreateRelatedTermCommand>(), It.IsAny<string>()), Times.Never);
         }
 
@@ -218,62 +235,80 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Streetcode.RelatedTermTests.Crea
         [Fact]
         public async Task Handle_CommandWithNullRelatedTermDTO_ShouldCallMapperToMapNullDtoToEntity()
         {
+            // Arrange
             var command = new CreateRelatedTermCommand(null);
 
             _mockMapper.Setup(m => m.Map<RelatedTerm>(null)).Returns((RelatedTerm)null);
 
+            // Act
             await ArrangeAndActForFailureAsync(command, mapEntityToDtoResult: null);
 
+            // Assert
             _mockMapper.Verify(m => m.Map<RelatedTerm>(null), Times.Once);
         }
 
         [Fact]
         public async Task Handle_CommandWithNullRelatedTermDTO_ShouldNotCallRelatedTermRepositoryGetAllAsync()
         {
+            // Arrange
             var command = new CreateRelatedTermCommand(null);
 
+            // Act
             await ArrangeAndActForFailureAsync(command, mapEntityToDtoResult: null);
 
+            // Assert
             _mockRelatedTermRepository.Verify(repo => repo.GetAllAsync(It.IsAny<Expression<System.Func<RelatedTerm, bool>>>(), null), Times.Never);
         }
 
         [Fact]
         public async Task Handle_CommandWithNullRelatedTermDTO_ShouldNotCallRelatedTermRepositoryCreate()
         {
+            // Arrange
             var command = new CreateRelatedTermCommand(null);
 
+            // Act
             await ArrangeAndActForFailureAsync(command, mapEntityToDtoResult: null);
 
+            // Assert
             _mockRelatedTermRepository.Verify(repo => repo.Create(It.IsAny<RelatedTerm>()), Times.Never);
         }
 
         [Fact]
         public async Task Handle_CommandWithNullRelatedTermDTO_ShouldNotCallRepositoryWrapperSaveChangesAsync()
         {
+            // Arrange
             var command = new CreateRelatedTermCommand(null);
 
+            // Act
             await ArrangeAndActForFailureAsync(command, mapEntityToDtoResult: null);
 
+            // Assert
             _mockRepositoryWrapper.Verify(repo => repo.SaveChangesAsync(), Times.Never);
         }
 
         [Fact]
         public async Task Handle_CommandWithNullRelatedTermDTO_ShouldNotCallMapperToMapEntityToDto()
         {
+            // Arrange
             var command = new CreateRelatedTermCommand(null);
 
+            // Act
             await ArrangeAndActForFailureAsync(command, mapEntityToDtoResult: null);
 
+            // Assert
             _mockMapper.Verify(m => m.Map<RelatedTermDTO>(It.IsAny<RelatedTerm>()), Times.Never);
         }
 
         [Fact]
         public async Task Handle_CommandWithNullRelatedTermDTO_ShouldCallLoggerError()
         {
+            // Arrange
             var command = new CreateRelatedTermCommand(null);
 
+            // Act
             await ArrangeAndActForFailureAsync(command, mapEntityToDtoResult: null);
 
+            // Assert
             _mockLogger.Verify(
                 logger => logger.LogError(It.IsAny<CreateRelatedTermCommand>(), "Cannot create new related word for a term!"),
                 Times.Once);
@@ -283,56 +318,68 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Streetcode.RelatedTermTests.Crea
         [Fact]
         public async Task Handle_RelatedTermAlreadyExists_ShouldReturnFailureResult()
         {
+            // Arrange
             var relatedTermDtoToCreate = new RelatedTermDTO { Id = 0, Word = "ExistingWord", TermId = 1 };
             var relatedTermEntityExisting = new RelatedTerm { Id = 1, Word = "ExistingWord", TermId = 1 };
             var existingTermsList = new List<RelatedTerm> { relatedTermEntityExisting };
             var command = new CreateRelatedTermCommand(relatedTermDtoToCreate);
             var relatedTermEntityToCreate = new RelatedTerm { Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
 
+            // Act
             var result = await ArrangeAndActForFailureAsync(command, relatedTermEntityToCreate: relatedTermEntityToCreate, existingTermsList: existingTermsList);
 
+            // Assert
             result.IsFailed.Should().BeTrue();
         }
 
         [Fact]
         public async Task Handle_RelatedTermAlreadyExists_ShouldContainCorrectErrorMessage()
         {
+            // Arrange
             var relatedTermDtoToCreate = new RelatedTermDTO { Id = 0, Word = "ExistingWord", TermId = 1 };
             var relatedTermEntityExisting = new RelatedTerm { Id = 1, Word = "ExistingWord", TermId = 1 };
             var existingTermsList = new List<RelatedTerm> { relatedTermEntityExisting };
             var command = new CreateRelatedTermCommand(relatedTermDtoToCreate);
             var relatedTermEntityToCreate = new RelatedTerm { Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
-
+            
+            // Act
             var result = await ArrangeAndActForFailureAsync(command, relatedTermEntityToCreate: relatedTermEntityToCreate, existingTermsList: existingTermsList);
 
+            // Assert
             result.Errors.Should().ContainSingle(e => e.Message == "Слово з цим визначенням уже існує");
         }
 
         [Fact]
         public async Task Handle_RelatedTermAlreadyExists_ShouldCallMapperToMapDtoToEntity()
         {
+            // Arrange
             var relatedTermDtoToCreate = new RelatedTermDTO { Id = 0, Word = "ExistingWord", TermId = 1 };
             var relatedTermEntityExisting = new RelatedTerm { Id = 1, Word = "ExistingWord", TermId = 1 };
             var existingTermsList = new List<RelatedTerm> { relatedTermEntityExisting };
             var command = new CreateRelatedTermCommand(relatedTermDtoToCreate);
             var relatedTermEntityToCreate = new RelatedTerm { Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
 
+            // Act
             await ArrangeAndActForFailureAsync(command, relatedTermEntityToCreate: relatedTermEntityToCreate, existingTermsList: existingTermsList);
 
+            // Assert
             _mockMapper.Verify(m => m.Map<RelatedTerm>(relatedTermDtoToCreate), Times.Once);
         }
 
         [Fact]
         public async Task Handle_RelatedTermAlreadyExists_ShouldCallRelatedTermRepositoryGetAllAsync()
         {
+            // Arrange
             var relatedTermDtoToCreate = new RelatedTermDTO { Id = 0, Word = "ExistingWord", TermId = 1 };
             var relatedTermEntityExisting = new RelatedTerm { Id = 1, Word = "ExistingWord", TermId = 1 };
             var existingTermsList = new List<RelatedTerm> { relatedTermEntityExisting };
             var command = new CreateRelatedTermCommand(relatedTermDtoToCreate);
             var relatedTermEntityToCreate = new RelatedTerm { Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
 
+            // Act
             await ArrangeAndActForFailureAsync(command, relatedTermEntityToCreate: relatedTermEntityToCreate, existingTermsList: existingTermsList);
 
+            // Assert
             _mockRelatedTermRepository.Verify(
                 repo => repo.GetAllAsync(It.IsAny<Expression<System.Func<RelatedTerm, bool>>>(), null), Times.Once);
         }
@@ -340,56 +387,68 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Streetcode.RelatedTermTests.Crea
         [Fact]
         public async Task Handle_RelatedTermAlreadyExists_ShouldNotCallRelatedTermRepositoryCreate()
         {
+            // Arrange
             var relatedTermDtoToCreate = new RelatedTermDTO { Id = 0, Word = "ExistingWord", TermId = 1 };
             var relatedTermEntityExisting = new RelatedTerm { Id = 1, Word = "ExistingWord", TermId = 1 };
             var existingTermsList = new List<RelatedTerm> { relatedTermEntityExisting };
             var command = new CreateRelatedTermCommand(relatedTermDtoToCreate);
             var relatedTermEntityToCreate = new RelatedTerm { Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
 
+            // Act
             await ArrangeAndActForFailureAsync(command, relatedTermEntityToCreate: relatedTermEntityToCreate, existingTermsList: existingTermsList);
 
+            // Assert
             _mockRelatedTermRepository.Verify(repo => repo.Create(It.IsAny<RelatedTerm>()), Times.Never);
         }
 
         [Fact]
         public async Task Handle_RelatedTermAlreadyExists_ShouldNotCallRepositoryWrapperSaveChangesAsync()
         {
+            // Arrange
             var relatedTermDtoToCreate = new RelatedTermDTO { Id = 0, Word = "ExistingWord", TermId = 1 };
             var relatedTermEntityExisting = new RelatedTerm { Id = 1, Word = "ExistingWord", TermId = 1 };
             var existingTermsList = new List<RelatedTerm> { relatedTermEntityExisting };
             var command = new CreateRelatedTermCommand(relatedTermDtoToCreate);
             var relatedTermEntityToCreate = new RelatedTerm { Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
 
+            // Act
             await ArrangeAndActForFailureAsync(command, relatedTermEntityToCreate: relatedTermEntityToCreate, existingTermsList: existingTermsList);
 
+            // Assert
             _mockRepositoryWrapper.Verify(repo => repo.SaveChangesAsync(), Times.Never);
         }
 
         [Fact]
         public async Task Handle_RelatedTermAlreadyExists_ShouldNotCallMapperToMapEntityToDto()
         {
+            // Arrange
             var relatedTermDtoToCreate = new RelatedTermDTO { Id = 0, Word = "ExistingWord", TermId = 1 };
             var relatedTermEntityExisting = new RelatedTerm { Id = 1, Word = "ExistingWord", TermId = 1 };
             var existingTermsList = new List<RelatedTerm> { relatedTermEntityExisting };
             var command = new CreateRelatedTermCommand(relatedTermDtoToCreate);
             var relatedTermEntityToCreate = new RelatedTerm { Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
 
+            // Act
             await ArrangeAndActForFailureAsync(command, relatedTermEntityToCreate: relatedTermEntityToCreate, existingTermsList: existingTermsList);
 
+            // Assert
             _mockMapper.Verify(m => m.Map<RelatedTermDTO>(It.IsAny<RelatedTerm>()), Times.Never);
         }
 
         [Fact]
         public async Task Handle_RelatedTermAlreadyExists_ShouldCallLoggerError()
         {
+            // Arrange
             var relatedTermDtoToCreate = new RelatedTermDTO { Id = 0, Word = "ExistingWord", TermId = 1 };
             var relatedTermEntityExisting = new RelatedTerm { Id = 1, Word = "ExistingWord", TermId = 1 };
             var existingTermsList = new List<RelatedTerm> { relatedTermEntityExisting };
             var command = new CreateRelatedTermCommand(relatedTermDtoToCreate);
             var relatedTermEntityToCreate = new RelatedTerm { Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
 
+            // Act
             await ArrangeAndActForFailureAsync(command, relatedTermEntityToCreate: relatedTermEntityToCreate, existingTermsList: existingTermsList);
 
+            // Assert
             _mockLogger.Verify(
                 logger => logger.LogError(It.IsAny<CreateRelatedTermCommand>(), "Слово з цим визначенням уже існує"),
                 Times.Once);
@@ -400,48 +459,60 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Streetcode.RelatedTermTests.Crea
         [Fact]
         public async Task Handle_SaveChangesAsyncReturnsZero_ShouldReturnFailureResult()
         {
+            // Arrange
             var relatedTermDtoToCreate = new RelatedTermDTO { Id = 0, Word = "WordToSave", TermId = 2 };
             var relatedTermEntityToCreate = new RelatedTerm { Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
             var command = new CreateRelatedTermCommand(relatedTermDtoToCreate);
 
+            // Act
             var result = await ArrangeAndActForFailureAsync(command, relatedTermEntityToCreate: relatedTermEntityToCreate, saveChangesResult: 0);
 
+            // Assert
             result.IsFailed.Should().BeTrue();
         }
 
         [Fact]
         public async Task Handle_SaveChangesAsyncReturnsZero_ShouldContainCorrectErrorMessage()
         {
+            // Arrange
             var relatedTermDtoToCreate = new RelatedTermDTO { Id = 0, Word = "WordToSave", TermId = 2 };
             var relatedTermEntityToCreate = new RelatedTerm { Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
             var command = new CreateRelatedTermCommand(relatedTermDtoToCreate);
 
+            // Act
             var result = await ArrangeAndActForFailureAsync(command, relatedTermEntityToCreate: relatedTermEntityToCreate, saveChangesResult: 0);
 
+            // Assert
             result.Errors.Should().ContainSingle(e => e.Message == "Cannot save changes in the database after related word creation!");
         }
 
         [Fact]
         public async Task Handle_SaveChangesAsyncReturnsZero_ShouldCallMapperToMapDtoToEntity()
         {
+            // Arrange
             var relatedTermDtoToCreate = new RelatedTermDTO { Id = 0, Word = "WordToSave", TermId = 2 };
             var relatedTermEntityToCreate = new RelatedTerm { Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
             var command = new CreateRelatedTermCommand(relatedTermDtoToCreate);
 
+            // Act
             await ArrangeAndActForFailureAsync(command, relatedTermEntityToCreate: relatedTermEntityToCreate, saveChangesResult: 0);
 
+            // Assert
             _mockMapper.Verify(m => m.Map<RelatedTerm>(relatedTermDtoToCreate), Times.Once);
         }
 
         [Fact]
         public async Task Handle_SaveChangesAsyncReturnsZero_ShouldCallRelatedTermRepositoryGetAllAsync()
         {
+            // Arrange
             var relatedTermDtoToCreate = new RelatedTermDTO { Id = 0, Word = "WordToSave", TermId = 2 };
             var relatedTermEntityToCreate = new RelatedTerm { Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
             var command = new CreateRelatedTermCommand(relatedTermDtoToCreate);
 
+            // Act
             await ArrangeAndActForFailureAsync(command, relatedTermEntityToCreate: relatedTermEntityToCreate, saveChangesResult: 0);
 
+            // Assert
             _mockRelatedTermRepository.Verify(
                 repo => repo.GetAllAsync(It.IsAny<Expression<System.Func<RelatedTerm, bool>>>(), null), Times.Once);
         }
@@ -450,36 +521,45 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Streetcode.RelatedTermTests.Crea
         [Fact]
         public async Task Handle_SaveChangesAsyncReturnsZero_ShouldCallRepositoryWrapperSaveChangesAsync()
         {
+            // Arrange
             var relatedTermDtoToCreate = new RelatedTermDTO { Id = 0, Word = "WordToSave", TermId = 2 };
             var relatedTermEntityToCreate = new RelatedTerm { Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
             var command = new CreateRelatedTermCommand(relatedTermDtoToCreate);
 
+            // Act
             await ArrangeAndActForFailureAsync(command, relatedTermEntityToCreate: relatedTermEntityToCreate, saveChangesResult: 0);
 
+            // Assert
             _mockRepositoryWrapper.Verify(repo => repo.SaveChangesAsync(), Times.Once);
         }
 
         [Fact]
         public async Task Handle_SaveChangesAsyncReturnsZero_ShouldNotCallMapperToMapEntityToDto()
         {
+            // Arrange
             var relatedTermDtoToCreate = new RelatedTermDTO { Id = 0, Word = "WordToSave", TermId = 2 };
             var relatedTermEntityToCreate = new RelatedTerm { Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
             var command = new CreateRelatedTermCommand(relatedTermDtoToCreate);
 
+            // Act
             await ArrangeAndActForFailureAsync(command, relatedTermEntityToCreate: relatedTermEntityToCreate, saveChangesResult: 0);
 
+            // Assert
             _mockMapper.Verify(m => m.Map<RelatedTermDTO>(It.IsAny<RelatedTerm>()), Times.Never);
         }
 
         [Fact]
         public async Task Handle_SaveChangesAsyncReturnsZero_ShouldCallLoggerError()
         {
+            // Arrange
             var relatedTermDtoToCreate = new RelatedTermDTO { Id = 0, Word = "WordToSave", TermId = 2 };
             var relatedTermEntityToCreate = new RelatedTerm { Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
             var command = new CreateRelatedTermCommand(relatedTermDtoToCreate);
 
+            // Act
             await ArrangeAndActForFailureAsync(command, relatedTermEntityToCreate: relatedTermEntityToCreate, saveChangesResult: 0);
 
+            // Assert
             _mockLogger.Verify(
                 logger => logger.LogError(It.IsAny<CreateRelatedTermCommand>(), "Cannot save changes in the database after related word creation!"),
                 Times.Once);
@@ -489,24 +569,30 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Streetcode.RelatedTermTests.Crea
         [Fact]
         public async Task Handle_MapEntityToDtoReturnsNull_ShouldReturnFailureResult()
         {
+            // Arrange
             var relatedTermDtoToCreate = new RelatedTermDTO { Id = 0, Word = "WordToMap", TermId = 3 };
             var relatedTermEntityCreated = new RelatedTerm { Id = 1, Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
             var command = new CreateRelatedTermCommand(relatedTermDtoToCreate);
 
+            // Act
             var result = await ArrangeAndActForFailureAsync(command, relatedTermEntityToCreate: relatedTermEntityCreated, relatedTermEntityCreated: relatedTermEntityCreated, saveChangesResult: 1, mapEntityToDtoResult: null);
 
+            // Assert
             result.IsFailed.Should().BeTrue();
         }
 
         [Fact]
         public async Task Handle_MapEntityToDtoReturnsNull_ShouldContainCorrectErrorMessage()
         {
+            // Arrange
             var relatedTermDtoToCreate = new RelatedTermDTO { Id = 0, Word = "WordToMap", TermId = 3 };
             var relatedTermEntityCreated = new RelatedTerm { Id = 1, Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
             var command = new CreateRelatedTermCommand(relatedTermDtoToCreate);
 
+            // Act
             var result = await ArrangeAndActForFailureAsync(command, relatedTermEntityToCreate: relatedTermEntityCreated, relatedTermEntityCreated: relatedTermEntityCreated, saveChangesResult: 1, mapEntityToDtoResult: null);
 
+            // Assert
             result.Errors.Should().ContainSingle(e => e.Message == "Cannot map entity!");
         }
 
@@ -514,24 +600,30 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Streetcode.RelatedTermTests.Crea
         [Fact]
         public async Task Handle_MapEntityToDtoReturnsNull_ShouldCallMapperToMapDtoToEntity()
         {
+            // Arrange
             var relatedTermDtoToCreate = new RelatedTermDTO { Id = 0, Word = "WordToMap", TermId = 3 };
             var relatedTermEntityCreated = new RelatedTerm { Id = 1, Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
             var command = new CreateRelatedTermCommand(relatedTermDtoToCreate);
 
+            // Act
             await ArrangeAndActForFailureAsync(command, relatedTermEntityToCreate: relatedTermEntityCreated, relatedTermEntityCreated: relatedTermEntityCreated, saveChangesResult: 1, mapEntityToDtoResult: null);
 
+            // Assert
             _mockMapper.Verify(m => m.Map<RelatedTerm>(relatedTermDtoToCreate), Times.Once);
         }
 
         [Fact]
         public async Task Handle_MapEntityToDtoReturnsNull_ShouldCallRelatedTermRepositoryGetAllAsync()
         {
+            // Arrange
             var relatedTermDtoToCreate = new RelatedTermDTO { Id = 0, Word = "WordToMap", TermId = 3 };
             var relatedTermEntityCreated = new RelatedTerm { Id = 1, Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
             var command = new CreateRelatedTermCommand(relatedTermDtoToCreate);
 
+            // Act
             await ArrangeAndActForFailureAsync(command, relatedTermEntityToCreate: relatedTermEntityCreated, relatedTermEntityCreated: relatedTermEntityCreated, saveChangesResult: 1, mapEntityToDtoResult: null);
 
+            // Assert
             _mockRelatedTermRepository.Verify(
                 repo => repo.GetAllAsync(It.IsAny<Expression<System.Func<RelatedTerm, bool>>>(), null), Times.Once);
         }
@@ -540,37 +632,45 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Streetcode.RelatedTermTests.Crea
         [Fact]
         public async Task Handle_MapEntityToDtoReturnsNull_ShouldCallRepositoryWrapperSaveChangesAsync()
         {
+            // Arrange
             var relatedTermDtoToCreate = new RelatedTermDTO { Id = 0, Word = "WordToMap", TermId = 3 };
             var relatedTermEntityCreated = new RelatedTerm { Id = 1, Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
             var command = new CreateRelatedTermCommand(relatedTermDtoToCreate);
 
+            // Act
             await ArrangeAndActForFailureAsync(command, relatedTermEntityToCreate: relatedTermEntityCreated, relatedTermEntityCreated: relatedTermEntityCreated, saveChangesResult: 1, mapEntityToDtoResult: null);
 
+            // Assert
             _mockRepositoryWrapper.Verify(repo => repo.SaveChangesAsync(), Times.Once);
         }
 
         [Fact]
         public async Task Handle_SaveChangesAsyncReturnsZero_ShouldCallRelatedTermRepositoryCreateAsync() // Renamed test for clarity
         {
+            // Arrange
             var relatedTermDtoToCreate = new RelatedTermDTO { Id = 0, Word = "WordToSave", TermId = 2 };
             var relatedTermEntityToCreate = new RelatedTerm { Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
             var command = new CreateRelatedTermCommand(relatedTermDtoToCreate);
 
+            // Act
             await ArrangeAndActForFailureAsync(command, relatedTermEntityToCreate: relatedTermEntityToCreate, relatedTermEntityCreated: relatedTermEntityToCreate, saveChangesResult: 0);
 
-
+            // Assert
             _mockRelatedTermRepository.Verify(repo => repo.CreateAsync(relatedTermEntityToCreate), Times.Once);
         }
 
         [Fact]
         public async Task Handle_MapEntityToDtoReturnsNull_ShouldCallLoggerError()
         {
+            // Arrange
             var relatedTermDtoToCreate = new RelatedTermDTO { Id = 0, Word = "WordToMap", TermId = 3 };
             var relatedTermEntityCreated = new RelatedTerm { Id = 1, Word = relatedTermDtoToCreate.Word, TermId = relatedTermDtoToCreate.TermId };
             var command = new CreateRelatedTermCommand(relatedTermDtoToCreate);
 
+            // Act
             await ArrangeAndActForFailureAsync(command, relatedTermEntityToCreate: relatedTermEntityCreated, relatedTermEntityCreated: relatedTermEntityCreated, saveChangesResult: 1, mapEntityToDtoResult: null);
 
+            // Assert
             _mockLogger.Verify(
                 logger => logger.LogError(It.IsAny<CreateRelatedTermCommand>(), "Cannot map entity!"),
                 Times.Once);
