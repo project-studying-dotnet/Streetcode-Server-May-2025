@@ -30,9 +30,13 @@ namespace Streetcode.BLL.MediatR.Partners.Create
                 newPartner = await _repositoryWrapper.PartnersRepository.CreateAsync(newPartner);
                 await _repositoryWrapper.SaveChangesAsync();
                 var streetcodeIds = request.newPartner.Streetcodes.Select(s => s.Id).ToList();
-                newPartner.Streetcodes.AddRange(await _repositoryWrapper
-                    .StreetcodeRepository
-                    .GetAllAsync(s => streetcodeIds.Contains(s.Id)));
+                if (streetcodeIds.Any())
+                {
+                    var streetcodes = await _repositoryWrapper
+                        .StreetcodeRepository
+                        .GetAllAsync(s => streetcodeIds.Contains(s.Id));
+                    newPartner.Streetcodes.AddRange(streetcodes);
+                }
 
                 await _repositoryWrapper.SaveChangesAsync();
                 return Result.Ok(_mapper.Map<PartnerDTO>(newPartner));

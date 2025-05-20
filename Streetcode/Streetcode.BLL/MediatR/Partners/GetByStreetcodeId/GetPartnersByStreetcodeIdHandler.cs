@@ -41,7 +41,7 @@ public class GetPartnersByStreetcodeIdHandler : IRequestHandler<GetPartnersByStr
 
         if (partners is null)
         {
-            string errorMsg = $"Cannot find a partners by a streetcode id: {request.StreetcodeId}";
+            string errorMsg = $"Cannot find partners by a streetcode id: {request.StreetcodeId}";
             _logger.LogError(request, errorMsg);
             return Result.Fail(new Error(errorMsg));
         }
