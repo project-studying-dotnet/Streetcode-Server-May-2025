@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Threading.Tasks;
+using AutoMapper;
 using FluentResults;
 using MediatR;
 using Streetcode.BLL.DTO.News;
@@ -7,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using Streetcode.DAL.Repositories.Interfaces.Base;
 using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.BLL.DTO.AdditionalContent.Subtitles;
-using System.Threading.Tasks;
 
 namespace Streetcode.BLL.MediatR.News.SortedByDateTime
 {
