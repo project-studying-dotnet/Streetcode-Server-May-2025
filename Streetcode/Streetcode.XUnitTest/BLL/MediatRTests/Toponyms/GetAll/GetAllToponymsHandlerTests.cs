@@ -82,8 +82,6 @@ public class GetAllToponymsHandlerTests
         VerifyMocksCalledOnce();
     }
 
-    // ---------- helpers ----------
-
     private static (IEnumerable<Toponym> entities, IEnumerable<ToponymDTO> dtos)
         CreateValidToponymEntitiesAndDtos()
     {
