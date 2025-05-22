@@ -4,18 +4,19 @@ using Microsoft.EntityFrameworkCore;
 using Streetcode.BLL.DTO.News;
 using Streetcode.BLL.Interfaces.BlobStorage;
 using Streetcode.BLL.Interfaces.Logging;
+using Streetcode.BLL.Interfaces.News;
 using Streetcode.DAL.Repositories.Interfaces.Base;
 
 namespace Streetcode.BLL.Services.News;
 
-public class NewsByUrlProvider
+public class NewsService : INewsService
 {
     private readonly IBlobService _blobService;
     private readonly ILoggerService _logger;
     private readonly IRepositoryWrapper _repositoryWrapper;
     private readonly IMapper _mapper;
 
-    public NewsByUrlProvider(
+    public NewsService(
         IBlobService blobService,
         ILoggerService loggerService,
         IRepositoryWrapper repositoryWrapper,
@@ -59,8 +60,8 @@ public class NewsByUrlProvider
         var news = (await _repositoryWrapper.NewsRepository.GetAllAsync()).ToList();
         var newsIndex = news.FindIndex(x => x.Id == newsDTO.Id);
 
-        string? prevNewsLink = await GetPrevNewsLink(news, newsIndex);
-        string? nextNewsLink = await GetNextNewsLink(news, newsIndex);
+        var prevNewsLink = await GetPrevNewsLink(news, newsIndex);
+        var nextNewsLink = await GetNextNewsLink(news, newsIndex);
         RandomNewsDTO randomNewsTitleAndLink = await GetRandomNewsDTO(news, newsIndex);
 
         return new NewsDTOWithURLs()
