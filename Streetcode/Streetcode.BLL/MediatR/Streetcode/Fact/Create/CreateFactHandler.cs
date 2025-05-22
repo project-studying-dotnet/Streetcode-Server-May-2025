@@ -1,0 +1,77 @@
+﻿using AutoMapper;
+using FluentResults;
+using MediatR;
+using Streetcode.BLL.DTO.Streetcode.TextContent.Fact;
+using Streetcode.BLL.Interfaces.Logging;
+using Streetcode.DAL.Repositories.Interfaces.Base;
+
+using Entity = Streetcode.DAL.Entities.Streetcode.TextContent.Fact;
+
+namespace Streetcode.BLL.MediatR.Streetcode.Fact.Create;
+
+public class CreateFactHandler : IRequestHandler<CreateFactCommand, Result<FactUpdateCreateDTO>>
+{
+    private readonly IRepositoryWrapper _repositoryWrapper;
+    private readonly IMapper _mapper;
+    private readonly ILoggerService _logger;
+
+    public CreateFactHandler(IRepositoryWrapper repositoryWrapper, IMapper mapper, ILoggerService logger)
+    {
+        _repositoryWrapper = repositoryWrapper;
+        _mapper = mapper;
+        _logger = logger;
+    }
+
+    public async Task<Result<FactUpdateCreateDTO>> Handle(CreateFactCommand request, CancellationToken cancellationToken)
+    {
+        var newFact = _mapper.Map<Entity>(request.NewFact);
+
+        if (newFact is null)
+        {
+            const string errorMsg = "Invalid fact data provided. New Fact is null.";
+            _logger.LogError(request, errorMsg);
+
+            return Result.Fail(new Error(errorMsg));
+        }
+
+        if (newFact.StreetcodeId == 0)
+        {
+            const string errorMsg = "StreetcodeId is required.";
+            _logger.LogError(request, errorMsg);
+
+            return Result.Fail(new Error(errorMsg));
+        }
+
+        var duplicate = await _repositoryWrapper
+            .FactRepository
+            .GetFirstOrDefaultAsync(
+                predicate: f =>
+                    f.StreetcodeId == newFact.StreetcodeId &&
+                    f.FactContent == newFact.FactContent);
+
+        if (duplicate is not null)
+        {
+            const string errorMsg = "A fact with the same content already exists for this streetcode.";
+            _logger.LogError(request, errorMsg);
+
+            return Result.Fail(new Error(errorMsg));
+        }
+
+        newFact.ImageId = newFact.ImageId == 0 ? null : newFact.ImageId;
+
+        var entity = await _repositoryWrapper.FactRepository.CreateAsync(newFact);
+        var isSuccessResult = await _repositoryWrapper.SaveChangesAsync() > 0;
+
+        if (isSuccessResult)
+        {
+            return Result.Ok(_mapper.Map<FactUpdateCreateDTO>(entity));
+        }
+        else
+        {
+            const string errorMsg = "Failed to save the fact.";
+            _logger.LogError(request, errorMsg);
+
+            return Result.Fail(new Error(errorMsg));
+        }
+    }
+}
