@@ -34,22 +34,17 @@ namespace Streetcode.BLL.MediatR.Media.Art.Delete
 
             var resultIsSuccess = await _repositoryWrapper.SaveChangesAsync() > 0;
 
-            if (resultIsSuccess)
-            {
-                await _blobService.DeleteFileInStorageAsync(art.Title);
-            }
-
-            if (resultIsSuccess)
-            {
-                _logger?.LogInformation($"DeleteArtCommand handled successfully");
-                return Result.Ok(Unit.Value);
-            }
-            else
+            if (!resultIsSuccess)
             {
                 string errorMsg = $"Failed to delete an art";
                 _logger.LogError(request, errorMsg);
                 return Result.Fail(new Error(errorMsg));
             }
+
+            await _blobService.DeleteFileInStorageAsync(art.Title);
+            _logger?.LogInformation($"DeleteArtCommand handled successfully");
+
+            return Result.Ok(Unit.Value);
         }
     }
 }
