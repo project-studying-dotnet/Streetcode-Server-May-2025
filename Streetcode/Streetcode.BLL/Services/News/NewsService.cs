@@ -12,18 +12,15 @@ namespace Streetcode.BLL.Services.News;
 public class NewsService : INewsService
 {
     private readonly IBlobService _blobService;
-    private readonly ILoggerService _logger;
     private readonly IRepositoryWrapper _repositoryWrapper;
     private readonly IMapper _mapper;
 
     public NewsService(
         IBlobService blobService,
-        ILoggerService loggerService,
         IRepositoryWrapper repositoryWrapper,
         IMapper mapper)
     {
         _blobService = blobService;
-        _logger = loggerService;
         _repositoryWrapper = repositoryWrapper;
         _mapper = mapper;
     }
@@ -64,7 +61,7 @@ public class NewsService : INewsService
         var nextNewsLink = await GetNextNewsLink(news, newsIndex);
         RandomNewsDTO randomNewsTitleAndLink = await GetRandomNewsDTO(news, newsIndex);
 
-        return new NewsDTOWithURLs()
+        return new NewsDTOWithURLs
         {
             RandomNews = randomNewsTitleAndLink,
             News = newsDTO,

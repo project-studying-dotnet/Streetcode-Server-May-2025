@@ -7,6 +7,7 @@ using Streetcode.BLL.DTO.Media.Images;
 using Streetcode.BLL.DTO.News;
 using Streetcode.BLL.Interfaces.BlobStorage;
 using Streetcode.BLL.Interfaces.Logging;
+using Streetcode.BLL.Interfaces.News;
 using Streetcode.BLL.MediatR.News.GetById;
 using Streetcode.BLL.MediatR.News.GetByUrl;
 using Streetcode.DAL.Entities.News;
@@ -18,89 +19,51 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.NewsTests;
 public class GetNewsByUrlHandlerTests
 {
     private readonly Mock<ILoggerService> _mockLoggerService;
-    private readonly Mock<IRepositoryWrapper> _mockRepository;
-    private readonly Mock<IMapper> _mockMapper;
-    private readonly Mock<IBlobService> _mockBlobService;
+    private readonly Mock<INewsService> _mockNewsService;
     private readonly GetNewsByUrlHandler _handler;
 
     public GetNewsByUrlHandlerTests()
     {
         _mockLoggerService = new Mock<ILoggerService>();
-        _mockRepository = new Mock<IRepositoryWrapper>();
-        _mockMapper = new Mock<IMapper>();
-        _mockBlobService = new Mock<IBlobService>();
-        _handler = new GetNewsByUrlHandler(_mockMapper.Object, _mockRepository.Object, _mockBlobService.Object, _mockLoggerService.Object);
+        _mockNewsService = new Mock<INewsService>();
+        _handler = new GetNewsByUrlHandler(_mockLoggerService.Object, _mockNewsService.Object);
     }
 
     [Fact]
-    public async Task Handler_ShouldReturnNewByUrlSuccessfully_NewWtihImage()
+    public async Task Handler_ShouldReturnNewByUrlSuccessfully()
     {
-        var news = GetNew();
-        SetUpMockRepository(news);
-        _mockMapper.Setup(x => x.Map<NewsDTO>(It.IsAny<News>()))
-            .Returns(GetNewsDTO);
-        SetUpMockBlobService( "base64string");
+        // Arange
+        var url = "/test";
+        var newsDto = GetNewsDTO();
 
-        var result = await _handler.Handle(new GetNewsByUrlQuery(news.URL), CancellationToken.None);
-
-        _mockBlobService.Verify(x => x.FindFileInStorageAsBase64(It.IsAny<string>()), Times.Once);
-        _mockRepository.Verify(r => r.NewsRepository.GetFirstOrDefaultAsync(
-            It.IsAny<Expression<Func<News, bool>>>(),
-            It.IsAny<Func<IQueryable<News>, IIncludableQueryable<News, object>>>()));
-        result.IsSuccess.Should().BeTrue();
-    }
-
-    [Fact]
-    public async Task Handler_ShouldReturnNewByUrlSuccessfully_NewWtihoutImage()
-    {
-        // Arrange
-        var news = GetNew();
-        SetUpMockRepository(news);
-        _mockMapper.Setup(x => x.Map<NewsDTO>(It.IsAny<News>()))
-            .Returns(GetNewsDTOWithoutImage());
-        SetUpMockBlobService(null);
+        _mockNewsService.Setup(x => x.GetNewsByUrlAsync(url))
+            .ReturnsAsync(newsDto);
 
         // Act
-        var result = await _handler.Handle(new GetNewsByUrlQuery(news.URL), CancellationToken.None);
+        var result = await _handler.Handle(new GetNewsByUrlQuery(url), CancellationToken.None);
 
-        // Asser
-        _mockBlobService.Verify(x => x.FindFileInStorageAsBase64(It.IsAny<string>()), Times.Never);
-        _mockRepository.Verify(r => r.NewsRepository.GetFirstOrDefaultAsync(
-            It.IsAny<Expression<Func<News, bool>>>(),
-            It.IsAny<Func<IQueryable<News>, IIncludableQueryable<News, object>>>()));
+        // Assert
         result.IsSuccess.Should().BeTrue();
+        _mockNewsService.Verify(x => x.GetNewsByUrlAsync(url), Times.Once);
     }
 
     [Fact]
     public async Task Handler_ShouldReturnError_IncorrectUrl()
     {
         // Arrange
-        var news = GetNew();
-        var errorMessage = $"No news by entered Url - {news.URL}";
-        SetUpMockRepository(news);
-        _mockMapper.Setup(x => x.Map<NewsDTO>(It.IsAny<News>()))
-            .Returns((NewsDTO)null);
-        SetUpMockBlobService(null);
+        var url = "/test";
+        var errorMessage = $"No news by entered Url - {url}";
+        _mockNewsService.Setup(x => x.GetNewsByUrlAsync(url))
+            .ReturnsAsync((NewsDTO)null);
 
         // Act
-        var result = await _handler.Handle(new GetNewsByUrlQuery(news.URL), CancellationToken.None);
+        var result = await _handler.Handle(new GetNewsByUrlQuery(url), CancellationToken.None);
 
         // Assert
         result.IsFailed.Should().BeTrue();
         result.Errors.Should().ContainSingle().Which.Message.Should().Be(errorMessage);
-    }
-
-    private News GetNew()
-    {
-        return new News
-        {
-            Id = 1,
-            Title = "Title",
-            Text = "Text",
-            ImageId = 1,
-            URL = "/test",
-            CreationDate = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-        };
+        _mockNewsService.Verify(x => x.GetNewsByUrlAsync(url), Times.Once);
+        _mockLoggerService.Verify(logger => logger.LogError(It.IsAny<object>(), errorMessage), Times.Once);
     }
 
     private NewsDTO GetNewsDTO()
@@ -121,31 +84,5 @@ public class GetNewsByUrlHandlerTests
             CreationDate = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc),
         };
     }
-
-    private NewsDTO GetNewsDTOWithoutImage()
-    {
-        return new NewsDTO
-        {
-            Id = 1,
-            Title = "Title",
-            Text = "Text",
-            ImageId = 1,
-            URL = "/test",
-            CreationDate = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-        };
-    }
-
-    private void SetUpMockRepository(News news)
-    {
-        _mockRepository.Setup(x => x.NewsRepository.GetFirstOrDefaultAsync(
-                It.IsAny<Expression<Func<News, bool>>>(),
-                It.IsAny<Func<IQueryable<News>, IIncludableQueryable<News, object>>>()))
-            .ReturnsAsync(news);
-    }
-
-    private void SetUpMockBlobService(string base64String)
-    {
-        _mockBlobService.Setup(x => x.FindFileInStorageAsBase64(It.IsAny<string>()))
-            .Returns(base64String);
-    }
 }
+
