@@ -35,7 +35,7 @@ public class UpdateNewsHandlerTests
     }
 
     [Fact]
-    public async Task Handler_ShouldUpdateNewsSuccessfully_WithImage()
+    public async Task Handler_WithImage_ShouldUpdateNewsSuccess()
     {
         // Arrange
         var newsDto = GetNewsDto();
@@ -63,7 +63,7 @@ public class UpdateNewsHandlerTests
     /// Image exist in Database, so we call Delete method.
     /// </summary>
     [Fact]
-    public async Task Handler_ShouldUpdateNewsSuccessfully_NewWithoutImage1()
+    public async Task Handler_NewWithoutImage_ShouldUpdateNewsSuccessfully1()
     {
         // Arrange
         var newsDto = GetNewsDto();
@@ -95,7 +95,7 @@ public class UpdateNewsHandlerTests
     /// Image Doesn't exist in Database, so we don't call Delete method.
     /// </summary>
     [Fact]
-    public async Task Handler_ShouldUpdateNewsSuccessfully_NewWithoutImage2()
+    public async Task Handler_NewWithoutImage_ShouldUpdateNewsSuccess2()
     {
         // Arrange
         var newsDto = GetNewsDto();
@@ -119,7 +119,7 @@ public class UpdateNewsHandlerTests
     }
 
     [Fact]
-    public async Task Handler_ShouldReturnError_WhenNewsNull()
+    public async Task Handler_WhenNewsNull_ShouldReturnError()
     {
         var errorMessage = "Cannot convert null to news";
         var newsDto = new NewsDTO();
@@ -133,7 +133,7 @@ public class UpdateNewsHandlerTests
     }
 
     [Fact]
-    public async Task Handler_ShouldReturnError_ResultIsFailed()
+    public async Task Handler_ResultIsFailed_ShouldReturnError()
     {
         // Arrange
         var errorMessage = "Failed to update news";

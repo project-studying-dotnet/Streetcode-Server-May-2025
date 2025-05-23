@@ -39,7 +39,7 @@ public class GetNewsByIdHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ShouldReturnNewSuccesfully()
+    public async Task Handle_CorrectId_ShouldReturnNewSuccesfully()
     {
         // Arrange
         var news = GetNew();
@@ -60,7 +60,7 @@ public class GetNewsByIdHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ShouldReturnNewSuccesfully_NewWithoutImage()
+    public async Task Handle__NewWithoutImage_ShouldReturnNewSucces()
     {
         // Arrange
         var news = GetNew();
@@ -81,7 +81,7 @@ public class GetNewsByIdHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ShouldReturnError_MappingReturnNullDto()
+    public async Task Handle_MappingReturnNullDto_ShouldReturnError()
     {
         // Arrange
         var news = GetNew();

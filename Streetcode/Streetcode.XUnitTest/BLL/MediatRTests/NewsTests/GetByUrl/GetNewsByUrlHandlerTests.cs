@@ -30,7 +30,7 @@ public class GetNewsByUrlHandlerTests
     }
 
     [Fact]
-    public async Task Handler_ShouldReturnNewByUrlSuccessfully()
+    public async Task Handler_CorrectUrl_ShouldReturnNewByUrlSuccess()
     {
         // Arange
         var url = "/test";
@@ -48,7 +48,7 @@ public class GetNewsByUrlHandlerTests
     }
 
     [Fact]
-    public async Task Handler_ShouldReturnError_IncorrectUrl()
+    public async Task Handler_IncorrectUrl_ShouldReturnError()
     {
         // Arrange
         var url = "/test";

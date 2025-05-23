@@ -31,7 +31,7 @@ public class NewsServiceTests
     }
 
     [Fact]
-    public async Task GetNewsByUrlAsync_ShouldReturnNewsDtoSuccessfully_WhenImageExists()
+    public async Task GetNewsByUrlAsync_WhenImageExists_ShouldReturnNewsDtoSuccessfully()
     {
         // Arrange
         var url = "/test";
@@ -72,7 +72,7 @@ public class NewsServiceTests
     }
 
     [Fact]
-    public async Task GetNewsByUrlAsync_ShouldReturnNewsDtoSuccessfully_WhenImageDoesNotExist()
+    public async Task GetNewsByUrlAsync_WhenImageDoesNotExist_ShouldReturnNewsDtoSuccessfully()
     {
         // Arrange
         var url = "/test";
@@ -103,7 +103,7 @@ public class NewsServiceTests
     }
 
     [Fact]
-    public async Task GetNewsByUrlAsync_ShouldReturnNull_UrlIsIncorrect()
+    public async Task GetNewsByUrlAsync_UrlIsIncorrect_ShouldReturnNull()
     {
         // Arrange
         var url = "/test";
@@ -121,7 +121,7 @@ public class NewsServiceTests
     }
 
     [Fact]
-    public async Task GetNewsWithURLsAsync_ShouldReturnNewsDtoWithAllUrls_WhenNewsMoreThanFour()
+    public async Task GetNewsWithURLsAsync_WhenNewsMoreThanFour_ShouldReturnNewsDtoWithAllUrls()
     {
         // Arrange
         var url = "/test1";
@@ -147,7 +147,7 @@ public class NewsServiceTests
     }
 
     [Fact]
-    public async Task GetNewsWithURLsAsync_ShouldReturnNewsDtoWithoutRandomNew_WhenThreeNews()
+    public async Task GetNewsWithURLsAsync_WhenThreeNews_ShouldReturnNewsDtoWithoutRandomNew()
     {
         // Arrange
         var url = "/test1";
@@ -170,7 +170,7 @@ public class NewsServiceTests
     }
 
     [Fact]
-    public async Task GetNewsWithURLsAsync_ShouldReturnNewsDtoOnlyWithPrevNew_WhenTwoNews()
+    public async Task GetNewsWithURLsAsync_WhenTwoNews_ShouldReturnNewsDtoOnlyWithPrevNew()
     {
         // Arrange
         var url = "/test1";
@@ -194,7 +194,7 @@ public class NewsServiceTests
     }
 
     [Fact]
-    public async Task GetNewsWithURLsAsync_ShouldReturnNewsDtoOnlyWithNextNew_WhenTwoNews()
+    public async Task GetNewsWithURLsAsync_WhenTwoNews_ShouldReturnNewsDtoOnlyWithNextNew()
     {
         // Arrange
         var url = "/test1";
@@ -218,7 +218,7 @@ public class NewsServiceTests
     }
 
     [Fact]
-    public async Task GetNewsWithURLsAsync_ShouldReturnOnlyCurrentNew_WhenOneNew()
+    public async Task GetNewsWithURLsAsync_WhenOneNew_ShouldReturnOnlyCurrentNew()
     {
         // Arrange
         var url = "/test1";

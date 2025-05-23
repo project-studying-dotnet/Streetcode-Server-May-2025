@@ -32,7 +32,7 @@ public class SortedByDateTimeHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ShouldReturnAllSortedNewsSuccessfully_NewsWIthImage()
+    public async Task Handle_NewsWIthImage_ShouldReturnAllSortedNewsSuccess()
     {
         // Arrange
         SetUpMockRepository(GetNewsCollection());
@@ -55,7 +55,7 @@ public class SortedByDateTimeHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ShouldReturnAllSortedNewsSuccessfully_NewsWithoutImage()
+    public async Task Handle_NewsWithoutImage_ShouldReturnAllSortedNewsSuccessfully()
     {
         // Arrange
         SetUpMockRepository(GetNewsCollection());
@@ -75,7 +75,7 @@ public class SortedByDateTimeHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ShouldReturnError_NullNewsCollection()
+    public async Task Handle_NullNewsCollection_ShouldReturnError()
     {
         // Arrange
         var errorMessage = "There are no news in the database";
