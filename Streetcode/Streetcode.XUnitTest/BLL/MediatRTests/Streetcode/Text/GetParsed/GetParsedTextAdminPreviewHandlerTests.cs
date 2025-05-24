@@ -25,7 +25,7 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Streetcode.Text.GetParsed
 
             // Act
             var result = await _handler.Handle(
-                new GetParsedTextForAdminPreviewCommand(rawText),
+                new GetParsedTextForAdminPreviewQuery(rawText),
                 CancellationToken.None);
 
             // Assert
@@ -42,7 +42,7 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Streetcode.Text.GetParsed
 
             // Act
             var result = await _handler.Handle(
-                new GetParsedTextForAdminPreviewCommand(rawText),
+                new GetParsedTextForAdminPreviewQuery(rawText),
                 CancellationToken.None);
 
             // Assert
@@ -59,7 +59,7 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Streetcode.Text.GetParsed
 
             // Act
             var result = await _handler.Handle(
-                new GetParsedTextForAdminPreviewCommand(rawText),
+                new GetParsedTextForAdminPreviewQuery(rawText),
                 CancellationToken.None);
 
             // Assert
