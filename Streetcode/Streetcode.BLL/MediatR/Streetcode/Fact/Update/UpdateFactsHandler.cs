@@ -21,9 +21,21 @@ public class UpdateFactsHandler : IRequestHandler<UpdateFactsCommand, Result<Fac
 
     public async Task<Result<FactDTO>> Handle(UpdateFactsCommand request, CancellationToken cancellationToken)
     {
-        var facts = _mapper.Map<DAL.Entities.Streetcode.TextContent.Fact>(request.FactUpdateCreateDto);
+        var factToUpdate =
+            await _repositoryWrapper.FactRepository.GetFirstOrDefaultAsync(x => x.Id == request.FactDTO.Id);
 
-        _repositoryWrapper.FactRepository.Update(facts);
+        if (factToUpdate == null)
+        {
+            const string errorMsg = "Fact by this id does not exist";
+            _logger.LogError(request, errorMsg);
+            return Result.Fail(new Error(errorMsg));
+        }
+
+        factToUpdate.Title = request.FactDTO.Title;
+        factToUpdate.ImageId = request.FactDTO.ImageId;
+        factToUpdate.FactContent = request.FactDTO.FactContent;
+
+        _repositoryWrapper.FactRepository.Update(factToUpdate);
         var resultIsSuccess = await _repositoryWrapper.SaveChangesAsync() > 0;
 
         if (!resultIsSuccess)
@@ -33,6 +45,6 @@ public class UpdateFactsHandler : IRequestHandler<UpdateFactsCommand, Result<Fac
             return Result.Fail(new Error(errorMsg));
         }
 
-        return Result.Ok(_mapper.Map<FactDTO>(facts));
+        return Result.Ok(_mapper.Map<FactDTO>(factToUpdate));
     }
 }

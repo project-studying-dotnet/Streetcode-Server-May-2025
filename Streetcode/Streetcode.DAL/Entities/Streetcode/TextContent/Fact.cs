@@ -18,7 +18,7 @@ public class Fact
     [Required]
     [MaxLength(600)]
     public string? FactContent { get; set; }
-    
+
     public int? ImageId { get; set; }
 
     public Image? Image { get; set; }
