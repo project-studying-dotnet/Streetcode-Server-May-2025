@@ -34,7 +34,7 @@ public class GetAllToponymsHandler : IRequestHandler<GetAllToponymsQuery,
             FindStreetcodesWithMatchTitle(ref toponyms, filterRequest.Title);
         }
 
-        // int pagesAmount = ApplyPagination(ref toponyms, filterRequest.Amount, filterRequest.Page);
+        int pagesAmount = ApplyPagination(ref toponyms, filterRequest.Amount, filterRequest.Page);
 
         var toponymDtos = _mapper.Map<IEnumerable<ToponymDTO>>(toponyms.AsEnumerable());
 
@@ -59,17 +59,17 @@ public class GetAllToponymsHandler : IRequestHandler<GetAllToponymsQuery,
             .Select(g => g.First());
     }
 
-    // private int ApplyPagination(
-    //    ref IQueryable<Toponym> toponyms,
-    //    int amount,
-    //    int page)
-    // {
-    //    var totalPages = (int)Math.Ceiling(toponyms.Count() / (double)amount);
+    private static int ApplyPagination(
+       ref IQueryable<Toponym> toponyms,
+       int amount,
+       int page)
+    {
+        var totalPages = (int)Math.Ceiling(toponyms.Count() / (double)amount);
 
-    // toponyms = toponyms
-    //        .Skip((page - 1) * amount)
-    //        .Take(amount);
+        toponyms = toponyms
+               .Skip((page - 1) * amount)
+               .Take(amount);
 
-    // return totalPages;
-    // }
+        return totalPages;
+    }
 }
