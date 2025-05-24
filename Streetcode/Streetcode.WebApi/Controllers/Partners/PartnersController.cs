@@ -37,18 +37,18 @@ public class PartnersController : BaseApiController
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreatePartnerDTO partner)
     {
-        return HandleResult(await Mediator.Send(new CreatePartnerQuery(partner)));
+        return HandleResult(await Mediator.Send(new CreatePartnerCommand(partner)));
     }
 
     [HttpPut]
     public async Task<IActionResult> Update([FromBody] CreatePartnerDTO partner)
     {
-        return HandleResult(await Mediator.Send(new BLL.MediatR.Partners.Update.UpdatePartnerQuery(partner)));
+        return HandleResult(await Mediator.Send(new BLL.MediatR.Partners.Update.UpdatePartnerCommand(partner)));
     }
 
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete([FromRoute] int id)
     {
-        return HandleResult(await Mediator.Send(new BLL.MediatR.Partners.Delete.DeletePartnerQuery(id)));
+        return HandleResult(await Mediator.Send(new BLL.MediatR.Partners.Delete.DeletePartnerCommand(id)));
     }
 }

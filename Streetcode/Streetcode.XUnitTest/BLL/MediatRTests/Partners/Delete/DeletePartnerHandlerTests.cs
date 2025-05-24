@@ -47,7 +47,7 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Partners.Delete
                 .Setup(m => m.Map<PartnerDTO>(partnerEntity))
                 .Returns(partnerDto);
 
-            var query = new DeletePartnerQuery(partnerId);
+            var query = new DeletePartnerCommand(partnerId);
 
             // Act
             var result = await _handler.Handle(query, CancellationToken.None);
@@ -69,7 +69,7 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Partners.Delete
                 .Setup(r => r.PartnersRepository.GetFirstOrDefaultAsync(It.IsAny<Expression<Func<PartnerEntity, bool>>>(), null))
                 .ReturnsAsync((PartnerEntity)null);
 
-            var query = new DeletePartnerQuery(partnerId);
+            var query = new DeletePartnerCommand(partnerId);
             var expectedMessage = "No partner with such id";
 
             // Act
@@ -99,7 +99,7 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Partners.Delete
                 .Setup(r => r.SaveChangesAsync())
                 .ThrowsAsync(new Exception(exceptionMessage));
 
-            var query = new DeletePartnerQuery(partnerId);
+            var query = new DeletePartnerCommand(partnerId);
 
             // Act
             var result = await _handler.Handle(query, CancellationToken.None);

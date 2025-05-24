@@ -39,7 +39,7 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Team.TeamMembersLinks.Create
         public async Task Handle_Should_Return_Fail_If_MappingRequestIsNull()
         {
             // Arrange
-            var query = new CreateTeamLinkQuery(null);
+            var query = new CreateTeamLinkCommand(null);
             _mockMapper.Setup(m => m.Map<DAL.Entities.Team.TeamMemberLink>(null))
                 .Returns((DAL.Entities.Team.TeamMemberLink)null);
 
@@ -61,7 +61,7 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Team.TeamMembersLinks.Create
             var dto = new TeamMemberLinkDTO();
             var entity = new DAL.Entities.Team.TeamMemberLink();
 
-            var query = new CreateTeamLinkQuery(dto);
+            var query = new CreateTeamLinkCommand(dto);
 
             _mockMapper.Setup(m => m.Map<DAL.Entities.Team.TeamMemberLink>(dto)).Returns(entity);
             _mockRepo.Setup(r => r.TeamLinkRepository.CreateAsync(entity))
@@ -86,7 +86,7 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Team.TeamMembersLinks.Create
             var entity = new DAL.Entities.Team.TeamMemberLink();
             var createdEntity = new DAL.Entities.Team.TeamMemberLink();
 
-            var query = new CreateTeamLinkQuery(dto);
+            var query = new CreateTeamLinkCommand(dto);
 
             _mockMapper.Setup(m => m.Map<DAL.Entities.Team.TeamMemberLink>(dto)).Returns(entity);
             _mockRepo.Setup(r => r.TeamLinkRepository.CreateAsync(entity))
@@ -113,7 +113,7 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Team.TeamMembersLinks.Create
             var entity = new DAL.Entities.Team.TeamMemberLink();
             var createdEntity = new DAL.Entities.Team.TeamMemberLink();
 
-            var query = new CreateTeamLinkQuery(dto);
+            var query = new CreateTeamLinkCommand(dto);
 
             _mockMapper.Setup(m => m.Map<DAL.Entities.Team.TeamMemberLink>(dto)).Returns(entity);
             _mockRepo.Setup(r => r.TeamLinkRepository.CreateAsync(entity))
@@ -141,7 +141,7 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Team.TeamMembersLinks.Create
             var createdEntity = new DAL.Entities.Team.TeamMemberLink();
             var mappedDto = new TeamMemberLinkDTO();
 
-            var query = new CreateTeamLinkQuery(dto);
+            var query = new CreateTeamLinkCommand(dto);
 
             _mockMapper.Setup(m => m.Map<DAL.Entities.Team.TeamMemberLink>(dto)).Returns(entity);
             _mockRepo.Setup(r => r.TeamLinkRepository.CreateAsync(entity))

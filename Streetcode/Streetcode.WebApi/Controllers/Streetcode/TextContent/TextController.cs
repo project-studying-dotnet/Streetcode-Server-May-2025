@@ -31,6 +31,6 @@ public class TextController : BaseApiController
     [HttpGet]
     public async Task<IActionResult> GetParsedText([FromQuery] string text)
     {
-        return HandleResult(await Mediator.Send(new GetParsedTextForAdminPreviewCommand(text)));
+        return HandleResult(await Mediator.Send(new GetParsedTextForAdminPreviewQuery(text)));
     }
 }

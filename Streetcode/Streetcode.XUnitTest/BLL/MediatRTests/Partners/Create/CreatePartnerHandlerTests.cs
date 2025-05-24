@@ -53,7 +53,7 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Partners.Create
                      .ReturnsAsync(streetcodesFromDb);
             _mapperMock.Setup(m => m.Map<PartnerDTO>(createdEntity)).Returns(expectedDto);
 
-            var query = new CreatePartnerQuery(requestDto);
+            var query = new CreatePartnerCommand(requestDto);
 
             // Act
             var result = await _handler.Handle(query, CancellationToken.None);
@@ -78,7 +78,7 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Partners.Create
             _repositoryWrapperMock.Setup(r => r.PartnersRepository.CreateAsync(partnerEntity)).ReturnsAsync(createdEntity);
             _mapperMock.Setup(m => m.Map<PartnerDTO>(createdEntity)).Returns(expectedDto);
 
-            var query = new CreatePartnerQuery(requestDto);
+            var query = new CreatePartnerCommand(requestDto);
 
             // Act
             var result = await _handler.Handle(query, CancellationToken.None);
@@ -105,7 +105,7 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Partners.Create
             _repositoryWrapperMock.Setup(r => r.PartnersRepository.CreateAsync(It.IsAny<Partner>()))
                      .ThrowsAsync(new Exception("Database error"));
 
-            var query = new CreatePartnerQuery(requestDto);
+            var query = new CreatePartnerCommand(requestDto);
 
             // Act
             var result = await _handler.Handle(query, CancellationToken.None);

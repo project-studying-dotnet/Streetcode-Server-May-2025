@@ -76,9 +76,9 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Team.Position.Create
             _mockLogger.Verify(l => l.LogError(query, exceptionMessage), Times.Once);
         }
 
-        private static CreatePositionQuery CreateTestQuery()
+        private static CreatePositionCommand CreateTestQuery()
         {
-            return new CreatePositionQuery(new PositionDTO { Position = "Test Position" });
+            return new CreatePositionCommand(new PositionDTO { Position = "Test Position" });
         }
 
         private static Positions CreateTestEntity()
