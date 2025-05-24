@@ -13,10 +13,11 @@ public class UpdateFactsHandler : IRequestHandler<UpdateFactsCommand, Result<Fac
     private readonly IMapper _mapper;
     private readonly IRepositoryWrapper _repositoryWrapper;
 
-    public UpdateFactsHandler(ILoggerService loggerService, IMapper mapper)
+    public UpdateFactsHandler(ILoggerService loggerService, IMapper mapper, IRepositoryWrapper repositoryWrapper)
     {
         _logger = loggerService;
         _mapper = mapper;
+        _repositoryWrapper = repositoryWrapper;
     }
 
     public async Task<Result<FactDTO>> Handle(UpdateFactsCommand request, CancellationToken cancellationToken)
@@ -34,6 +35,7 @@ public class UpdateFactsHandler : IRequestHandler<UpdateFactsCommand, Result<Fac
         factToUpdate.Title = request.FactDTO.Title;
         factToUpdate.ImageId = request.FactDTO.ImageId;
         factToUpdate.FactContent = request.FactDTO.FactContent;
+        factToUpdate.StreetcodeId = request.FactDTO.StreetcodeId;
 
         _repositoryWrapper.FactRepository.Update(factToUpdate);
         var resultIsSuccess = await _repositoryWrapper.SaveChangesAsync() > 0;
