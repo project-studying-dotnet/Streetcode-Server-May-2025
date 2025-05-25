@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Streetcode.BLL.DTO.Streetcode.TextContent.Fact;
 using Streetcode.BLL.MediatR.Streetcode.Fact.Create;
+using Streetcode.BLL.MediatR.Streetcode.Fact.Delete;
 using Streetcode.BLL.MediatR.Streetcode.Fact.GetAll;
 using Streetcode.BLL.MediatR.Streetcode.Fact.GetById;
 using Streetcode.BLL.MediatR.Streetcode.Fact.GetByStreetcodeId;
@@ -32,6 +33,12 @@ public class FactController : BaseApiController
     public async Task<IActionResult> Create([FromBody] FactUpdateCreateDTO fact)
     {
         return HandleResult(await Mediator.Send(new CreateFactCommand(fact)));
+    }
+
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete([FromRoute] int id)
+    {
+        return HandleResult(await Mediator.Send(new DeleteFactCommand(id)));
     }
 
     [HttpPatch("{streetcodeId:int}/Reorder")]

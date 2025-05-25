@@ -8,7 +8,7 @@ using Streetcode.DAL.Repositories.Interfaces.Base;
 
 namespace Streetcode.BLL.MediatR.Partners.Create
 {
-    public class CreatePartnerHandler : IRequestHandler<CreatePartnerQuery, Result<PartnerDTO>>
+    public class CreatePartnerHandler : IRequestHandler<CreatePartnerCommand, Result<PartnerDTO>>
     {
         private readonly IMapper _mapper;
         private readonly IRepositoryWrapper _repositoryWrapper;
@@ -21,7 +21,7 @@ namespace Streetcode.BLL.MediatR.Partners.Create
             _logger = logger;
         }
 
-        public async Task<Result<PartnerDTO>> Handle(CreatePartnerQuery request, CancellationToken cancellationToken)
+        public async Task<Result<PartnerDTO>> Handle(CreatePartnerCommand request, CancellationToken cancellationToken)
         {
             var newPartner = _mapper.Map<Partner>(request.newPartner);
             try
