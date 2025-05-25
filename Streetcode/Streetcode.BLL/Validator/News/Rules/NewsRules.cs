@@ -5,7 +5,7 @@ namespace Streetcode.BLL.Validator.News.Rules;
 public static class NewsRules
 {
     public static IRuleBuilderOptions<T, string> ValidTitle<T>(this IRuleBuilder<T, string> rule) =>
-        rule.NotEmpty().MaximumLength(30);
+        rule.NotEmpty();
 
     public static IRuleBuilderOptions<T, string> ValidText<T>(this IRuleBuilder<T, string> rule) =>
         rule.NotEmpty();
