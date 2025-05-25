@@ -48,7 +48,7 @@ public class SortedByDateTimeHandlerTests
         _mockRepository.Verify(r => r.NewsRepository.GetAllAsync(
             null,
             It.IsAny<Func<IQueryable<News>, IIncludableQueryable<News, object>>?>()));
-        _mockBlobService.Verify(x => x.FindFileInStorageAsBase64(It.IsAny<string?>()), Times.Exactly(2));
+        _mockBlobService.Verify(x => x.FindFileInStorageAsBase64Async(It.IsAny<string?>()), Times.Exactly(2));
         result.Value.Where(x => x.Image is not null)
             .All(x => x.Image.Base64 == base64Image).Should().BeTrue();
         result.IsSuccess.Should().BeTrue();
@@ -70,7 +70,7 @@ public class SortedByDateTimeHandlerTests
         _mockRepository.Verify(r => r.NewsRepository.GetAllAsync(
             null,
             It.IsAny<Func<IQueryable<News>, IIncludableQueryable<News, object>>?>()));
-        _mockBlobService.Verify(x => x.FindFileInStorageAsBase64(It.IsAny<string?>()), Times.Never);
+        _mockBlobService.Verify(x => x.FindFileInStorageAsBase64Async(It.IsAny<string?>()), Times.Never);
         result.IsSuccess.Should().BeTrue();
     }
 
@@ -186,7 +186,7 @@ public class SortedByDateTimeHandlerTests
 
     private void SetUpMockBlobService(string base64String)
     {
-        _mockBlobService.Setup(x => x.FindFileInStorageAsBase64(It.IsAny<string>()))
-            .Returns(base64String);
+        _mockBlobService.Setup(x => x.FindFileInStorageAsBase64Async(It.IsAny<string>()))
+            .ReturnsAsync(base64String);
     }
 }

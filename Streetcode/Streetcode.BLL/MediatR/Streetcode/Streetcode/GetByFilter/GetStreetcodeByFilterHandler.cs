@@ -120,7 +120,7 @@ namespace Streetcode.BLL.MediatR.Streetcode.Streetcode.GetByFilter
             return results;
         }
 
-        private StreetcodeFilterResultDTO CreateFilterResult(StreetcodeContent streetcode, string content, string? sourceName = null, string? blockName = null)
+        private static StreetcodeFilterResultDTO CreateFilterResult(StreetcodeContent streetcode, string content, string? sourceName = null, string? blockName = null)
         {
             return new StreetcodeFilterResultDTO
             {

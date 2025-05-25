@@ -42,7 +42,7 @@ public class GetImageByStreetcodeIdHandler : IRequestHandler<GetImageByStreetcod
 
         foreach (var image in imageDtos)
         {
-            image.Base64 = _blobService.FindFileInStorageAsBase64(image.BlobName);
+            image.Base64 = await _blobService.FindFileInStorageAsBase64Async(image.BlobName);
         }
 
         return Result.Ok(imageDtos);

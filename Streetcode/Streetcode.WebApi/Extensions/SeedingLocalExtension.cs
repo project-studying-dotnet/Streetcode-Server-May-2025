@@ -47,7 +47,7 @@ namespace Streetcode.WebApi.Extensions
                         string filePath = Path.Combine(blobPath, img.BlobName);
                         if (!File.Exists(filePath))
                         {
-                            blobService.SaveFileInStorageBase64(img.Base64, img.BlobName.Split('.')[0], img.BlobName.Split('.')[1]);
+                            await blobService.SaveFileInStorageBase64Async(img.Base64, img.BlobName.Split('.')[0], img.BlobName.Split('.')[1]);
                         }
                     }
 
@@ -56,7 +56,7 @@ namespace Streetcode.WebApi.Extensions
                         string filePath = Path.Combine(blobPath, audio.BlobName);
                         if (!File.Exists(filePath))
                         {
-                            blobService.SaveFileInStorageBase64(audio.Base64, audio.BlobName.Split('.')[0], audio.BlobName.Split('.')[1]);
+                            await blobService.SaveFileInStorageBase64Async(audio.Base64, audio.BlobName.Split('.')[0], audio.BlobName.Split('.')[1]);
                         }
                     }
 

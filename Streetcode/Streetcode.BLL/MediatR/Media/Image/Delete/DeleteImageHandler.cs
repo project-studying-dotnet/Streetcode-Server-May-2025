@@ -41,7 +41,7 @@ public class DeleteImageHandler : IRequestHandler<DeleteImageCommand, Result<Uni
 
         if (resultIsSuccess)
         {
-            _blobService.DeleteFileInStorage(image.BlobName);
+            await _blobService.DeleteFileInStorageAsync(image.BlobName);
         }
 
         if(resultIsSuccess)

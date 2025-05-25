@@ -54,8 +54,8 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Media.Art.GetByStreetcodeId
                 .Returns(new List<ArtDTO> { artDto });
 
             _mockBlobService
-                .Setup(b => b.FindFileInStorageAsBase64(image.BlobName))
-                .Returns("base64-image");
+                .Setup(b => b.FindFileInStorageAsBase64Async(image.BlobName))
+                .ReturnsAsync("base64-image");
 
 
             var query = new GetArtsByStreetcodeIdQuery(1);
@@ -95,7 +95,7 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Media.Art.GetByStreetcodeId
             // Assert
             Assert.True(result.IsSuccess);
             Assert.Equal(new List<ArtDTO> { artDto }, result.Value);
-            _mockBlobService.Verify(b => b.FindFileInStorageAsBase64(It.IsAny<string>()), Times.Never);
+            _mockBlobService.Verify(b => b.FindFileInStorageAsBase64Async(It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
@@ -123,7 +123,7 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Media.Art.GetByStreetcodeId
             // Assert
             Assert.True(result.IsSuccess);
             Assert.Equal(new List<ArtDTO> { artDto }, result.Value);
-            _mockBlobService.Verify(b => b.FindFileInStorageAsBase64(It.IsAny<string>()), Times.Never);
+            _mockBlobService.Verify(b => b.FindFileInStorageAsBase64Async(It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
