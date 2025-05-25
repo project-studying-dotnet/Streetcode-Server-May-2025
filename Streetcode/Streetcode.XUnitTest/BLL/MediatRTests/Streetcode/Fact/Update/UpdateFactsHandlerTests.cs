@@ -31,10 +31,7 @@ public class UpdateFactsHandlerTests
         // Arrange
         var factDto = GetFactDto();
         var fact = GetFact();
-        _mockRepoWrapper.Setup(r => r.FactRepository.GetFirstOrDefaultAsync(
-                It.IsAny<Expression<Func<DAL.Entities.Streetcode.TextContent.Fact, bool>>>(),
-                null))
-            .ReturnsAsync(fact);
+        _mockMapper.Setup(m => m.Map<DAL.Entities.Streetcode.TextContent.Fact>(factDto)).Returns(fact);
         _mockRepoWrapper.Setup(r => r.FactRepository.Update(It.IsAny<DAL.Entities.Streetcode.TextContent.Fact>()));
         _mockRepoWrapper.Setup(r => r.SaveChangesAsync())
             .ReturnsAsync(1);
@@ -45,8 +42,7 @@ public class UpdateFactsHandlerTests
         var result = await _handler.Handle(new UpdateFactsCommand(factDto), CancellationToken.None);
 
         // Assert
-        _mockRepoWrapper.Verify(r => r.FactRepository.GetFirstOrDefaultAsync(
-            It.IsAny<Expression<Func<DAL.Entities.Streetcode.TextContent.Fact, bool>>>(), null), Times.Once);
+        _mockMapper.Verify(m => m.Map<DAL.Entities.Streetcode.TextContent.Fact>(factDto), Times.Once);
         _mockRepoWrapper.Verify(r => r.FactRepository.Update(It.IsAny<DAL.Entities.Streetcode.TextContent.Fact>()), Times.Once);
         _mockRepoWrapper.Verify(r => r.SaveChangesAsync(), Times.Once);
         _mockMapper.Verify(m => m.Map<FactDTO>(fact), Times.Once);
@@ -57,18 +53,17 @@ public class UpdateFactsHandlerTests
     public async Task Handle_IdIsIncorrect_ShouldReturnError()
     {
         // Arrange
-        var errorMessage = "Fact by this id does not exist";
+        var errorMessage = "Cannot convert null to Fact";
         var factDto = GetFactDto();
         var fact = GetFact();
-        _mockRepoWrapper.Setup(r => r.FactRepository.GetFirstOrDefaultAsync(
-                It.IsAny<Expression<Func<DAL.Entities.Streetcode.TextContent.Fact, bool>>>(),
-                null))
-            .ReturnsAsync((DAL.Entities.Streetcode.TextContent.Fact)null);
+        _mockMapper.Setup(m => m.Map<DAL.Entities.Streetcode.TextContent.Fact>(factDto))
+            .Returns((DAL.Entities.Streetcode.TextContent.Fact)null);
 
         // Act
         var result = await _handler.Handle(new UpdateFactsCommand(factDto), CancellationToken.None);
 
-        // ASsert
+        // Assert
+        _mockMapper.Verify(m => m.Map<DAL.Entities.Streetcode.TextContent.Fact>(factDto), Times.Once);
         _mockMapper.Verify(m => m.Map<FactDTO>(fact), Times.Never);
         _mockRepoWrapper.Verify(r => r.FactRepository.Update(It.IsAny<DAL.Entities.Streetcode.TextContent.Fact>()), Times.Never);
         _mockRepoWrapper.Verify(r => r.SaveChangesAsync(), Times.Never);
@@ -84,10 +79,7 @@ public class UpdateFactsHandlerTests
         var errorMessage = "Failed to update facts";
         var factDto = GetFactDto();
         var fact = GetFact();
-        _mockRepoWrapper.Setup(r => r.FactRepository.GetFirstOrDefaultAsync(
-                It.IsAny<Expression<Func<DAL.Entities.Streetcode.TextContent.Fact, bool>>>(),
-                null))
-            .ReturnsAsync(fact);
+        _mockMapper.Setup(m => m.Map<DAL.Entities.Streetcode.TextContent.Fact>(factDto)).Returns(fact);
         _mockRepoWrapper.Setup(r => r.FactRepository.Update(It.IsAny<DAL.Entities.Streetcode.TextContent.Fact>()));
         _mockRepoWrapper.Setup(r => r.SaveChangesAsync())
             .ReturnsAsync(0);
