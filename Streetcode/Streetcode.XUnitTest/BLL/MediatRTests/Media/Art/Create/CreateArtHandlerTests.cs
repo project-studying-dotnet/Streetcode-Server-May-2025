@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using FluentAssertions;
 using Moq;
 using Repositories.Interfaces;
@@ -177,7 +177,6 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Media.Art.Create
 
             // Assert
             result.IsFailed.Should().BeTrue();
-            // Повідомлення про помилку залежить від реалізації вашого CreateArtHandler
             result.Errors.First().Message.Should().Contain("Не вдалося створити об'єкт мистецтва");
         }
     }

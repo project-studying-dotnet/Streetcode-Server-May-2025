@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using FluentResults;
 using Streetcode.DAL.Repositories.Interfaces.Base;
 using AutoMapper;
@@ -10,6 +10,7 @@ using Streetcode.DAL.Entities.Media.Images;
 using Streetcode.DAL.Entities.Media;
 using ImageEntity = Streetcode.DAL.Entities.Media.Images.Image;
 using ArtEntity = Streetcode.DAL.Entities.Media.Images.Art;
+
 namespace Streetcode.BLL.MediatR.Media.Art.Create
 {
     public class CreateArtHandler : IRequestHandler<CreateArtCommand, Result<ArtDTO>>
@@ -125,3 +126,4 @@ namespace Streetcode.BLL.MediatR.Media.Art.Create
         }
     }
 }
+
