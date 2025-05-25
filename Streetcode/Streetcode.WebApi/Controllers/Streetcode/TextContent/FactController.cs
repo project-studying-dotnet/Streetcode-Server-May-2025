@@ -4,6 +4,7 @@ using Streetcode.BLL.MediatR.Streetcode.Fact.Create;
 using Streetcode.BLL.MediatR.Streetcode.Fact.GetAll;
 using Streetcode.BLL.MediatR.Streetcode.Fact.GetById;
 using Streetcode.BLL.MediatR.Streetcode.Fact.GetByStreetcodeId;
+using Streetcode.BLL.MediatR.Streetcode.Fact.Update;
 
 namespace Streetcode.WebApi.Controllers.Streetcode.TextContent;
 
@@ -31,5 +32,11 @@ public class FactController : BaseApiController
     public async Task<IActionResult> Create([FromBody] FactUpdateCreateDTO fact)
     {
         return HandleResult(await Mediator.Send(new CreateFactCommand(fact)));
+    }
+
+    [HttpPut]
+    public async Task<IActionResult> Update([FromBody] FactDTO fact)
+    {
+        return HandleResult(await Mediator.Send(new UpdateFactsCommand(fact)));
     }
 }
