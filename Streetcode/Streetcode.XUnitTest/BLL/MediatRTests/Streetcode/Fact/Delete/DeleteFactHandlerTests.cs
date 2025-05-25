@@ -1,5 +1,4 @@
 ﻿using System.Linq.Expressions;
-using AutoMapper;
 using FluentAssertions;
 using Moq;
 using Streetcode.BLL.Interfaces.Logging;
@@ -13,7 +12,6 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Streetcode.Fact.Delete;
 
 public class DeleteFactHandlerTests
 {
-    private readonly Mock<IMapper> _mockMapper;
     private readonly Mock<ILoggerService> _logger;
     private readonly Mock<IRepositoryWrapper> _repositoryWrapper;
     private readonly DeleteFactHandler _handler;
