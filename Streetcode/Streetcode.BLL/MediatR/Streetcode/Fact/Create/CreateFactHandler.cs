@@ -58,6 +58,7 @@ public class CreateFactHandler : IRequestHandler<CreateFactCommand, Result<FactU
         }
 
         newFact.ImageId = newFact.ImageId == 0 ? null : newFact.ImageId;
+        newFact.Position = newFact.Position == 0 ? null : newFact.Position;
 
         var entity = await _repositoryWrapper.FactRepository.CreateAsync(newFact);
         var isSuccessResult = await _repositoryWrapper.SaveChangesAsync() > 0;
