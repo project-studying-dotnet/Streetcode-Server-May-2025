@@ -126,4 +126,3 @@ namespace Streetcode.BLL.MediatR.Media.Art.Create
         }
     }
 }
-
