@@ -1,9 +1,7 @@
 using AutoMapper;
-using FluentResults;
 using Microsoft.EntityFrameworkCore;
 using Streetcode.BLL.DTO.News;
 using Streetcode.BLL.Interfaces.BlobStorage;
-using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.BLL.Interfaces.News;
 using Streetcode.DAL.Repositories.Interfaces.Base;
 
