@@ -3,50 +3,49 @@ using MediatR;
 using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.DAL.Repositories.Interfaces.Base;
 
-namespace Streetcode.BLL.MediatR.Streetcode.Fact.Delete
-{
-    public class DeleteFactHandler : IRequestHandler<DeleteFactCommand, Result<Unit>>
-    {
-        private readonly IRepositoryWrapper _repositoryWrapper;
-        private readonly ILoggerService _logger;
+namespace Streetcode.BLL.MediatR.Streetcode.Fact.Delete;
 
-        public DeleteFactHandler(IRepositoryWrapper repositoryWrapper, ILoggerService logger)
+public class DeleteFactHandler : IRequestHandler<DeleteFactCommand, Result<Unit>>
+{
+    private readonly IRepositoryWrapper _repositoryWrapper;
+    private readonly ILoggerService _logger;
+
+    public DeleteFactHandler(IRepositoryWrapper repositoryWrapper, ILoggerService logger)
+    {
+        _repositoryWrapper = repositoryWrapper;
+        _logger = logger;
+    }
+
+    public async Task<Result<Unit>> Handle(DeleteFactCommand request, CancellationToken cancellationToken)
+    {
+        int id = request.id;
+        var fact = await _repositoryWrapper.FactRepository.GetFirstOrDefaultAsync(n => n.Id == id);
+
+        if (fact == null)
         {
-            _repositoryWrapper = repositoryWrapper;
-            _logger = logger;
+            string errorMsg = $"Couldn't find a fact with id: {request.id}";
+            _logger.LogError(request, errorMsg);
+            return Result.Fail(new Error(errorMsg));
         }
 
-        public async Task<Result<Unit>> Handle(DeleteFactCommand request, CancellationToken cancellationToken)
+        if (fact.Image != null)
         {
-            int id = request.id;
-            var fact = await _repositoryWrapper.FactRepository.GetFirstOrDefaultAsync(n => n.Id == id);
+            _repositoryWrapper.ImageRepository.Delete(fact.Image);
+        }
 
-            if (fact == null)
-            {
-                string errorMsg = $"Couldn't find a fact with id: {request.id}";
-                _logger.LogError(request, errorMsg);
-                return Result.Fail(new Error(errorMsg));
-            }
+        _repositoryWrapper.FactRepository.Delete(fact);
+        var resultIsSuccess = await _repositoryWrapper.SaveChangesAsync() > 0;
 
-            if (fact.Image != null)
-            {
-                _repositoryWrapper.ImageRepository.Delete(fact.Image);
-            }
-
-            _repositoryWrapper.FactRepository.Delete(fact);
-            var resultIsSuccess = await _repositoryWrapper.SaveChangesAsync() > 0;
-
-            if (resultIsSuccess)
-            {
-                _logger.LogInformation("DeleteFactCommand handled successfully");
-                return Result.Ok(Unit.Value);
-            }
-            else
-            {
-                string errorMsg = "Failed to delete a fact";
-                _logger.LogError(request, errorMsg);
-                return Result.Fail(new Error(errorMsg));
-            }
+        if (resultIsSuccess)
+        {
+            _logger.LogInformation("DeleteFactCommand handled successfully");
+            return Result.Ok(Unit.Value);
+        }
+        else
+        {
+            string errorMsg = "Failed to delete a fact";
+            _logger.LogError(request, errorMsg);
+            return Result.Fail(new Error(errorMsg));
         }
     }
 }

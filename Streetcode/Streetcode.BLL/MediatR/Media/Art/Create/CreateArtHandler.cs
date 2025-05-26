@@ -4,9 +4,11 @@ using MediatR;
 using Streetcode.BLL.DTO.Media.Art;
 using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.DAL.Repositories.Interfaces.Base;
+
 using ArtEntity = Streetcode.DAL.Entities.Media.Images.Art;
 
 namespace Streetcode.BLL.MediatR.Media.Art.Create;
+
 public class CreateArtHandler : IRequestHandler<CreateArtCommand, Result<ArtDTO>>
 {
     private readonly IMapper _mapper;
