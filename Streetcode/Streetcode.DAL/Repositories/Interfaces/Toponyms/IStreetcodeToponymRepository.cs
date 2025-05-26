@@ -1,9 +1,8 @@
 ﻿using Streetcode.DAL.Entities.Toponyms;
 using Streetcode.DAL.Repositories.Interfaces.Base;
 
-namespace Streetcode.DAL.Repositories.Interfaces.Toponyms
+namespace Streetcode.DAL.Repositories.Interfaces.Toponyms;
+
+public interface IStreetcodeToponymRepository : IRepositoryBase<StreetcodeToponym>
 {
-	public interface IStreetcodeToponymRepository : IRepositoryBase<StreetcodeToponym>
-	{
-	}
 }
