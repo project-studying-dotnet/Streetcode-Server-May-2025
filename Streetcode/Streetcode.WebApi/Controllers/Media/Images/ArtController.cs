@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Streetcode.BLL.DTO.Media.Art;
-using Streetcode.BLL.DTO.Media.Images;
 using Streetcode.BLL.MediatR.Media.Art.Create;
 using Streetcode.BLL.MediatR.Media.Art.Delete;
 using Streetcode.BLL.MediatR.Media.Art.GetAll;
