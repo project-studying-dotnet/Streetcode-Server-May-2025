@@ -7,6 +7,7 @@ using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.BLL.MediatR.Media.Art.GetAll;
 using Streetcode.DAL.Repositories.Interfaces.Base;
 using Xunit;
+
 using ArtEntity = Streetcode.DAL.Entities.Media.Images.Art;
 
 namespace Streetcode.XUnitTest.BLL.MediatRTests.Media.Art.GetAll

@@ -1,17 +1,10 @@
-using System.Linq.Expressions;
-using AutoMapper;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore.Query;
 using Moq;
 using Streetcode.BLL.DTO.Media.Images;
 using Streetcode.BLL.DTO.News;
-using Streetcode.BLL.Interfaces.BlobStorage;
 using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.BLL.Interfaces.News;
-using Streetcode.BLL.MediatR.News.GetById;
 using Streetcode.BLL.MediatR.News.GetByUrl;
-using Streetcode.DAL.Entities.News;
-using Streetcode.DAL.Repositories.Interfaces.Base;
 using Xunit;
 
 namespace Streetcode.XUnitTest.BLL.MediatRTests.NewsTests;

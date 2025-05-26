@@ -1,14 +1,11 @@
 using System.Linq.Expressions;
 using AutoMapper;
 using FluentAssertions;
-using FluentResults;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Moq;
 using Streetcode.BLL.DTO.Media.Images;
 using Streetcode.BLL.DTO.News;
 using Streetcode.BLL.Interfaces.BlobStorage;
 using Streetcode.BLL.Interfaces.Logging;
-using Streetcode.BLL.MediatR.News.Create;
 using Streetcode.BLL.MediatR.News.Update;
 using Streetcode.DAL.Entities.Media.Images;
 using Streetcode.DAL.Entities.News;
