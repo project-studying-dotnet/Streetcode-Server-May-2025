@@ -2,13 +2,12 @@
 using Streetcode.BLL.DTO.Team;
 using Streetcode.DAL.Entities.Team;
 
-namespace Streetcode.BLL.Mapping.Team
+namespace Streetcode.BLL.Mapping.Team;
+
+public class TeamLinkProfile : Profile
 {
-    public class TeamLinkProfile : Profile
+    public TeamLinkProfile()
     {
-        public TeamLinkProfile()
-        {
-            CreateMap<TeamMemberLink, TeamMemberLinkDTO>().ReverseMap();
-        }
+        CreateMap<TeamMemberLink, TeamMemberLinkDTO>().ReverseMap();
     }
 }
