@@ -9,7 +9,7 @@ using Entity = Streetcode.DAL.Entities.Streetcode.TextContent.Fact;
 
 namespace Streetcode.BLL.MediatR.Streetcode.Fact.Create;
 
-public class CreateFactHandler : IRequestHandler<CreateFactCommand, Result<FactUpdateCreateDTO>>
+public class CreateFactHandler : IRequestHandler<CreateFactCommand, Result<FactDTO>>
 {
     private readonly IRepositoryWrapper _repositoryWrapper;
     private readonly IMapper _mapper;
@@ -22,7 +22,7 @@ public class CreateFactHandler : IRequestHandler<CreateFactCommand, Result<FactU
         _logger = logger;
     }
 
-    public async Task<Result<FactUpdateCreateDTO>> Handle(CreateFactCommand request, CancellationToken cancellationToken)
+    public async Task<Result<FactDTO>> Handle(CreateFactCommand request, CancellationToken cancellationToken)
     {
         var newFact = _mapper.Map<Entity>(request.NewFact);
 
@@ -65,7 +65,7 @@ public class CreateFactHandler : IRequestHandler<CreateFactCommand, Result<FactU
 
         if (isSuccessResult)
         {
-            return Result.Ok(_mapper.Map<FactUpdateCreateDTO>(entity));
+            return Result.Ok(_mapper.Map<FactDTO>(entity));
         }
         else
         {
