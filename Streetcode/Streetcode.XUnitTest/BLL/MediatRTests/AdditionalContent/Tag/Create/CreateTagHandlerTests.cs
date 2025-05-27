@@ -38,7 +38,7 @@ public class CreateTagHandlerTests
         _mapper.Setup(m => m.Map<TagDTO>(tag)).Returns(tagDto);
 
         // Act
-        var result = await _handler.Handle(new CreateTagQuery(createTagDto), CancellationToken.None);
+        var result = await _handler.Handle(new CreateTagCommand(createTagDto), CancellationToken.None);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -61,7 +61,7 @@ public class CreateTagHandlerTests
             .ThrowsAsync(new Exception(exceptionMessage));
 
         // Act
-        var result = await _handler.Handle(new CreateTagQuery(createTagDto), CancellationToken.None);
+        var result = await _handler.Handle(new CreateTagCommand(createTagDto), CancellationToken.None);
 
         // Assert
         result.IsSuccess.Should().BeFalse();
