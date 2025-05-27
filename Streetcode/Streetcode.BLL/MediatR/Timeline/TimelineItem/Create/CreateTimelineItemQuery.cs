@@ -7,7 +7,6 @@ using FluentResults;
 using MediatR;
 using Streetcode.BLL.DTO.Timeline;
 
-namespace Streetcode.BLL.MediatR.Timeline.TimelineItem.Create
-{
-    public record CreateTimelineItemQuery(TimelineItemDTO newTimelineItem) : IRequest<Result<TimelineItemDTO>>;
-}
+namespace Streetcode.BLL.MediatR.Timeline.TimelineItem.Create;
+
+public record CreateTimelineItemQuery(TimelineItemDTO newTimelineItem) : IRequest<Result<TimelineItemDTO>>;

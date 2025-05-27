@@ -19,131 +19,130 @@ using Xunit;
 
 using TimelineItemEntity = Streetcode.DAL.Entities.Timeline.TimelineItem;
 
-namespace Streetcode.XUnitTest.BLL.MediatRTests.Timeline.TimelineItem.Create
+namespace Streetcode.XUnitTest.BLL.MediatRTests.Timeline.TimelineItem.Create;
+
+public class CreateTimelineItemHandlerTests
 {
-    public class CreateTimelineItemHandlerTests
+    private readonly Mock<IRepositoryWrapper> _mockRepositoryWrapper;
+    private readonly Mock<IMapper> _mockMapper;
+    private readonly Mock<ILoggerService> _mockLogger;
+    private readonly CreateTimelineItemHandler _handler;
+
+    public CreateTimelineItemHandlerTests()
     {
-        private readonly Mock<IRepositoryWrapper> _mockRepositoryWrapper;
-        private readonly Mock<IMapper> _mockMapper;
-        private readonly Mock<ILoggerService> _mockLogger;
-        private readonly CreateTimelineItemHandler _handler;
+        _mockRepositoryWrapper = new Mock<IRepositoryWrapper>();
+        _mockMapper = new Mock<IMapper>();
+        _mockLogger = new Mock<ILoggerService>();
+        _handler = new CreateTimelineItemHandler(_mockRepositoryWrapper.Object, _mockMapper.Object, _mockLogger.Object);
+    }
 
-        public CreateTimelineItemHandlerTests()
+    [Fact]
+    public async Task Handle_ShouldReturnOk_WhenTimelineItemIsCreatedSuccessfully()
+    {
+        // Arrange
+        var dto = new TimelineItemDTO
         {
-            _mockRepositoryWrapper = new Mock<IRepositoryWrapper>();
-            _mockMapper = new Mock<IMapper>();
-            _mockLogger = new Mock<ILoggerService>();
-            _handler = new CreateTimelineItemHandler(_mockRepositoryWrapper.Object, _mockMapper.Object, _mockLogger.Object);
-        }
+            Id = 0,
+            Title = "Test Title",
+            Date = DateTime.UtcNow,
+            DateViewPattern = DateViewPattern.DateMonthYear,
+            HistoricalContexts = new List<HistoricalContextDTO> { new() { Id = 1, Title = "War" } }
+        };
 
-        [Fact]
-        public async Task Handle_ShouldReturnOk_WhenTimelineItemIsCreatedSuccessfully()
+        var request = new CreateTimelineItemQuery(dto);
+
+        var entity = new TimelineItemEntity
         {
-            // Arrange
-            var dto = new TimelineItemDTO
-            {
-                Id = 0,
-                Title = "Test Title",
-                Date = DateTime.UtcNow,
-                DateViewPattern = DateViewPattern.DateMonthYear,
-                HistoricalContexts = new List<HistoricalContextDTO> { new() { Id = 1, Title = "War" } }
-            };
+            StreetcodeId = 1,
+            HistoricalContextTimelines = new List<HistoricalContextTimeline>()
+        };
 
-            var request = new CreateTimelineItemQuery(dto);
+        _mockMapper.Setup(m => m.Map<TimelineItemEntity>(dto)).Returns(entity);
+        _mockRepositoryWrapper.Setup(r => r.StreetcodeRepository.GetFirstOrDefaultAsync(It.IsAny<Expression<Func<StreetcodeContent, bool>>>(), null))
+                 .ReturnsAsync(new StreetcodeContent { Id = 1 });
+        _mockRepositoryWrapper.Setup(r => r.TimelineRepository.Create(entity));
+        _mockRepositoryWrapper.Setup(r => r.SaveChangesAsync()).ReturnsAsync(1);
+        _mockMapper.Setup(m => m.Map<TimelineItemDTO>(entity)).Returns(dto);
 
-            var entity = new TimelineItemEntity
-            {
-                StreetcodeId = 1,
-                HistoricalContextTimelines = new List<HistoricalContextTimeline>()
-            };
+        // Act
+        var result = await _handler.Handle(request, CancellationToken.None);
 
-            _mockMapper.Setup(m => m.Map<TimelineItemEntity>(dto)).Returns(entity);
-            _mockRepositoryWrapper.Setup(r => r.StreetcodeRepository.GetFirstOrDefaultAsync(It.IsAny<Expression<Func<StreetcodeContent, bool>>>(), null))
-                     .ReturnsAsync(new StreetcodeContent { Id = 1 });
-            _mockRepositoryWrapper.Setup(r => r.TimelineRepository.Create(entity));
-            _mockRepositoryWrapper.Setup(r => r.SaveChangesAsync()).ReturnsAsync(1);
-            _mockMapper.Setup(m => m.Map<TimelineItemDTO>(entity)).Returns(dto);
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.Equal(dto, result.Value);
+    }
 
-            // Act
-            var result = await _handler.Handle(request, CancellationToken.None);
-
-            // Assert
-            Assert.True(result.IsSuccess);
-            Assert.Equal(dto, result.Value);
-        }
-
-        [Fact]
-        public async Task Handle_ShouldReturnFail_WhenStreetcodeIdIsZero()
+    [Fact]
+    public async Task Handle_ShouldReturnFail_WhenStreetcodeIdIsZero()
+    {
+        // Arrange
+        var dto = new TimelineItemDTO
         {
-            // Arrange
-            var dto = new TimelineItemDTO
-            {
-                Title = "Invalid",
-                Date = DateTime.UtcNow,
-                DateViewPattern = DateViewPattern.DateMonthYear
-            };
+            Title = "Invalid",
+            Date = DateTime.UtcNow,
+            DateViewPattern = DateViewPattern.DateMonthYear
+        };
 
-            var entity = new TimelineItemEntity { StreetcodeId = 0 };
+        var entity = new TimelineItemEntity { StreetcodeId = 0 };
 
-            _mockMapper.Setup(m => m.Map<TimelineItemEntity>(dto)).Returns(entity);
+        _mockMapper.Setup(m => m.Map<TimelineItemEntity>(dto)).Returns(entity);
 
-            var query = new CreateTimelineItemQuery(dto);
-            var errorMsg = "StreetcodeId must be a positive number";
+        var query = new CreateTimelineItemQuery(dto);
+        var errorMsg = "StreetcodeId must be a positive number";
 
-            // Act
-            var result = await _handler.Handle(query, CancellationToken.None);
+        // Act
+        var result = await _handler.Handle(query, CancellationToken.None);
 
-            // Assert
-            Assert.False(result.IsSuccess);
-            Assert.Equal(errorMsg, result.Errors.First().Message);
-        }
+        // Assert
+        Assert.False(result.IsSuccess);
+        Assert.Equal(errorMsg, result.Errors.First().Message);
+    }
 
-        [Fact]
-        public async Task Handle_ShouldReturnFail_WhenStreetcodeNotFound()
-        {
-            // Arrange
-            var dto = new TimelineItemDTO { Title = "Test", Date = DateTime.UtcNow, DateViewPattern = DateViewPattern.DateMonthYear };
-            var entity = new TimelineItemEntity { StreetcodeId = 99 };
+    [Fact]
+    public async Task Handle_ShouldReturnFail_WhenStreetcodeNotFound()
+    {
+        // Arrange
+        var dto = new TimelineItemDTO { Title = "Test", Date = DateTime.UtcNow, DateViewPattern = DateViewPattern.DateMonthYear };
+        var entity = new TimelineItemEntity { StreetcodeId = 99 };
 
-            _mockMapper.Setup(m => m.Map<TimelineItemEntity>(dto)).Returns(entity);
-            _mockRepositoryWrapper.Setup(r => r.StreetcodeRepository.GetFirstOrDefaultAsync(It.IsAny<Expression<Func<StreetcodeContent, bool>>>(), null))
-                     .ReturnsAsync((StreetcodeContent?)null);
+        _mockMapper.Setup(m => m.Map<TimelineItemEntity>(dto)).Returns(entity);
+        _mockRepositoryWrapper.Setup(r => r.StreetcodeRepository.GetFirstOrDefaultAsync(It.IsAny<Expression<Func<StreetcodeContent, bool>>>(), null))
+                 .ReturnsAsync((StreetcodeContent?)null);
 
-            var query = new CreateTimelineItemQuery(dto);
-            var errorMsg = $"Streetcode with id {entity.StreetcodeId} does not exist";
+        var query = new CreateTimelineItemQuery(dto);
+        var errorMsg = $"Streetcode with id {entity.StreetcodeId} does not exist";
 
-            // Act
-            var result = await _handler.Handle(query, CancellationToken.None);
+        // Act
+        var result = await _handler.Handle(query, CancellationToken.None);
 
-            // Assert
-            Assert.False(result.IsSuccess);
-            Assert.Equal(errorMsg, result.Errors.First().Message);
-        }
+        // Assert
+        Assert.False(result.IsSuccess);
+        Assert.Equal(errorMsg, result.Errors.First().Message);
+    }
 
-        [Fact]
-        public async Task Handle_ShouldReturnFail_WhenSaveFails()
-        {
-            var dto = new TimelineItemDTO { Title = "Test", Date = DateTime.UtcNow, DateViewPattern = DateViewPattern.DateMonthYear };
-            var entity = new TimelineItemEntity { StreetcodeId = 1 };
+    [Fact]
+    public async Task Handle_ShouldReturnFail_WhenSaveFails()
+    {
+        var dto = new TimelineItemDTO { Title = "Test", Date = DateTime.UtcNow, DateViewPattern = DateViewPattern.DateMonthYear };
+        var entity = new TimelineItemEntity { StreetcodeId = 1 };
 
-            var mockTimelineRepo = new Mock<ITimelineRepository>();
-            _mockRepositoryWrapper.Setup(r => r.TimelineRepository).Returns(mockTimelineRepo.Object);
-            mockTimelineRepo.Setup(r => r.Create(It.IsAny<TimelineItemEntity>()));
+        var mockTimelineRepo = new Mock<ITimelineRepository>();
+        _mockRepositoryWrapper.Setup(r => r.TimelineRepository).Returns(mockTimelineRepo.Object);
+        mockTimelineRepo.Setup(r => r.Create(It.IsAny<TimelineItemEntity>()));
 
-            _mockMapper.Setup(m => m.Map<TimelineItemEntity>(dto)).Returns(entity);
-            _mockRepositoryWrapper.Setup(r => r.StreetcodeRepository.GetFirstOrDefaultAsync(It.IsAny<Expression<Func<StreetcodeContent, bool>>>(), null))
-                     .ReturnsAsync(new StreetcodeContent { Id = 1 });
-            _mockRepositoryWrapper.Setup(r => r.SaveChangesAsync()).ReturnsAsync(0);
+        _mockMapper.Setup(m => m.Map<TimelineItemEntity>(dto)).Returns(entity);
+        _mockRepositoryWrapper.Setup(r => r.StreetcodeRepository.GetFirstOrDefaultAsync(It.IsAny<Expression<Func<StreetcodeContent, bool>>>(), null))
+                 .ReturnsAsync(new StreetcodeContent { Id = 1 });
+        _mockRepositoryWrapper.Setup(r => r.SaveChangesAsync()).ReturnsAsync(0);
 
-            var query = new CreateTimelineItemQuery(dto);
-            var errorMsg = $"Failed to save timeline item.";
+        var query = new CreateTimelineItemQuery(dto);
+        var errorMsg = $"Failed to save timeline item.";
 
-            // Act
-            var result = await _handler.Handle(query, CancellationToken.None);
+        // Act
+        var result = await _handler.Handle(query, CancellationToken.None);
 
-            // Assert
-            Assert.False(result.IsSuccess);
-            Assert.Equal(errorMsg, result.Errors.First().Message);
-        }
+        // Assert
+        Assert.False(result.IsSuccess);
+        Assert.Equal(errorMsg, result.Errors.First().Message);
     }
 }
