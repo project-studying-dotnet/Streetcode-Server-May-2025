@@ -37,7 +37,7 @@ public class GetAllNewsHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ShouldReturnAllNewsSuccessfully()
+    public async Task Handle_NewsExists_ShouldReturnAllNewsSuccessfully()
     {
         // Arrange
         SetUpMockRepository(GetNewsCollection());
@@ -58,7 +58,7 @@ public class GetAllNewsHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ShouldReturnError_NullNewsCollection()
+    public async Task Handle_NullNewsCollection_ShouldReturnError()
     {
         // Arrange
         var errorMessage = "There are no news in the database";

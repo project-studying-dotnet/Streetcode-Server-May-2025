@@ -31,7 +31,7 @@ public class CreateNewsHandlerTests
     }
 
     [Fact]
-    public async Task Handler_ShouldReturnCorrectType_CorrectInput()
+    public async Task Handler_CorrectInput_ShouldReturnCorrectType()
     {
         // Arrange
         var news = GetNews();
@@ -55,7 +55,7 @@ public class CreateNewsHandlerTests
     }
 
     [Fact]
-    public async Task Handler_ShouldReturnErrorMessage_IncorrectInput()
+    public async Task Handler_IncorrectInput_ShouldReturnErrorMessage()
     {
         // Arrange
         var newsDto = new NewsDTO();
@@ -72,7 +72,7 @@ public class CreateNewsHandlerTests
     }
 
     [Fact]
-    public async Task Handler_ShouldReturnErrorMessage_WhenSaveChangesIsFalse()
+    public async Task Handler_WhenSaveChangesIsFalse_ShouldReturnErrorMessage()
     {
         // Arrange
         var news = GetNews();

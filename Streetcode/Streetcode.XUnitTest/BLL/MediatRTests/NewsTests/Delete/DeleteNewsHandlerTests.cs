@@ -30,7 +30,7 @@ public class DeleteNewsHandlerTests
     }
 
     [Fact]
-    public async Task Handler_ShouldDeleteNewsSuccessfully_WhenImageExists()
+    public async Task Handler_WhenImageExists_ShouldDeleteNewsSuccessfully()
     {
         // Arrange
         var testNews = GetNews();
@@ -50,7 +50,7 @@ public class DeleteNewsHandlerTests
     }
 
     [Fact]
-    public async Task Handler_ShouldDeleteNewsSuccessfully_WhenImageDoesntExists()
+    public async Task Handler_WhenImageDoesntExists_ShouldDeleteNewsSuccessfully()
     {
         // Arrange
         var testNews = GetNewsWithoutImage();
@@ -70,7 +70,7 @@ public class DeleteNewsHandlerTests
     }
 
     [Fact]
-    public async Task Handler_ShouldReturnErrorMessage_IdIsIncorrect()
+    public async Task Handler_IdIsIncorrect_ShouldReturnErrorMessage()
     {
         // Arrange
         var testNews = GetNews();
@@ -86,7 +86,7 @@ public class DeleteNewsHandlerTests
     }
 
     [Fact]
-    public async Task Handler_ShouldReturnErrorMessage_DeletedFailure()
+    public async Task Handler_DeletedFailure_ShouldReturnErrorMessage()
     {
         // Arrange
         var testNews = GetNews();
