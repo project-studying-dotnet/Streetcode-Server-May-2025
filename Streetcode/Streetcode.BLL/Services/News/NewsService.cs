@@ -1,9 +1,7 @@
 using AutoMapper;
-using FluentResults;
 using Microsoft.EntityFrameworkCore;
 using Streetcode.BLL.DTO.News;
 using Streetcode.BLL.Interfaces.BlobStorage;
-using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.BLL.Interfaces.News;
 using Streetcode.DAL.Repositories.Interfaces.Base;
 
@@ -32,7 +30,7 @@ public class NewsService : INewsService
             include: scl => scl
                 .Include(sc => sc.Image)));
 
-        if(newsDTO is null)
+        if (newsDTO is null)
         {
             return null;
         }
@@ -49,7 +47,7 @@ public class NewsService : INewsService
     {
         var newsDTO = await GetNewsByUrlAsync(url);
 
-        if(newsDTO is null)
+        if (newsDTO is null)
         {
             return null;
         }
@@ -82,7 +80,7 @@ public class NewsService : INewsService
 
     private async Task<string?> GetNextNewsLink(List<DAL.Entities.News.News> news, int newsIndex)
     {
-        if(newsIndex != news.Count - 1)
+        if (newsIndex != news.Count - 1)
         {
             return news[newsIndex + 1].URL;
         }
