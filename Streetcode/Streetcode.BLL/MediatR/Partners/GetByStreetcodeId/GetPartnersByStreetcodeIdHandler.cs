@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Streetcode.BLL.DTO.Partners;
 using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.DAL.Repositories.Interfaces.Base;
+using Streetcode.DAL.Specifications.Partner;
+using Streetcode.DAL.Specifications.Streetcode;
 
 namespace Streetcode.BLL.MediatR.Partners.GetByStreetcodeId;
 
@@ -23,8 +25,8 @@ public class GetPartnersByStreetcodeIdHandler : IRequestHandler<GetPartnersByStr
 
     public async Task<Result<IEnumerable<PartnerDTO>>> Handle(GetPartnersByStreetcodeIdQuery request, CancellationToken cancellationToken)
     {
-        var streetcode = await _repositoryWrapper.StreetcodeRepository
-            .GetSingleOrDefaultAsync(st => st.Id == request.StreetcodeId);
+        var streetcodeSpec = new StreetcodeByIdSpec(request.StreetcodeId);
+        var streetcode = await _repositoryWrapper.StreetcodeRepository.GetBySpecAsync(streetcodeSpec, cancellationToken);
 
         if (streetcode is null)
         {
@@ -33,10 +35,8 @@ public class GetPartnersByStreetcodeIdHandler : IRequestHandler<GetPartnersByStr
             return Result.Fail(new Error(errorMsg));
         }
 
-        var partners = await _repositoryWrapper.PartnersRepository
-            .GetAllAsync(
-                predicate: p => p.Streetcodes.Any(sc => sc.Id == streetcode.Id) || p.IsVisibleEverywhere,
-                include: p => p.Include(pl => pl.PartnerSourceLinks));
+        var partnersSpec = new PartnersByStreetcodeIdSpec(request.StreetcodeId);
+        var partners = await _repositoryWrapper.PartnersRepository.ListAsync(partnersSpec, cancellationToken);
 
         if (partners is null)
         {

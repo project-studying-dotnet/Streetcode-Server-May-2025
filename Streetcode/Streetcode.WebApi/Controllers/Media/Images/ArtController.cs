@@ -50,10 +50,4 @@ public class ArtController : BaseApiController
     {
         return HandleResult(await Mediator.Send(new DeleteArtCommand(id)));
     }
-
-    [HttpPost]
-    public async Task<IActionResult> Create([FromBody] ArtDTO art)
-    {
-        return HandleResult(await Mediator.Send(new CreateArtCommand(art)));
-    }
 }

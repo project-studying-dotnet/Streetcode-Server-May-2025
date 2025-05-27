@@ -1,5 +1,7 @@
 using Hangfire;
 using MediatR;
+using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Streetcode.BLL.Interfaces.Logging;
@@ -19,6 +21,8 @@ using Streetcode.BLL.Interfaces.Instagram;
 using Streetcode.BLL.Services.Instagram;
 using Streetcode.BLL.Interfaces.Text;
 using Streetcode.BLL.Services.Text;
+using Streetcode.BLL.Behaviors;
+using Serilog.Events;
 using Streetcode.BLL.Interfaces.News;
 using Streetcode.BLL.Services.News;
 
@@ -38,6 +42,8 @@ public static class ServiceCollectionExtensions
         var currentAssemblies = AppDomain.CurrentDomain.GetAssemblies();
         services.AddAutoMapper(currentAssemblies);
         services.AddMediatR(currentAssemblies);
+        services.AddValidatorsFromAssemblies(currentAssemblies);
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
         services.AddScoped<IBlobService, BlobService>();
         services.AddScoped<ILoggerService, LoggerService>();

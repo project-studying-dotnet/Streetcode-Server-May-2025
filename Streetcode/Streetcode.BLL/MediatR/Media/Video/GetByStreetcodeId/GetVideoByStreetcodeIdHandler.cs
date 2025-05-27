@@ -6,6 +6,8 @@ using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.BLL.MediatR.ResultVariations;
 using Streetcode.DAL.Entities.Streetcode;
 using Streetcode.DAL.Repositories.Interfaces.Base;
+using Streetcode.DAL.Specifications.Streetcode;
+using Streetcode.DAL.Specifications.Video;
 
 namespace Streetcode.BLL.MediatR.Media.Video.GetByStreetcodeId;
 
@@ -24,11 +26,14 @@ public class GetVideoByStreetcodeIdHandler : IRequestHandler<GetVideoByStreetcod
 
     public async Task<Result<VideoDTO>> Handle(GetVideoByStreetcodeIdQuery request, CancellationToken cancellationToken)
     {
-        var video = await _repositoryWrapper.VideoRepository
-            .GetFirstOrDefaultAsync(video => video.StreetcodeId == request.StreetcodeId);
-        if(video == null)
+        var videoSpec = new VideoByStreetcodeIdSpec(request.StreetcodeId);
+        var video = await _repositoryWrapper.VideoRepository.GetBySpecAsync(videoSpec, cancellationToken);
+
+        if (video == null)
         {
-            StreetcodeContent? streetcode = await _repositoryWrapper.StreetcodeRepository.GetFirstOrDefaultAsync(x => x.Id == request.StreetcodeId);
+            var streetcodeSpec = new StreetcodeByIdSpec(request.StreetcodeId);
+            var streetcode = await _repositoryWrapper.StreetcodeRepository.GetBySpecAsync(streetcodeSpec, cancellationToken);
+
             if (streetcode is null)
             {
                 string errorMsg = $"Streetcode with id: {request.StreetcodeId} doesn`t exist";

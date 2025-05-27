@@ -4,6 +4,7 @@ using MediatR;
 using Streetcode.BLL.DTO.Media.Video;
 using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.DAL.Repositories.Interfaces.Base;
+using Streetcode.DAL.Specifications.Video;
 
 namespace Streetcode.BLL.MediatR.Media.Video.GetById;
 
@@ -22,7 +23,8 @@ public class GetVideoByIdHandler : IRequestHandler<GetVideoByIdQuery, Result<Vid
 
     public async Task<Result<VideoDTO>> Handle(GetVideoByIdQuery request, CancellationToken cancellationToken)
     {
-        var video = await _repositoryWrapper.VideoRepository.GetFirstOrDefaultAsync(f => f.Id == request.Id);
+        var spec = new VideoByIdSpec(request.Id);
+        var video = await _repositoryWrapper.VideoRepository.GetBySpecAsync(spec, cancellationToken);
 
         if (video is null)
         {
