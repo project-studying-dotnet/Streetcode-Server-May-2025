@@ -1,16 +1,15 @@
-﻿namespace Streetcode.WebApi.Extensions
-{
-    public static class ConfigurationBuilderExtensions
-    {
-        public static IConfigurationBuilder ConfigureCustom(this IConfigurationBuilder builder, string environment)
-        {
-            builder.SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
-                .AddEnvironmentVariables("STREETCODE_")
-                .AddUserSecrets<Program>(optional: environment == "Local");
+﻿namespace Streetcode.WebApi.Extensions;
 
-            return builder;
-        }
+public static class ConfigurationBuilderExtensions
+{
+    public static IConfigurationBuilder ConfigureCustom(this IConfigurationBuilder builder, string environment)
+    {
+        builder.SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
+            .AddEnvironmentVariables("STREETCODE_")
+            .AddUserSecrets<Program>(optional: environment == "Local");
+
+        return builder;
     }
 }

@@ -4,63 +4,61 @@ using MediatR;
 using Streetcode.BLL.DTO.News;
 using Streetcode.BLL.Interfaces.BlobStorage;
 using Streetcode.BLL.Interfaces.Logging;
-using Streetcode.DAL.Entities.News;
 using Streetcode.DAL.Repositories.Interfaces.Base;
 
-namespace Streetcode.BLL.MediatR.News.Update
+namespace Streetcode.BLL.MediatR.News.Update;
+
+public class UpdateNewsHandler : IRequestHandler<UpdateNewsCommand, Result<NewsDTO>>
 {
-    public class UpdateNewsHandler : IRequestHandler<UpdateNewsCommand, Result<NewsDTO>>
+    private readonly IRepositoryWrapper _repositoryWrapper;
+    private readonly IMapper _mapper;
+    private readonly IBlobService _blobSevice;
+    private readonly ILoggerService _logger;
+    public UpdateNewsHandler(IRepositoryWrapper repositoryWrapper, IMapper mapper, IBlobService blobService, ILoggerService logger)
     {
-        private readonly IRepositoryWrapper _repositoryWrapper;
-        private readonly IMapper _mapper;
-        private readonly IBlobService _blobSevice;
-        private readonly ILoggerService _logger;
-        public UpdateNewsHandler(IRepositoryWrapper repositoryWrapper, IMapper mapper, IBlobService blobService, ILoggerService logger)
+        _repositoryWrapper = repositoryWrapper;
+        _mapper = mapper;
+        _blobSevice = blobService;
+        _logger = logger;
+    }
+
+    public async Task<Result<NewsDTO>> Handle(UpdateNewsCommand request, CancellationToken cancellationToken)
+    {
+        var news = _mapper.Map<DAL.Entities.News.News>(request.news);
+        if (news is null)
         {
-            _repositoryWrapper = repositoryWrapper;
-            _mapper = mapper;
-            _blobSevice = blobService;
-            _logger = logger;
+            const string errorMsg = "Cannot convert null to news";
+            _logger.LogError(request, errorMsg);
+            return Result.Fail(new Error(errorMsg));
         }
 
-        public async Task<Result<NewsDTO>> Handle(UpdateNewsCommand request, CancellationToken cancellationToken)
+        var response = _mapper.Map<NewsDTO>(news);
+
+        if (news.Image is not null && response.Image?.BlobName != null)
         {
-            var news = _mapper.Map<DAL.Entities.News.News>(request.news);
-            if (news is null)
+            response.Image.Base64 = await _blobSevice.FindFileInStorageAsBase64Async(response.Image.BlobName);
+        }
+        else if (response.ImageId != null)
+        {
+            var img = await _repositoryWrapper.ImageRepository.GetFirstOrDefaultAsync(x => x.Id == response.ImageId);
+            if (img != null)
             {
-                const string errorMsg = "Cannot convert null to news";
-                _logger.LogError(request, errorMsg);
-                return Result.Fail(new Error(errorMsg));
+                _repositoryWrapper.ImageRepository.Delete(img);
             }
+        }
 
-            var response = _mapper.Map<NewsDTO>(news);
+        _repositoryWrapper.NewsRepository.Update(news);
+        var resultIsSuccess = await _repositoryWrapper.SaveChangesAsync() > 0;
 
-            if (news.Image is not null && response.Image?.BlobName != null)
-            {
-                response.Image.Base64 = await _blobSevice.FindFileInStorageAsBase64Async(response.Image.BlobName);
-            }
-            else if (response.ImageId != null)
-            {
-                var img = await _repositoryWrapper.ImageRepository.GetFirstOrDefaultAsync(x => x.Id == response.ImageId);
-                if (img != null)
-                {
-                    _repositoryWrapper.ImageRepository.Delete(img);
-                }
-            }
-
-            _repositoryWrapper.NewsRepository.Update(news);
-            var resultIsSuccess = await _repositoryWrapper.SaveChangesAsync() > 0;
-
-            if(resultIsSuccess)
-            {
-                return Result.Ok(response);
-            }
-            else
-            {
-                const string errorMsg = $"Failed to update news";
-                _logger.LogError(request, errorMsg);
-                return Result.Fail(new Error(errorMsg));
-            }
+        if (resultIsSuccess)
+        {
+            return Result.Ok(response);
+        }
+        else
+        {
+            const string errorMsg = $"Failed to update news";
+            _logger.LogError(request, errorMsg);
+            return Result.Fail(new Error(errorMsg));
         }
     }
 }

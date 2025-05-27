@@ -3,7 +3,6 @@ using Ardalis.Specification;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Query;
-using Streetcode.DAL.Persistence;
 
 namespace Streetcode.DAL.Repositories.Interfaces.Base;
 

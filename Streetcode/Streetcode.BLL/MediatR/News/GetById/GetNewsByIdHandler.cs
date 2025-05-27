@@ -3,47 +3,45 @@ using FluentResults;
 using MediatR;
 using Streetcode.BLL.DTO.News;
 using Streetcode.BLL.Interfaces.BlobStorage;
-using Streetcode.DAL.Entities.News;
 using Streetcode.DAL.Repositories.Interfaces.Base;
 using Microsoft.EntityFrameworkCore;
 using Streetcode.BLL.Interfaces.Logging;
 
-namespace Streetcode.BLL.MediatR.News.GetById
+namespace Streetcode.BLL.MediatR.News.GetById;
+
+public class GetNewsByIdHandler : IRequestHandler<GetNewsByIdQuery, Result<NewsDTO>>
 {
-    public class GetNewsByIdHandler : IRequestHandler<GetNewsByIdQuery, Result<NewsDTO>>
+    private readonly IMapper _mapper;
+    private readonly IRepositoryWrapper _repositoryWrapper;
+    private readonly IBlobService _blobService;
+    private readonly ILoggerService _logger;
+    public GetNewsByIdHandler(IMapper mapper, IRepositoryWrapper repositoryWrapper, IBlobService blobService, ILoggerService logger)
     {
-        private readonly IMapper _mapper;
-        private readonly IRepositoryWrapper _repositoryWrapper;
-        private readonly IBlobService _blobService;
-        private readonly ILoggerService _logger;
-        public GetNewsByIdHandler(IMapper mapper, IRepositoryWrapper repositoryWrapper, IBlobService blobService, ILoggerService logger)
+        _mapper = mapper;
+        _repositoryWrapper = repositoryWrapper;
+        _blobService = blobService;
+        _logger = logger;
+    }
+
+    public async Task<Result<NewsDTO>> Handle(GetNewsByIdQuery request, CancellationToken cancellationToken)
+    {
+        int id = request.id;
+        var newsDTO = _mapper.Map<NewsDTO>(await _repositoryWrapper.NewsRepository.GetFirstOrDefaultAsync(
+            predicate: sc => sc.Id == id,
+            include: scl => scl
+                .Include(sc => sc.Image)));
+        if (newsDTO is null)
         {
-            _mapper = mapper;
-            _repositoryWrapper = repositoryWrapper;
-            _blobService = blobService;
-            _logger = logger;
+            string errorMsg = $"No news by entered Id - {id}";
+            _logger.LogError(request, errorMsg);
+            return Result.Fail(errorMsg);
         }
 
-        public async Task<Result<NewsDTO>> Handle(GetNewsByIdQuery request, CancellationToken cancellationToken)
+        if (newsDTO.Image is not null)
         {
-            int id = request.id;
-            var newsDTO = _mapper.Map<NewsDTO>(await _repositoryWrapper.NewsRepository.GetFirstOrDefaultAsync(
-                predicate: sc => sc.Id == id,
-                include: scl => scl
-                    .Include(sc => sc.Image)));
-            if(newsDTO is null)
-            {
-                string errorMsg = $"No news by entered Id - {id}";
-                _logger.LogError(request, errorMsg);
-                return Result.Fail(errorMsg);
-            }
-
-            if (newsDTO.Image is not null)
-            {
-                newsDTO.Image.Base64 = await _blobService.FindFileInStorageAsBase64Async(newsDTO.Image.BlobName);
-            }
-
-            return Result.Ok(newsDTO);
+            newsDTO.Image.Base64 = await _blobService.FindFileInStorageAsBase64Async(newsDTO.Image.BlobName);
         }
+
+        return Result.Ok(newsDTO);
     }
 }

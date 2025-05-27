@@ -1,12 +1,11 @@
 ﻿using FluentResults;
 
-namespace Streetcode.BLL.MediatR.ResultVariations
+namespace Streetcode.BLL.MediatR.ResultVariations;
+
+public class NullResult<T> : Result<T>
 {
-    public class NullResult<T> : Result<T>
+    public NullResult()
+        : base()
     {
-        public NullResult()
-            : base()
-        {
-        }
     }
 }
