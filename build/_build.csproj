@@ -8,6 +8,7 @@
     <NukeRootDirectory>..</NukeRootDirectory>
     <NukeScriptDirectory>..\Streetcode</NukeScriptDirectory>
     <NukeTelemetryVersion>1</NukeTelemetryVersion>
+	  <CodeAnalysisRuleSet>../settings.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <ItemGroup>

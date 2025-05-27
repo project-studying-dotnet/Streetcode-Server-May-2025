@@ -1,4 +1,6 @@
 using System.Linq.Expressions;
+using Ardalis.Specification;
+using Ardalis.Specification.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Query;
@@ -8,7 +10,7 @@ using Streetcode.DAL.Repositories.Interfaces.Base;
 
 namespace Streetcode.DAL.Repositories.Realizations.Base;
 
-public abstract class RepositoryBase<T> : IRepositoryBase<T>
+public abstract class RepositoryBase<T> : Interfaces.Base.IRepositoryBase<T>
     where T : class
 {
     private readonly StreetcodeDbContext _dbContext;
@@ -131,6 +133,31 @@ public abstract class RepositoryBase<T> : IRepositoryBase<T>
         Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = default)
     {
         return await GetQueryable(predicate, include, selector).FirstOrDefaultAsync();
+    }
+
+    public async Task<IEnumerable<T>> ListAsync(ISpecification<T> specification, CancellationToken cancellationToken)
+    {
+        return await ApplySpecification(specification).ToListAsync(cancellationToken);
+    }
+
+    public async Task<T?> GetBySpecAsync(ISpecification<T> specification, CancellationToken cancellationToken = default)
+    {
+        return await ApplySpecification(specification).FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task<int> CountAsync(ISpecification<T> specification, CancellationToken cancellationToken = default)
+    {
+        return await ApplySpecification(specification).CountAsync(cancellationToken);
+    }
+
+    public async Task<bool> AnyAsync(ISpecification<T> specification, CancellationToken cancellationToken = default)
+    {
+        return await ApplySpecification(specification).AnyAsync(cancellationToken);
+    }
+
+    private IQueryable<T> ApplySpecification(ISpecification<T> specification)
+    {
+        return SpecificationEvaluator.Default.GetQuery(_dbContext.Set<T>().AsQueryable(), specification);
     }
 
     private IQueryable<T> GetQueryable(
