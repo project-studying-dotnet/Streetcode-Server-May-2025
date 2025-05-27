@@ -6,8 +6,6 @@ using Moq;
 using Streetcode.BLL.DTO.Media.Images;
 using Streetcode.BLL.DTO.News;
 using Streetcode.BLL.Interfaces.BlobStorage;
-using Streetcode.BLL.Interfaces.Logging;
-using Streetcode.BLL.Interfaces.News;
 using Streetcode.BLL.Services.News;
 using Streetcode.DAL.Entities.News;
 using Streetcode.DAL.Repositories.Interfaces.Base;
@@ -56,8 +54,8 @@ public class NewsServiceTests
             .ReturnsAsync(new News());
         _mockMapper.Setup(x => x.Map<NewsDTO>(It.IsAny<News>())).Returns(newsDto);
         var base64String = "base64";
-        _mockBlobService.Setup(x => x.FindFileInStorageAsBase64(It.IsAny<string>()))
-            .Returns(base64String);
+        _mockBlobService.Setup(x => x.FindFileInStorageAsBase64Async(It.IsAny<string>()))
+            .ReturnsAsync(base64String);
 
         // Act
         var result = await _newsService.GetNewsByUrlAsync(url);
@@ -68,7 +66,7 @@ public class NewsServiceTests
             It.IsAny<Expression<Func<News, bool>>>(),
             It.IsAny<Func<IQueryable<News>, IIncludableQueryable<News, object>>>()), Times.Once);
         _mockMapper.Verify(x => x.Map<NewsDTO>(It.IsAny<News>()), Times.Once);
-        _mockBlobService.Verify(x => x.FindFileInStorageAsBase64(It.IsAny<string>()), Times.Once);
+        _mockBlobService.Verify(x => x.FindFileInStorageAsBase64Async(It.IsAny<string>()), Times.Once);
     }
 
     [Fact]
@@ -91,15 +89,15 @@ public class NewsServiceTests
             .ReturnsAsync(new News());
         _mockMapper.Setup(x => x.Map<NewsDTO>(It.IsAny<News>())).Returns(newsDto);
         var base64String = "base64";
-        _mockBlobService.Setup(x => x.FindFileInStorageAsBase64(It.IsAny<string>()))
-            .Returns(base64String);
+        _mockBlobService.Setup(x => x.FindFileInStorageAsBase64Async(It.IsAny<string>()))
+            .ReturnsAsync(base64String);
 
         // Act
         var result = await _newsService.GetNewsByUrlAsync(url);
 
         // Assert
         result.Should().BeEquivalentTo(newsDto);
-        _mockBlobService.Verify(x => x.FindFileInStorageAsBase64(It.IsAny<string>()), Times.Never);
+        _mockBlobService.Verify(x => x.FindFileInStorageAsBase64Async(It.IsAny<string>()), Times.Never);
     }
 
     [Fact]
