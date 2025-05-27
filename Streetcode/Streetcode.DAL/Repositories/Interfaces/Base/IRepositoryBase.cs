@@ -50,7 +50,8 @@ public interface IRepositoryBase<T>
 
     Task<T?> GetFirstOrDefaultAsync(
         Expression<Func<T, bool>>? predicate = default,
-        Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = default);
+        Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = default,
+        bool v = false);
 
     Task<T?> GetFirstOrDefaultAsync(
         Expression<Func<T, T>> selector,
