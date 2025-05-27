@@ -2,6 +2,7 @@
 using FluentResults;
 using MediatR;
 using Streetcode.BLL.DTO.Timeline;
+using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.DAL.Repositories.Interfaces.Base;
 
 namespace Streetcode.BLL.MediatR.Timeline.TimelineItem.Delete;
@@ -10,11 +11,13 @@ public class DeleteTimelineItemHandler : IRequestHandler<DeleteTimelineItemComma
 {
     private readonly IRepositoryWrapper _repository;
     private readonly IMapper _mapper;
+    private readonly ILoggerService _logger;
 
-    public DeleteTimelineItemHandler(IRepositoryWrapper repository, IMapper mapper)
+    public DeleteTimelineItemHandler(IRepositoryWrapper repository, IMapper mapper, ILoggerService logger)
     {
         _repository = repository;
         _mapper = mapper;
+        _logger = logger;
     }
 
     public async Task<Result<TimelineItemDTO>> Handle(DeleteTimelineItemCommand request, CancellationToken cancellationToken)
@@ -23,7 +26,9 @@ public class DeleteTimelineItemHandler : IRequestHandler<DeleteTimelineItemComma
 
         if (timelineItem is null)
         {
-            return Result.Fail($"Timeline item with id {request.Id} not found.");
+            const string errorMsg = "Timeline item not found";
+            _logger.LogError(request, errorMsg);
+            return Result.Fail(errorMsg);
         }
 
         _repository.TimelineRepository.Delete(timelineItem);
@@ -31,10 +36,11 @@ public class DeleteTimelineItemHandler : IRequestHandler<DeleteTimelineItemComma
 
         if (result == 0)
         {
-            return Result.Fail("Failed to delete timeline item.");
+            const string errorMsg = "Failed to delete timeline item.";
+            _logger.LogError(request, errorMsg);
+            return Result.Fail(errorMsg);
         }
 
-        var deletedDto = _mapper.Map<TimelineItemDTO>(timelineItem);
-        return Result.Ok(deletedDto);
+        return Result.Ok(_mapper.Map<TimelineItemDTO>(timelineItem));
     }
 }

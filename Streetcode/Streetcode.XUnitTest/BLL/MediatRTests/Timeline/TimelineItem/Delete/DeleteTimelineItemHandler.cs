@@ -7,6 +7,7 @@ using Xunit;
 using Streetcode.BLL.DTO.Timeline;
 using Streetcode.BLL.MediatR.Timeline.TimelineItem.Delete;
 using Streetcode.DAL.Repositories.Interfaces.Base;
+using Streetcode.BLL.Interfaces.Logging;
 
 using TimelineItemEntity = Streetcode.DAL.Entities.Timeline.TimelineItem;
 
@@ -17,12 +18,17 @@ public class DeleteTimelineItemHandlerTests
     private readonly Mock<IRepositoryWrapper> _repositoryWrapperMock;
     private readonly Mock<IMapper> _mapperMock;
     private readonly DeleteTimelineItemHandler _handler;
+    private readonly Mock<ILoggerService> _loggerMock;
 
     public DeleteTimelineItemHandlerTests()
     {
         _repositoryWrapperMock = new Mock<IRepositoryWrapper>();
         _mapperMock = new Mock<IMapper>();
-        _handler = new DeleteTimelineItemHandler(_repositoryWrapperMock.Object, _mapperMock.Object);
+        _loggerMock = new Mock<ILoggerService>();
+        _handler = new DeleteTimelineItemHandler(
+            _repositoryWrapperMock.Object,
+            _mapperMock.Object,
+            _loggerMock.Object);
     }
 
     [Fact]
@@ -105,7 +111,7 @@ public class DeleteTimelineItemHandlerTests
         _repositoryWrapperMock
             .Setup(r => r.TimelineRepository.GetFirstOrDefaultAsync(
                 It.IsAny<Expression<Func<TimelineItemEntity, bool>>>(),
-                null))  // ПРИБРАЛИ 3-й аргумент
+                null))
             .ReturnsAsync(entity);
 
         _repositoryWrapperMock
