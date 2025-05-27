@@ -30,14 +30,14 @@ public class NewsService : INewsService
             include: scl => scl
                 .Include(sc => sc.Image)));
 
-        if(newsDTO is null)
+        if (newsDTO is null)
         {
             return null;
         }
 
         if (newsDTO.Image is not null)
         {
-            newsDTO.Image.Base64 = _blobService.FindFileInStorageAsBase64(newsDTO.Image.BlobName);
+            newsDTO.Image.Base64 = await _blobService.FindFileInStorageAsBase64Async(newsDTO.Image.BlobName);
         }
 
         return newsDTO;
@@ -47,7 +47,7 @@ public class NewsService : INewsService
     {
         var newsDTO = await GetNewsByUrlAsync(url);
 
-        if(newsDTO is null)
+        if (newsDTO is null)
         {
             return null;
         }
@@ -80,7 +80,7 @@ public class NewsService : INewsService
 
     private async Task<string?> GetNextNewsLink(List<DAL.Entities.News.News> news, int newsIndex)
     {
-        if(newsIndex != news.Count - 1)
+        if (newsIndex != news.Count - 1)
         {
             return news[newsIndex + 1].URL;
         }
