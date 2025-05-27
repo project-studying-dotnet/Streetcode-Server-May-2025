@@ -7,4 +7,5 @@ public class FactDTO
     public int ImageId { get; set; }
     public int StreetcodeId { get; set; }
     public string FactContent { get; set; }
+    public int? Position { get; set; }
 }
