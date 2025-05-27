@@ -7,82 +7,75 @@ using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.DAL.Repositories.Interfaces.Base;
 using Microsoft.EntityFrameworkCore;
 
-namespace Streetcode.BLL.MediatR.Media.Art.Update
+namespace Streetcode.BLL.MediatR.Media.Art.Update;
+
+public class UpdateArtHandler
 {
-    public class UpdateArtHandler
+    private readonly IRepositoryWrapper _repositoryWrapper;
+    private readonly IMapper _mapper;
+    private readonly IBlobService _blobService;
+    private readonly ILoggerService _logger;
+
+    public UpdateArtHandler(
+        IRepositoryWrapper repositoryWrapper,
+        IMapper mapper,
+        IBlobService blobService,
+        ILoggerService logger)
     {
-        private readonly IRepositoryWrapper _repositoryWrapper;
-        private readonly IMapper _mapper;
-        private readonly IBlobService _blobService;
-        private readonly ILoggerService _logger;
+        _repositoryWrapper = repositoryWrapper;
+        _mapper = mapper;
+        _blobService = blobService;
+        _logger = logger;
+    }
 
-        public UpdateArtHandler(
-            IRepositoryWrapper repositoryWrapper,
-            IMapper mapper,
-            IBlobService blobService,
-            ILoggerService logger)
+    public async Task<Result<ArtDTO>> Handle(UpdateArtCommand request, CancellationToken cancellationToken)
+    {
+        var artUpdateRequest = request.ArtUpdateRequest;
+
+        // Removed try block
+
+        var artEntity = await _repositoryWrapper.ArtRepository.GetFirstOrDefaultAsync(
+            predicate: a => a.Id == artUpdateRequest.Id,
+            include: query => query
+                .Include(a => a.Image)
+                    .ThenInclude(img => img.ImageDetails));
+
+        if (artEntity == null)
         {
-            _repositoryWrapper = repositoryWrapper;
-            _mapper = mapper;
-            _blobService = blobService;
-            _logger = logger;
+            string errorMsg = $"Art with ID {artUpdateRequest.Id} not found.";
+            _logger.LogWarning($"UpdateArtHandler: {errorMsg}");
+            return Result.Fail(new Error(errorMsg));
         }
 
-        public async Task<Result<ArtDTO>> Handle(UpdateArtCommand request, CancellationToken cancellationToken)
+        artEntity.Title = artUpdateRequest.Title;
+        artEntity.Description = artUpdateRequest.Description;
+
+        _repositoryWrapper.ArtRepository.Update(artEntity);
+        var saveResult = await _repositoryWrapper.SaveChangesAsync();
+
+        if (saveResult <= 0)
         {
-            var artUpdateRequest = request.ArtUpdateRequest;
+            string errorMsg = $"Failed to update Art with ID {artUpdateRequest.Id}. No changes were saved to the database.";
+            _logger.LogError(request, errorMsg);
+            return Result.Fail(new Error(errorMsg));
+        }
 
-            try
+        var updatedArtDto = _mapper.Map<ArtDTO>(artEntity);
+
+        if (updatedArtDto.Image != null && !string.IsNullOrWhiteSpace(artEntity.Image?.BlobName))
+        {
+            updatedArtDto.Image.Base64 = await _blobService.FindFileInStorageAsBase64Async(artEntity.Image.BlobName);
+            if (artEntity.Image != null)
             {
-                var artEntity = await _repositoryWrapper.ArtRepository.GetFirstOrDefaultAsync(
-                    predicate: a => a.Id == artUpdateRequest.Id,
-                    include: query => query
-                        .Include(a => a.Image)
-                            .ThenInclude(img => img.ImageDetails));
-
-                if (artEntity == null)
+                updatedArtDto.Image.MimeType = artEntity.Image.MimeType;
+                if (artEntity.Image.ImageDetails != null)
                 {
-                    string errorMsg = $"Art with ID {artUpdateRequest.Id} not found.";
-                    _logger.LogWarning($"UpdateArtHandler: {errorMsg}");
-                    return Result.Fail(new Error(errorMsg));
+                    updatedArtDto.Image.ImageDetails = _mapper.Map<ImageDetailsDTO>(artEntity.Image.ImageDetails);
                 }
-
-                artEntity.Title = artUpdateRequest.Title;
-                artEntity.Description = artUpdateRequest.Description;
-
-                _repositoryWrapper.ArtRepository.Update(artEntity);
-                var saveResult = await _repositoryWrapper.SaveChangesAsync();
-
-                if (saveResult <= 0)
-                {
-                    string errorMsg = $"Failed to update Art with ID {artUpdateRequest.Id}. No changes were saved to the database.";
-                    _logger.LogError(request, errorMsg);
-                    return Result.Fail(new Error(errorMsg));
-                }
-
-                var updatedArtDto = _mapper.Map<ArtDTO>(artEntity);
-
-                if (updatedArtDto.Image != null && !string.IsNullOrWhiteSpace(updatedArtDto.Image.BlobName))
-                {
-                    updatedArtDto.Image.Base64 = await _blobService.FindFileInStorageAsBase64Async(updatedArtDto.Image.BlobName);
-                    if (artEntity.Image != null)
-                    {
-                        updatedArtDto.Image.MimeType = artEntity.Image.MimeType;
-                        if (artEntity.Image.ImageDetails != null)
-                        {
-                            updatedArtDto.Image.ImageDetails = _mapper.Map<ImageDetailsDTO>(artEntity.Image.ImageDetails);
-                        }
-                    }
-                }
-
-                _logger.LogInformation($"UpdateArtHandler: Art with ID {artEntity.Id} updated successfully.");
-                return Result.Ok(updatedArtDto);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(request, $"UpdateArtHandler: An error occurred while updating Art with ID {artUpdateRequest.Id}. Error: {ex.Message}");
-                return Result.Fail(new Error($"Не вдалося оновити об'єкт мистецтва: {ex.Message}"));
             }
         }
+
+        _logger.LogInformation($"UpdateArtHandler: Art with ID {artEntity.Id} updated successfully.");
+        return Result.Ok(updatedArtDto);
     }
 }
