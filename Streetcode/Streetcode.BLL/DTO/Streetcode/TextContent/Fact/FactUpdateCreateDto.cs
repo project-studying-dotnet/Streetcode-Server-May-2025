@@ -19,4 +19,3 @@ public class FactUpdateCreateDTO : FactDTO
     [MaxLength(200, ErrorMessage = "Опис зображення не може перевищувати 200 символів.")]
     public string? ImageDescription { get; set; }
 }
-
