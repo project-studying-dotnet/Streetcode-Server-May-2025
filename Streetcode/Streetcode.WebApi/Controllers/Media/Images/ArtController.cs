@@ -6,6 +6,7 @@ using Streetcode.BLL.MediatR.Media.Art.Delete;
 using Streetcode.BLL.MediatR.Media.Art.GetAll;
 using Streetcode.BLL.MediatR.Media.Art.GetById;
 using Streetcode.BLL.MediatR.Media.Art.GetByStreetcodeId;
+using Streetcode.BLL.MediatR.Media.Art.Update;
 
 namespace Streetcode.WebApi.Controllers.Media.Images;
 
@@ -27,6 +28,20 @@ public class ArtController : BaseApiController
     public async Task<IActionResult> GetByStreetcodeId([FromRoute] int streetcodeId)
     {
         return HandleResult(await Mediator.Send(new GetArtsByStreetcodeIdQuery(streetcodeId)));
+    }
+
+    [Authorize(Roles = "Administrator")]
+    [HttpPost]
+    public async Task<IActionResult> Create([FromBody] ArtCreateRequestDTO artCreateRequest)
+    {
+        return HandleResult(await Mediator.Send(new CreateArtCommand(artCreateRequest)));
+    }
+
+    [Authorize(Roles = "Administrator")]
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateArtRequestDTO artUpdateRequest)
+    {
+        return HandleResult(await Mediator.Send(new UpdateArtCommand(artUpdateRequest)));
     }
 
     [Authorize(Roles = "Administrator")]

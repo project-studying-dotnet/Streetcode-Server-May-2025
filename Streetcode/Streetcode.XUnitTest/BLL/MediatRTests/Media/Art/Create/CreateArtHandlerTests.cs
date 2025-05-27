@@ -1,142 +1,183 @@
-﻿using AutoMapper;
+using AutoMapper;
 using FluentAssertions;
 using Moq;
 using Repositories.Interfaces;
 using Streetcode.BLL.DTO.Media.Art;
+using Streetcode.BLL.DTO.Media.Images;
+using Streetcode.BLL.Interfaces.BlobStorage;
 using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.BLL.MediatR.Media.Art.Create;
 using Streetcode.DAL.Repositories.Interfaces.Base;
 using Xunit;
-
+using ImageEntity = Streetcode.DAL.Entities.Media.Images.Image;
 using ArtEntity = Streetcode.DAL.Entities.Media.Images.Art;
 
-namespace Streetcode.XUnitTest.BLL.MediatRTests.Media.Art.Create;
-
-public class CreateArtHandlerTests
+namespace Streetcode.XUnitTest.BLL.MediatRTests.Media.Art.Create
 {
-    private readonly Mock<IMapper> _mockMapper;
-    private readonly Mock<IRepositoryWrapper> _mockRepoWrapper;
-    private readonly Mock<IArtRepository> _mockArtRepo;
-    private readonly Mock<ILoggerService> _mockLogger;
-    private readonly CreateArtHandler _handler;
-
-    public CreateArtHandlerTests()
+    public class CreateArtHandlerTests
     {
-        _mockMapper = new Mock<IMapper>();
-        _mockRepoWrapper = new Mock<IRepositoryWrapper>();
-        _mockArtRepo = new Mock<IArtRepository>();
-        _mockLogger = new Mock<ILoggerService>();
-        _handler = new CreateArtHandler(_mockMapper.Object, _mockRepoWrapper.Object, _mockLogger.Object);
-    }
-    [Fact]
-    public async Task Handle_ShouldReturnSuccess_WhenArtIsCreatedSuccessfully()
-    {
-        // Arrange
-        var artDto = new ArtDTO
+        private readonly Mock<IRepositoryWrapper> _mockRepositoryWrapper;
+        private readonly Mock<IArtRepository> _mockArtRepository;
+        private readonly Mock<IImageRepository> _mockImageRepository;
+        private readonly Mock<IMapper> _mockMapper;
+        private readonly Mock<IBlobService> _mockBlobService;
+        private readonly Mock<ILoggerService> _mockLoggerService;
+        private readonly CreateArtHandler _handler;
+
+        public CreateArtHandlerTests()
         {
-            Id = 1,
-            Description = "description",
-            Title = "title",
-            ImageId = 1
-        };
-        var artEntity = new ArtEntity
+            _mockRepositoryWrapper = new Mock<IRepositoryWrapper>();
+            _mockArtRepository = new Mock<IArtRepository>();
+            _mockImageRepository = new Mock<IImageRepository>();
+            _mockMapper = new Mock<IMapper>();
+            _mockBlobService = new Mock<IBlobService>();
+            _mockLoggerService = new Mock<ILoggerService>();
+            _mockRepositoryWrapper.Setup(r => r.ArtRepository).Returns(_mockArtRepository.Object);
+            _mockRepositoryWrapper.Setup(r => r.ImageRepository).Returns(_mockImageRepository.Object);
+            _handler = new CreateArtHandler(
+                _mockRepositoryWrapper.Object,
+                _mockMapper.Object,
+                _mockBlobService.Object,
+                _mockLoggerService.Object);
+        }
+
+        [Fact]
+        public async Task Handle_ValidRequest_ReturnsOkResultWithArtDTO()
         {
-            Id = 1,
-            Description = "description",
-            Title = "title",
-            ImageId = 1,
-            StreetcodeArts = []
-        };
+            // Arrange
+            var artCreateRequest = new ArtCreateRequestDTO
+            {
+                Title = "Test Art",
+                Description = "Test Description",
+                Image = new ImageFileBaseCreateDTO { BaseFormat = "validbase64", Extension = "png", Title = "ImageTitle", Alt = "ImageAlt" }
+            };
+            var command = new CreateArtCommand(artCreateRequest);
+            var savedImageEntity = new ImageEntity { Id = 1, BlobName = "hashed.png", MimeType = "image/png" };
+            var savedArtEntity = new ArtEntity { Id = 1, Title = "Test Art", ImageId = 1, Image = savedImageEntity };
+            var artDto = new ArtDTO { Id = 1, Title = "Test Art", Image = new ImageDTO { Id = 1, BlobName = "hashed.png", Base64 = "base64image" } };
 
-        var command = new CreateArtCommand(artDto);
+            _mockBlobService.Setup(s => s.SaveFileInStorageAsync(artCreateRequest.Image.BaseFormat, It.IsAny<string>(), artCreateRequest.Image.Extension))
+                .ReturnsAsync("hashed");
 
-        _mockMapper.Setup(m => m.Map<ArtEntity>(artDto)).Returns(artEntity);
-        _mockMapper.Setup(m => m.Map<ArtDTO>(artEntity)).Returns(artDto);
+            _mockRepositoryWrapper.Setup(r => r.SaveChangesAsync())
+                .ReturnsAsync(1); // Simulate successful save
 
-        _mockArtRepo.Setup(r => r.CreateAsync(It.IsAny<ArtEntity>())).ReturnsAsync(artEntity);
-        _mockRepoWrapper.Setup(r => r.ArtRepository).Returns(_mockArtRepo.Object);
-        _mockRepoWrapper.Setup(r => r.SaveChangesAsync()).ReturnsAsync(1);
+            _mockImageRepository.Setup(r => r.CreateAsync(It.IsAny<ImageEntity>()))
+                .Callback<ImageEntity>(img => img.Id = savedImageEntity.Id);
 
-        var handler = new CreateArtHandler(_mockMapper.Object, _mockRepoWrapper.Object, _mockLogger.Object);
+            _mockMapper.Setup(m => m.Map<ArtDTO>(It.IsAny<ArtEntity>()))
+                .Returns(artDto);
+            _mockBlobService.Setup(s => s.FindFileInStorageAsBase64Async(It.IsAny<string>()))
+                .ReturnsAsync("base64image");
 
-        // Act
-        var result = await handler.Handle(command, CancellationToken.None);
+            // Act
+            var result = await _handler.Handle(command, CancellationToken.None);
 
-        // Assert
-        result.IsSuccess.Should().BeTrue();
-        result.Value.Title.Should().Be("title");
-    }
+            // Assert
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Should().BeEquivalentTo(artDto, options => options.ExcludingMissingMembers());
+        }
 
-    [Fact]
-    public async Task Handle_ShouldReturnFailure_WhenMappingReturnsNull()
-    {
-        var artDto = new ArtDTO
+        [Fact]
+        public async Task Handle_NullImageDataInRequest_ReturnsFailResult()
         {
-            Id = 1,
-            Description = "description",
-            Title = "title",
-            ImageId = 1
-        };
-        var artEntity = new ArtEntity
+            // Arrange
+            var artCreateRequest = new ArtCreateRequestDTO { Title = "Test Art", Image = null };
+            var command = new CreateArtCommand(artCreateRequest);
+
+            // Act
+            var result = await _handler.Handle(command, CancellationToken.None);
+
+            // Assert
+            result.IsFailed.Should().BeTrue();
+            result.Errors.First().Message.Should().Contain("Дані зображення є обов'язковими.");
+        }
+
+        [Fact]
+        public async Task Handle_EmptyBaseFormatInImage_ReturnsFailResult()
         {
-            Id = 1,
-            Description = "description",
-            Title = "title",
-            ImageId = 1,
-            StreetcodeArts = []
-        };
+            // Arrange
+            var artCreateRequest = new ArtCreateRequestDTO
+            {
+                Image = new ImageFileBaseCreateDTO { BaseFormat = "", Extension = "png" }
+            };
+            var command = new CreateArtCommand(artCreateRequest);
 
-        var command = new CreateArtCommand(artDto);
+            // Act
+            var result = await _handler.Handle(command, CancellationToken.None);
 
-        _mockMapper.Setup(m => m.Map<ArtEntity>(It.IsAny<ArtDTO>())).Returns((ArtEntity)null);
+            // Assert
+            result.IsFailed.Should().BeTrue();
+            result.Errors.First().Message.Should().Contain("Base64 рядок зображення є обов'язковим.");
+        }
 
-        var handler = new CreateArtHandler(_mockMapper.Object, _mockRepoWrapper.Object, _mockLogger.Object);
-
-        var result = await handler.Handle(command, CancellationToken.None);
-
-        result.IsFailed.Should().BeTrue();
-
-        result.Errors.Should().ContainSingle()
-            .Which.Message.Should().Be("Cannot convert null to art");
-
-        _mockLogger.Verify(l => l.LogError(command, "Cannot convert null to art"), Times.Once);
-    }
-
-    [Fact]
-    public async Task Handle_ShouldReturnFailure_WhenSaveFails()
-    {
-        var artDto = new ArtDTO
+        [Fact]
+        public async Task Handle_EmptyExtensionInImage_ReturnsFailResult()
         {
-            Id = 1,
-            Description = "description",
-            Title = "title",
-            ImageId = 1
-        };
-        var artEntity = new ArtEntity
+            // Arrange
+            var artCreateRequest = new ArtCreateRequestDTO
+            {
+                Image = new ImageFileBaseCreateDTO { BaseFormat = "validbase64", Extension = "" }
+            };
+            var command = new CreateArtCommand(artCreateRequest);
+
+            // Act
+            var result = await _handler.Handle(command, CancellationToken.None);
+
+            // Assert
+            result.IsFailed.Should().BeTrue();
+            result.Errors.First().Message.Should().Contain("Розширення файлу зображення є обов'язковим.");
+        }
+
+        [Fact]
+        public async Task Handle_BlobServiceSaveThrowsException_ReturnsFailResult()
         {
-            Id = 1,
-            Description = "description",
-            Title = "title",
-            ImageId = 1,
-            StreetcodeArts = []
-        };
+            // Arrange
+            var artCreateRequest = new ArtCreateRequestDTO
+            {
+                Image = new ImageFileBaseCreateDTO { BaseFormat = "validbase64", Extension = "png" }
+            };
+            var command = new CreateArtCommand(artCreateRequest);
 
-        var command = new CreateArtCommand(artDto);
+            _mockBlobService.Setup(s => s.SaveFileInStorageAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ThrowsAsync(new InvalidOperationException("Blob service failed"));
 
-        _mockMapper.Setup(m => m.Map<ArtEntity>(artDto)).Returns(artEntity);
-        _mockArtRepo.Setup(r => r.CreateAsync(It.IsAny<ArtEntity>())).ReturnsAsync(artEntity);
-        _mockRepoWrapper.Setup(r => r.ArtRepository).Returns(_mockArtRepo.Object);
-        _mockRepoWrapper.Setup(r => r.SaveChangesAsync()).ReturnsAsync(0);
+            // Act
+            var result = await _handler.Handle(command, CancellationToken.None);
 
-        var handler = new CreateArtHandler(_mockMapper.Object, _mockRepoWrapper.Object, _mockLogger.Object);
+            // Assert
+            result.IsFailed.Should().BeTrue();
+            result.Errors.First().Message.Should().Contain("Не вдалося створити об'єкт мистецтва: Blob service failed");
+        }
 
-        var result = await handler.Handle(command, CancellationToken.None);
+        [Fact]
+        public async Task Handle_SaveChangesAsyncForArtFails_ReturnsFailResult()
+        {
+            // Arrange
+            var artCreateRequest = new ArtCreateRequestDTO
+            {
+                Title = "Test Art",
+                Image = new ImageFileBaseCreateDTO { BaseFormat = "validbase64", Extension = "png", Title = "ImageTitle" }
+            };
+            var command = new CreateArtCommand(artCreateRequest);
 
-        result.IsFailed.Should().BeTrue();
+            _mockBlobService.Setup(s => s.SaveFileInStorageAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync("hashed");
 
-        result.Errors.Should().ContainSingle()
-            .Which.Message.Should().Be("Failed to save art.");
+            _mockRepositoryWrapper.SetupSequence(r => r.SaveChangesAsync())
+                .ReturnsAsync(1)
+                .ReturnsAsync(0);
 
-        _mockLogger.Verify(l => l.LogError(command, "Failed to save art."), Times.Once);
+            _mockImageRepository.Setup(r => r.CreateAsync(It.IsAny<ImageEntity>()))
+                .Callback<ImageEntity>(img => img.Id = 1);
+
+
+            // Act
+            var result = await _handler.Handle(command, CancellationToken.None);
+
+            // Assert
+            result.IsFailed.Should().BeTrue();
+            result.Errors.First().Message.Should().Contain("Не вдалося створити об'єкт мистецтва");
+        }
     }
 }
