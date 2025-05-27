@@ -16,6 +16,7 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
+		<PackageReference Include="FluentAssertions" Version="8.2.0" />
 		<PackageReference Include="FluentAssertions.AspNetCore.Mvc" Version="4.2.0" />
 		<PackageReference Include="Ical.Net" Version="4.2.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
