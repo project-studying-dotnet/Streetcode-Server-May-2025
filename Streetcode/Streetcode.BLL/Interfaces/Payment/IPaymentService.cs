@@ -1,9 +1,8 @@
 ﻿using Streetcode.DAL.Entities.Payment;
 
-namespace Streetcode.BLL.Interfaces.Payment
+namespace Streetcode.BLL.Interfaces.Payment;
+
+public interface IPaymentService
 {
-    public interface IPaymentService
-    {
-        Task<InvoiceInfo> CreateInvoiceAsync(Invoice invoice);
-    }
+    Task<InvoiceInfo> CreateInvoiceAsync(Invoice invoice);
 }

@@ -5,43 +5,42 @@ using Streetcode.BLL.DTO.Partners;
 using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.DAL.Repositories.Interfaces.Base;
 
-namespace Streetcode.BLL.MediatR.Partners.Delete
+namespace Streetcode.BLL.MediatR.Partners.Delete;
+
+public class DeletePartnerHandler : IRequestHandler<DeletePartnerCommand, Result<PartnerDTO>>
 {
-    public class DeletePartnerHandler : IRequestHandler<DeletePartnerCommand, Result<PartnerDTO>>
+    private readonly IMapper _mapper;
+    private readonly IRepositoryWrapper _repositoryWrapper;
+    private readonly ILoggerService _logger;
+
+    public DeletePartnerHandler(IRepositoryWrapper repositoryWrapper, IMapper mapper, ILoggerService logger)
     {
-        private readonly IMapper _mapper;
-        private readonly IRepositoryWrapper _repositoryWrapper;
-        private readonly ILoggerService _logger;
+        _repositoryWrapper = repositoryWrapper;
+        _mapper = mapper;
+        _logger = logger;
+    }
 
-        public DeletePartnerHandler(IRepositoryWrapper repositoryWrapper, IMapper mapper, ILoggerService logger)
+    public async Task<Result<PartnerDTO>> Handle(DeletePartnerCommand request, CancellationToken cancellationToken)
+    {
+        var partner = await _repositoryWrapper.PartnersRepository.GetFirstOrDefaultAsync(p => p.Id == request.id);
+        if (partner == null)
         {
-            _repositoryWrapper = repositoryWrapper;
-            _mapper = mapper;
-            _logger = logger;
+            const string errorMsg = "No partner with such id";
+            _logger.LogError(request, errorMsg);
+            return Result.Fail(errorMsg);
         }
-
-        public async Task<Result<PartnerDTO>> Handle(DeletePartnerCommand request, CancellationToken cancellationToken)
+        else
         {
-            var partner = await _repositoryWrapper.PartnersRepository.GetFirstOrDefaultAsync(p => p.Id == request.id);
-            if (partner == null)
+            _repositoryWrapper.PartnersRepository.Delete(partner);
+            try
             {
-                const string errorMsg = "No partner with such id";
-                _logger.LogError(request, errorMsg);
-                return Result.Fail(errorMsg);
+                await _repositoryWrapper.SaveChangesAsync();
+                return Result.Ok(_mapper.Map<PartnerDTO>(partner));
             }
-            else
+            catch (Exception ex)
             {
-                _repositoryWrapper.PartnersRepository.Delete(partner);
-                try
-                {
-                    await _repositoryWrapper.SaveChangesAsync();
-                    return Result.Ok(_mapper.Map<PartnerDTO>(partner));
-                }
-                catch(Exception ex)
-                {
-                    _logger.LogError(request, ex.Message);
-                    return Result.Fail(ex.Message);
-                }
+                _logger.LogError(request, ex.Message);
+                return Result.Fail(ex.Message);
             }
         }
     }

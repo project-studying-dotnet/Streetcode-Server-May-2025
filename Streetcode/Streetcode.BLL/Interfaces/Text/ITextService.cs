@@ -1,7 +1,6 @@
-﻿namespace Streetcode.BLL.Interfaces.Text
+﻿namespace Streetcode.BLL.Interfaces.Text;
+
+public interface ITextService
 {
-    public interface ITextService
-    {
-        Task<string> AddTermsTag(string text);
-    }
+    Task<string> AddTermsTag(string text);
 }

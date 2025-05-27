@@ -1,7 +1,7 @@
-﻿namespace DbUpdate;
-
-using DbUp;
+﻿using DbUp;
 using Microsoft.Extensions.Configuration;
+
+namespace DbUpdate;
 
 public class Program
 {

@@ -1,9 +1,8 @@
 ﻿using Streetcode.DAL.Entities.Instagram;
 
-namespace Streetcode.BLL.Interfaces.Instagram
+namespace Streetcode.BLL.Interfaces.Instagram;
+
+public interface IInstagramService
 {
-    public interface IInstagramService
-    {
-        Task<IEnumerable<InstagramPost>> GetPostsAsync();
-    }
+    Task<IEnumerable<InstagramPost>> GetPostsAsync();
 }

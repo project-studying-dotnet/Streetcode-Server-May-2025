@@ -4,34 +4,33 @@ using Streetcode.BLL.Interfaces.Email;
 using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.DAL.Entities.AdditionalContent.Email;
 
-namespace Streetcode.BLL.MediatR.Email
+namespace Streetcode.BLL.MediatR.Email;
+
+public class SendEmailHandler : IRequestHandler<SendEmailCommand, Result<Unit>>
 {
-    public class SendEmailHandler : IRequestHandler<SendEmailCommand, Result<Unit>>
+    private readonly IEmailService _emailService;
+    private readonly ILoggerService _logger;
+
+    public SendEmailHandler(IEmailService emailService, ILoggerService logger)
     {
-        private readonly IEmailService _emailService;
-        private readonly ILoggerService _logger;
+        _emailService = emailService;
+        _logger = logger;
+    }
 
-        public SendEmailHandler(IEmailService emailService, ILoggerService logger)
+    public async Task<Result<Unit>> Handle(SendEmailCommand request, CancellationToken cancellationToken)
+    {
+        var message = new Message(new string[] { "streetcodeua@gmail.com" }, request.Email.From, "FeedBack", request.Email.Content);
+        bool isResultSuccess = await _emailService.SendEmailAsync(message);
+
+        if (isResultSuccess)
         {
-            _emailService = emailService;
-            _logger = logger;
+            return Result.Ok(Unit.Value);
         }
-
-        public async Task<Result<Unit>> Handle(SendEmailCommand request, CancellationToken cancellationToken)
+        else
         {
-            var message = new Message(new string[] { "streetcodeua@gmail.com" }, request.Email.From, "FeedBack", request.Email.Content);
-            bool isResultSuccess = await _emailService.SendEmailAsync(message);
-
-            if(isResultSuccess)
-            {
-                return Result.Ok(Unit.Value);
-            }
-            else
-            {
-                const string errorMsg = $"Failed to send email message";
-                _logger.LogError(request, errorMsg);
-                return Result.Fail(new Error(errorMsg));
-            }
+            const string errorMsg = $"Failed to send email message";
+            _logger.LogError(request, errorMsg);
+            return Result.Fail(new Error(errorMsg));
         }
     }
 }

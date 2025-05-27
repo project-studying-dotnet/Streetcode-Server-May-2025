@@ -13,11 +13,11 @@ public class TimelineItemProfile : Profile
         CreateMap<TimelineItem, TimelineItemDTO>()
             .ForMember(dest => dest.HistoricalContexts, opt => opt.MapFrom(x => x.HistoricalContextTimelines
                 .Select(x => new HistoricalContextDTO
-                        {
-                            Id = x.HistoricalContextId,
-                            Title = x.HistoricalContext != null
-                                ? (x.HistoricalContext.Title ?? string.Empty)
-                                : string.Empty
-                        }).ToList()));
+                {
+                    Id = x.HistoricalContextId,
+                    Title = x.HistoricalContext != null
+                        ? (x.HistoricalContext.Title ?? string.Empty)
+                        : string.Empty
+                }).ToList()));
     }
 }

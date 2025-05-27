@@ -1,10 +1,9 @@
-﻿namespace Streetcode.DAL.Enums
+﻿namespace Streetcode.DAL.Enums;
+
+[Flags]
+public enum UserRole
 {
-    [Flags]
-    public enum UserRole
-    {
-        MainAdministrator,
-        Administrator,
-        Moderator
-    }
+    MainAdministrator,
+    Administrator,
+    Moderator
 }

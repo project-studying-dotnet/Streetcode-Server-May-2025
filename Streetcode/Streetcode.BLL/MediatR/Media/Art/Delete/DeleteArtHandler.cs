@@ -44,7 +44,7 @@ public class DeleteArtHandler : IRequestHandler<DeleteArtCommand, Result<Unit>>
             _logger.LogError(request, errorMsg);
             return Result.Fail(new Error(errorMsg));
         }
-
+        
         if (!string.IsNullOrWhiteSpace(blobNameToDelete))
         {
             try
@@ -63,6 +63,7 @@ public class DeleteArtHandler : IRequestHandler<DeleteArtCommand, Result<Unit>>
         }
 
         _logger.LogInformation($"DeleteArtCommand for Art ID: {request.Id} handled successfully (database entity deleted).");
+        
         return Result.Ok(Unit.Value);
     }
 }

@@ -1,9 +1,8 @@
-namespace Streetcode.BLL.DTO.Media.Art
+namespace Streetcode.BLL.DTO.Media.Art;
+
+public class StreetcodeArtDTO
 {
-    public class StreetcodeArtDTO
-    {
-        public int Index { get; set; }
-        public int StreetcodeId { get; set; }
-        public ArtDTO? Art { get; set; }
-    }
+    public int Index { get; set; }
+    public int StreetcodeId { get; set; }
+    public ArtDTO? Art { get; set; }
 }
