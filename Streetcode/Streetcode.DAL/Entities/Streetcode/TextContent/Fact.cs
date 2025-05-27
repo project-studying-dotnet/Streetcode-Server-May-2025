@@ -12,7 +12,7 @@ public class Fact
     public int Id { get; set; }
 
     [Required]
-    [MaxLength(100)]
+    [MaxLength(68)]
     public string? Title { get; set; }
 
     [Required]
