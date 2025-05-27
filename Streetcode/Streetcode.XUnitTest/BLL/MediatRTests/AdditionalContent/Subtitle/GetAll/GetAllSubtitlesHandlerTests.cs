@@ -15,7 +15,7 @@ public class GetAllSubtitlesHandlerTests
     private readonly Mock<IRepositoryWrapper> _repositoryWrapper;
     private readonly Mock<IMapper> _mapper;
     private readonly Mock<ILoggerService> _logger;
-    
+
     public GetAllSubtitlesHandlerTests()
     {
         _repositoryWrapper = new Mock<IRepositoryWrapper>();
@@ -34,10 +34,10 @@ public class GetAllSubtitlesHandlerTests
             .ReturnsAsync(subtitle);
         _mapper.Setup(x => x.Map<IEnumerable<SubtitleDTO>>(subtitle))
             .Returns(subtitleDtos);
-        
+
         // Act
         var result = await _handler.Handle(new GetAllSubtitlesQuery(), CancellationToken.None);
-        
+
         // Assert
         result.IsSuccess.Should().BeTrue();
         _repositoryWrapper.Verify(r => r.SubtitleRepository.GetAllAsync(null, null), Times.Once);
@@ -51,10 +51,10 @@ public class GetAllSubtitlesHandlerTests
         var expectedErrorMessage = "Cannot find any subtitles";
         _repositoryWrapper.Setup(r => r.SubtitleRepository.GetAllAsync(null, null))
             .ReturnsAsync((IEnumerable<DAL.Entities.AdditionalContent.Subtitle>)null);
-        
+
         // Act
         var result = await _handler.Handle(new GetAllSubtitlesQuery(), CancellationToken.None);
-        
+
         // Assert
         result.IsSuccess.Should().BeFalse();
         _repositoryWrapper.Verify(r => r.SubtitleRepository.GetAllAsync(null, null), Times.Once);
@@ -73,7 +73,7 @@ public class GetAllSubtitlesHandlerTests
             new DAL.Entities.AdditionalContent.Subtitle { Id = 2 },
         };
     }
-    
+
     private IEnumerable<SubtitleDTO> GetAllSubtitlesDTOs()
     {
         return new List<SubtitleDTO>

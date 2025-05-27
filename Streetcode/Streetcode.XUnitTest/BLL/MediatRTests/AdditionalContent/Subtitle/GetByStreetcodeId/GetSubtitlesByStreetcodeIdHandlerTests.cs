@@ -60,10 +60,10 @@ public class GetSubtitlesByStreetcodeIdHandlerTests
             .ReturnsAsync((DAL.Entities.AdditionalContent.Subtitle)null);
         _mapper.Setup(m => m.Map<SubtitleDTO>(
             It.IsAny<DAL.Entities.AdditionalContent.Subtitle>())).Returns((SubtitleDTO)null);
-        
+
         // Act
         var result = await _handler.Handle(new GetSubtitlesByStreetcodeIdQuery(streetcodeId), CancellationToken.None);
-        
+
         // Assert
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().BeNull();

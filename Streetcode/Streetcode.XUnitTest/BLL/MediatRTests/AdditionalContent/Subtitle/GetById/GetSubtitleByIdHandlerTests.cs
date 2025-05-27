@@ -58,10 +58,10 @@ public class GetSubtitleByIdHandlerTests
         _repositoryWrapper.Setup(r => r.SubtitleRepository.GetFirstOrDefaultAsync(
             It.IsAny<Expression<Func<DAL.Entities.AdditionalContent.Subtitle, bool>>>(), null))
             .ReturnsAsync((DAL.Entities.AdditionalContent.Subtitle)null);
-        
+
         // Act
         var result = await _handler.Handle(new GetSubtitleByIdQuery(subtitleId), CancellationToken.None);
-        
+
         // Assert
         result.IsSuccess.Should().BeFalse();
         result.Errors.Should().ContainSingle().Which.Message.Should()
@@ -82,7 +82,7 @@ public class GetSubtitleByIdHandlerTests
             Id = 1,
         };
     }
-    
+
     private SubtitleDTO GetSubtitleDto()
     {
         return new SubtitleDTO
