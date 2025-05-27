@@ -1,6 +1,6 @@
 using FluentValidation;
 using Streetcode.BLL.MediatR.Streetcode.RelatedTerm.Create;
-using Streetcode.BLL.Validator.Streetcode.RelatedTerm.Rules;
+using Streetcode.BLL.Validator;
 
 namespace Streetcode.BLL.Validator.Streetcode.RelatedTerm.Create;
 
@@ -8,7 +8,7 @@ public sealed class CreateRelatedTermValidator : AbstractValidator<CreateRelated
 {
     public CreateRelatedTermValidator()
     {
-        RuleFor(c => c.RelatedTerm.Word).ValidWord();
-        RuleFor(c => c.RelatedTerm.TermId).ValidTermId();
+        RuleFor(c => c.RelatedTerm.Word).NotEmpty();
+        RuleFor(c => c.RelatedTerm.TermId).GreaterThan(0);
     }
 }

@@ -1,6 +1,5 @@
 using FluentValidation;
 using Streetcode.BLL.MediatR.News.Create;
-using Streetcode.BLL.Validator.News.Rules;
 
 namespace Streetcode.BLL.Validator.News.Create;
 

@@ -1,12 +1,12 @@
 using FluentValidation;
 using Streetcode.BLL.MediatR.AdditionalContent.Tag.Create;
 
-namespace Streetcode.BLL.Validator.News.Create;
+namespace Streetcode.BLL.Validator.AdditionalContent.Tag.Create;
 
-public sealed class CreateTagValidator : AbstractValidator<CreateTagQuery>
+public sealed class CreateTagValidator : AbstractValidator<CreateTagCommand>
 {
     public CreateTagValidator()
     {
-        RuleFor(q => q.tag.Title).NotEmpty();
+        RuleFor(c => c.tag.Title).NotEmpty();
     }
 }
