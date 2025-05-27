@@ -39,7 +39,7 @@ public class NewsService : INewsService
 
         if (newsDTO.Image is not null)
         {
-            newsDTO.Image.Base64 = _blobService.FindFileInStorageAsBase64(newsDTO.Image.BlobName);
+            newsDTO.Image.Base64 = await _blobService.FindFileInStorageAsBase64Async(newsDTO.Image.BlobName);
         }
 
         return newsDTO;
