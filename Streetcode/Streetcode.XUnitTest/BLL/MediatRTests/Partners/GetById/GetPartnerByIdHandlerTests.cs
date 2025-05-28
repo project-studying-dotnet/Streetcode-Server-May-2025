@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using Ardalis.Specification;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore.Query;
 using Moq;
@@ -36,9 +37,9 @@ public class GetPartnerByIdHandlerTests
         var partnerDto = new PartnerDTO { Id = 1 };
 
         _repositoryWrapperMock
-            .Setup(r => r.PartnersRepository.GetSingleOrDefaultAsync(
-                It.IsAny<Expression<Func<Partner, bool>>>(),
-                It.IsAny<Func<IQueryable<Partner>, IIncludableQueryable<Partner, object>>>()))
+            .Setup(r => r.PartnersRepository.GetBySpecAsync(
+                It.IsAny<ISpecification<PartnerEntity>>(),
+                It.IsAny<CancellationToken>()))
             .ReturnsAsync(partner);
 
         _mapperMock
