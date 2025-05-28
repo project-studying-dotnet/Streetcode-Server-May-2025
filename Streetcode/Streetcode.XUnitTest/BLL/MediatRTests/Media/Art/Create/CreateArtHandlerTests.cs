@@ -130,7 +130,7 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Media.Art.Create
         }
 
         [Fact]
-        public async Task Handle_BlobServiceSaveThrowsException_ReturnsFailResult()
+        public async Task Handle_BlobServiceSaveThrowsException_ThrowsInvalidOperationException()
         {
             // Arrange
             var artCreateRequest = new ArtCreateRequestDTO
@@ -138,20 +138,21 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Media.Art.Create
                 Image = new ImageFileBaseCreateDTO { BaseFormat = "validbase64", Extension = "png" }
             };
             var command = new CreateArtCommand(artCreateRequest);
+            var expectedExceptionMessage = "Blob service failed";
 
             _mockBlobService.Setup(s => s.SaveFileInStorageAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-                .ThrowsAsync(new InvalidOperationException("Blob service failed"));
+                .ThrowsAsync(new InvalidOperationException(expectedExceptionMessage));
 
             // Act
-            var result = await _handler.Handle(command, CancellationToken.None);
+            Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
 
             // Assert
-            result.IsFailed.Should().BeTrue();
-            result.Errors.First().Message.Should().Contain("Не вдалося створити об'єкт мистецтва: Blob service failed");
+            (await act.Should().ThrowAsync<InvalidOperationException>())
+                .WithMessage(expectedExceptionMessage);
         }
 
         [Fact]
-        public async Task Handle_SaveChangesAsyncForArtFails_ReturnsFailResult()
+        public async Task Handle_SaveChangesAsyncForArtThrowsException_ThrowsException() // Renamed for clarity
         {
             // Arrange
             var artCreateRequest = new ArtCreateRequestDTO
@@ -160,24 +161,24 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Media.Art.Create
                 Image = new ImageFileBaseCreateDTO { BaseFormat = "validbase64", Extension = "png", Title = "ImageTitle" }
             };
             var command = new CreateArtCommand(artCreateRequest);
+            var expectedExceptionMessage = "Simulated database error during art save";
 
             _mockBlobService.Setup(s => s.SaveFileInStorageAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync("hashed");
-
-            _mockRepositoryWrapper.SetupSequence(r => r.SaveChangesAsync())
-                .ReturnsAsync(1)
-                .ReturnsAsync(0);
+                .ReturnsAsync("hashedblobname");
 
             _mockImageRepository.Setup(r => r.CreateAsync(It.IsAny<ImageEntity>()))
                 .Callback<ImageEntity>(img => img.Id = 1);
 
+            _mockRepositoryWrapper.SetupSequence(r => r.SaveChangesAsync())
+                .ReturnsAsync(1)
+                .ThrowsAsync(new Exception(expectedExceptionMessage));
 
             // Act
-            var result = await _handler.Handle(command, CancellationToken.None);
+            Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
 
             // Assert
-            result.IsFailed.Should().BeTrue();
-            result.Errors.First().Message.Should().Contain("Не вдалося створити об'єкт мистецтва");
+            (await act.Should().ThrowAsync<Exception>())
+                .WithMessage(expectedExceptionMessage);
         }
     }
 }
