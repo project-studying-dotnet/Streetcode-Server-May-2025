@@ -1,6 +1,5 @@
 ﻿using FluentResults;
 using MediatR;
-using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.BLL.Interfaces.Payment;
 using Streetcode.DAL.Entities.Payment;
 
@@ -11,12 +10,10 @@ public class CreateInvoiceHandler : IRequestHandler<CreateInvoiceCommand, Result
     private const int _hryvnyaCurrencyCode = 980;
     private const int _currencyMultiplier = 100;
     private readonly IPaymentService _paymentService;
-    private readonly ILoggerService _logger;
 
-    public CreateInvoiceHandler(IPaymentService paymentService, ILoggerService logger)
+    public CreateInvoiceHandler(IPaymentService paymentService)
     {
         _paymentService = paymentService;
-        _logger = logger;
     }
 
     public async Task<Result<InvoiceInfo>> Handle(CreateInvoiceCommand request, CancellationToken cancellationToken)

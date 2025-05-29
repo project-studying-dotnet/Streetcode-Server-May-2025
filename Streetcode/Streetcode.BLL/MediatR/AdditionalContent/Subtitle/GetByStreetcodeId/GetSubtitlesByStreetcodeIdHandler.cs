@@ -2,7 +2,6 @@ using AutoMapper;
 using FluentResults;
 using MediatR;
 using Streetcode.BLL.DTO.AdditionalContent.Subtitles;
-using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.BLL.MediatR.ResultVariations;
 using Streetcode.DAL.Repositories.Interfaces.Base;
 
@@ -12,13 +11,11 @@ public class GetSubtitlesByStreetcodeIdHandler : IRequestHandler<GetSubtitlesByS
 {
     private readonly IMapper _mapper;
     private readonly IRepositoryWrapper _repositoryWrapper;
-    private readonly ILoggerService _logger;
 
-    public GetSubtitlesByStreetcodeIdHandler(IRepositoryWrapper repositoryWrapper, IMapper mapper, ILoggerService logger)
+    public GetSubtitlesByStreetcodeIdHandler(IRepositoryWrapper repositoryWrapper, IMapper mapper)
     {
         _repositoryWrapper = repositoryWrapper;
         _mapper = mapper;
-        _logger = logger;
     }
 
     public async Task<Result<SubtitleDTO>> Handle(GetSubtitlesByStreetcodeIdQuery request, CancellationToken cancellationToken)

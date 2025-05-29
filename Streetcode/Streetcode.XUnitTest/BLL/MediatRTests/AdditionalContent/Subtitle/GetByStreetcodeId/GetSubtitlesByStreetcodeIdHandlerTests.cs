@@ -3,8 +3,6 @@ using AutoMapper;
 using FluentAssertions;
 using Moq;
 using Streetcode.BLL.DTO.AdditionalContent.Subtitles;
-using Streetcode.BLL.Interfaces.Logging;
-using Streetcode.BLL.MediatR.AdditionalContent.Subtitle.GetById;
 using Streetcode.BLL.MediatR.AdditionalContent.Subtitle.GetByStreetcodeId;
 using Streetcode.DAL.Repositories.Interfaces.Base;
 using Xunit;
@@ -16,14 +14,12 @@ public class GetSubtitlesByStreetcodeIdHandlerTests
     private readonly GetSubtitlesByStreetcodeIdHandler _handler;
     private readonly Mock<IRepositoryWrapper> _repositoryWrapper;
     private readonly Mock<IMapper> _mapper;
-    private readonly Mock<ILoggerService> _logger;
 
     public GetSubtitlesByStreetcodeIdHandlerTests()
     {
         _repositoryWrapper = new Mock<IRepositoryWrapper>();
         _mapper = new Mock<IMapper>();
-        _logger = new Mock<ILoggerService>();
-        _handler = new GetSubtitlesByStreetcodeIdHandler(_repositoryWrapper.Object, _mapper.Object, _logger.Object);
+        _handler = new GetSubtitlesByStreetcodeIdHandler(_repositoryWrapper.Object, _mapper.Object);
     }
 
     [Fact]
