@@ -4,12 +4,12 @@ using MediatR;
 using Moq;
 using Streetcode.BLL.DTO.Analytics;
 using Streetcode.BLL.Interfaces.Logging;
-using Streetcode.BLL.MediatR.Analytics;
+using Streetcode.BLL.MediatR.Analytics.Create;
 using Streetcode.DAL.Entities.Analytics;
 using Streetcode.DAL.Repositories.Interfaces.Base;
 using Xunit;
 
-namespace Streetcode.XUnitTest.BLL.MediatRTests.Analytics;
+namespace Streetcode.XUnitTest.BLL.MediatRTests.Analytics.Create;
 
 public class CreateStatisticRecordHandlerTests
 {

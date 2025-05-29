@@ -6,7 +6,7 @@ using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.DAL.Entities.Analytics;
 using Streetcode.DAL.Repositories.Interfaces.Base;
 
-namespace Streetcode.BLL.MediatR.Analytics;
+namespace Streetcode.BLL.MediatR.Analytics.Create;
 
 public class CreateStatisticRecordHandler : IRequestHandler<CreateStatisticRecordCommand, Result<StatisticRecordDTO>>
 {

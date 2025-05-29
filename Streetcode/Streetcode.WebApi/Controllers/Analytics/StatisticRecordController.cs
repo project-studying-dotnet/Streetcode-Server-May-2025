@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Streetcode.BLL.DTO.Analytics;
 using Streetcode.BLL.MediatR.Analytics;
+using Streetcode.BLL.MediatR.Analytics.Create;
 
 namespace Streetcode.WebApi.Controllers.Analytics;
 
