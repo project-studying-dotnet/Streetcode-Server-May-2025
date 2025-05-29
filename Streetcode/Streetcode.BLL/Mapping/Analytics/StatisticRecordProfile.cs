@@ -8,6 +8,7 @@ public class StatisticRecordProfile : Profile
 {
     public StatisticRecordProfile()
     {
-        CreateMap<StatisticRecord, StatisticRecordDTO>().ReverseMap();
+        CreateMap<StatisticRecordCreateDTO, StatisticRecord>();
+        CreateMap<StatisticRecord, StatisticRecordDTO>();
     }
 }
