@@ -8,35 +8,30 @@ namespace Streetcode.BLL.MediatR.Analytics.Delete;
 
 public class DeleteStatisticRecordHandler : IRequestHandler<DeleteStatisticRecordCommand, Result<Unit>>
 {
-    private readonly IMediator _mediator;
     private readonly IRepositoryWrapper _repositoryWrapper;
     private readonly ILoggerService _logger;
-    private readonly IMapper _mapper;
 
     public DeleteStatisticRecordHandler(
-        IMediator mediator,
         IRepositoryWrapper repositoryWrapper,
-        ILoggerService logger,
-        IMapper mapper)
+        ILoggerService logger)
     {
-        _mediator = mediator;
         _repositoryWrapper = repositoryWrapper;
         _logger = logger;
-        _mapper = mapper;
     }
 
     public async Task<Result<Unit>> Handle(DeleteStatisticRecordCommand request, CancellationToken cancellationToken)
     {
-        var statisticRecord = await _repositoryWrapper.StatisticRecordRepository
-            .GetFirstOrDefaultAsync(sr => sr.Id == request.Id);
+        var record = await _repositoryWrapper.StatisticRecordRepository
+            .GetFirstOrDefaultAsync(r => r.Id == request.Id);
 
-        if (statisticRecord is null)
+        if (record == null)
         {
-            _logger.LogWarning($"StatisticRecord with Id {request.Id} not found.");
-            return Result.Fail(new Error($"StatisticRecord with Id {request.Id} not found."));
+            var message = $"StatisticRecord with Id {request.Id} not found.";
+            _logger.LogWarning(message);
+            return Result.Fail(new Error(message));
         }
 
-        _repositoryWrapper.StatisticRecordRepository.Delete(statisticRecord);
+        _repositoryWrapper.StatisticRecordRepository.Delete(record);
 
         try
         {
@@ -46,8 +41,9 @@ public class DeleteStatisticRecordHandler : IRequestHandler<DeleteStatisticRecor
         }
         catch (Exception ex)
         {
-            _logger.LogError(request, $"Error deleting StatisticRecord with Id {request.Id}: {ex.Message}");
-            return Result.Fail(new Error($"Error deleting StatisticRecord: {ex.Message}"));
+            var errorMessage = $"Error deleting StatisticRecord with Id {request.Id}: {ex.Message}";
+            _logger.LogError(request, errorMessage);
+            return Result.Fail(new Error(errorMessage));
         }
     }
 }

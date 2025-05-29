@@ -9,7 +9,4 @@ using System.Threading.Tasks;
 
 namespace Streetcode.BLL.MediatR.Analytics.Delete;
 
-public record DeleteStatisticRecordCommand : IRequest<Result<Unit>>, IBaseRequest, IEquatable<DeleteStatisticRecordCommand>
-{
-    public int Id { get; init; }
-}
+public record DeleteStatisticRecordCommand(int Id) : IRequest<Result<Unit>>;
