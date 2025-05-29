@@ -25,6 +25,9 @@ public class Fact
 
     public Image? Image { get; set; }
 
+    [MaxLength(200)]
+    public string? ImageDescription { get; set; }
+
     public int StreetcodeId { get; set; }
 
     public StreetcodeContent? Streetcode { get; set; }
