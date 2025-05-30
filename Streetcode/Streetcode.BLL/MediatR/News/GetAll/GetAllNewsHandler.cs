@@ -6,50 +6,48 @@ using Streetcode.BLL.Interfaces.BlobStorage;
 using Streetcode.DAL.Repositories.Interfaces.Base;
 using Microsoft.EntityFrameworkCore;
 using Streetcode.BLL.Interfaces.Logging;
-using Streetcode.BLL.DTO.AdditionalContent.Subtitles;
 
-namespace Streetcode.BLL.MediatR.News.GetAll
+namespace Streetcode.BLL.MediatR.News.GetAll;
+
+public class GetAllNewsHandler : IRequestHandler<GetAllNewsQuery, Result<IEnumerable<NewsDTO>>>
 {
-    public class GetAllNewsHandler : IRequestHandler<GetAllNewsQuery, Result<IEnumerable<NewsDTO>>>
+    private readonly IRepositoryWrapper _repositoryWrapper;
+    private readonly IMapper _mapper;
+    private readonly IBlobService _blobService;
+    private readonly ILoggerService _logger;
+
+    public GetAllNewsHandler(IRepositoryWrapper repositoryWrapper, IMapper mapper, IBlobService blobService, ILoggerService logger)
     {
-        private readonly IRepositoryWrapper _repositoryWrapper;
-        private readonly IMapper _mapper;
-        private readonly IBlobService _blobService;
-        private readonly ILoggerService _logger;
+        _repositoryWrapper = repositoryWrapper;
+        _mapper = mapper;
+        _blobService = blobService;
+        _logger = logger;
+    }
 
-        public GetAllNewsHandler(IRepositoryWrapper repositoryWrapper, IMapper mapper, IBlobService blobService, ILoggerService logger)
+    public async Task<Result<IEnumerable<NewsDTO>>> Handle(GetAllNewsQuery request, CancellationToken cancellationToken)
+    {
+        var news = await _repositoryWrapper.NewsRepository.GetAllAsync(
+            include: cat => cat.Include(img => img.Image));
+        if (news == null)
         {
-            _repositoryWrapper = repositoryWrapper;
-            _mapper = mapper;
-            _blobService = blobService;
-            _logger = logger;
+            const string errorMsg = "There are no news in the database";
+            _logger.LogError(request, errorMsg);
+            return Result.Fail(errorMsg);
         }
 
-        public async Task<Result<IEnumerable<NewsDTO>>> Handle(GetAllNewsQuery request, CancellationToken cancellationToken)
-        {
-            var news = await _repositoryWrapper.NewsRepository.GetAllAsync(
-                include: cat => cat.Include(img => img.Image));
-            if (news == null)
+        var newsDTOs = _mapper.Map<IEnumerable<NewsDTO>>(news);
+
+        var tasks = newsDTOs
+            .Where(dto => dto.Image is not null)
+            .Select(async dto =>
             {
-                const string errorMsg = "There are no news in the database";
-                _logger.LogError(request, errorMsg);
-                return Result.Fail(errorMsg);
-            }
+                dto.Image!.Base64 = await _blobService.FindFileInStorageAsBase64Async(dto.Image.BlobName!);
+                return dto;
+            })
+            .ToList();
 
-            var newsDTOs = _mapper.Map<IEnumerable<NewsDTO>>(news);
+        var processedNewsDTOs = await Task.WhenAll(tasks);
 
-            var tasks = newsDTOs
-                .Where(dto => dto.Image is not null)
-                .Select(async dto =>
-                {
-                    dto.Image!.Base64 = await _blobService.FindFileInStorageAsBase64Async(dto.Image.BlobName!);
-                    return dto;
-                })
-                .ToList();
-
-            var processedNewsDTOs = await Task.WhenAll(tasks);
-
-            return Result.Ok(newsDTOs);
-        }
+        return Result.Ok(newsDTOs);
     }
 }

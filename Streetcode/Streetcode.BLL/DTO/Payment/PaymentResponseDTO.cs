@@ -1,8 +1,7 @@
-﻿namespace Streetcode.BLL.DTO.Payment
+﻿namespace Streetcode.BLL.DTO.Payment;
+
+public class PaymentResponseDTO
 {
-    public class PaymentResponseDTO
-    {
-        public string InvoiceId { get; set; }
-        public string PageUrl { get; set; }
-    }
+    public string InvoiceId { get; set; }
+    public string PageUrl { get; set; }
 }

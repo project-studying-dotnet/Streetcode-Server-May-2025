@@ -14,32 +14,25 @@ public class CreateFactHandler : IRequestHandler<CreateFactCommand, Result<FactD
     private readonly IRepositoryWrapper _repositoryWrapper;
     private readonly IMapper _mapper;
     private readonly ILoggerService _logger;
+    private readonly FactValidator _validator;
 
     public CreateFactHandler(IRepositoryWrapper repositoryWrapper, IMapper mapper, ILoggerService logger)
     {
         _repositoryWrapper = repositoryWrapper;
         _mapper = mapper;
         _logger = logger;
+        _validator = new FactValidator(_logger);
     }
 
     public async Task<Result<FactDTO>> Handle(CreateFactCommand request, CancellationToken cancellationToken)
     {
         var newFact = _mapper.Map<Entity>(request.NewFact);
 
-        if (newFact is null)
+        var validation = _validator.Validation(request, newFact);
+
+        if (validation != null)
         {
-            const string errorMsg = "Invalid fact data provided. New Fact is null.";
-            _logger.LogError(request, errorMsg);
-
-            return Result.Fail(new Error(errorMsg));
-        }
-
-        if (newFact.StreetcodeId == 0)
-        {
-            const string errorMsg = "StreetcodeId is required.";
-            _logger.LogError(request, errorMsg);
-
-            return Result.Fail(new Error(errorMsg));
+            return validation;
         }
 
         var duplicate = await _repositoryWrapper
@@ -52,9 +45,7 @@ public class CreateFactHandler : IRequestHandler<CreateFactCommand, Result<FactD
         if (duplicate is not null)
         {
             const string errorMsg = "A fact with the same content already exists for this streetcode.";
-            _logger.LogError(request, errorMsg);
-
-            return Result.Fail(new Error(errorMsg));
+            return _validator.LogAndFail(request, errorMsg);
         }
 
         newFact.ImageId = newFact.ImageId == 0 ? null : newFact.ImageId;
@@ -70,9 +61,7 @@ public class CreateFactHandler : IRequestHandler<CreateFactCommand, Result<FactD
         else
         {
             const string errorMsg = "Failed to save the fact.";
-            _logger.LogError(request, errorMsg);
-
-            return Result.Fail(new Error(errorMsg));
+            return _validator.LogAndFail(request, errorMsg);
         }
     }
 }

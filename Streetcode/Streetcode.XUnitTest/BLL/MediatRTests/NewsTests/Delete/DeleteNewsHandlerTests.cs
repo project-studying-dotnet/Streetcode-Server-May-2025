@@ -1,11 +1,7 @@
 using System.Linq.Expressions;
 using AutoMapper;
-using MediatR;
-using Microsoft.EntityFrameworkCore.Query;
 using Moq;
 using FluentAssertions;
-using FluentResults.Extensions;
-using Serilog;
 using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.BLL.MediatR.News.Delete;
 using Streetcode.DAL.Entities.Media.Images;

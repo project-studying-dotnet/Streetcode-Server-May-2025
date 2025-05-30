@@ -1,23 +1,18 @@
-﻿using AutoMapper;
-using FluentResults;
+﻿using FluentResults;
 using MediatR;
-using NLog.Targets;
 using Streetcode.BLL.Interfaces.Logging;
-using Streetcode.DAL.Entities.Streetcode;
 using Streetcode.DAL.Repositories.Interfaces.Base;
 
 namespace Streetcode.BLL.MediatR.Streetcode.RelatedFigure.Create;
 
 public class CreateRelatedFigureHandler : IRequestHandler<CreateRelatedFigureCommand, Result<Unit>>
 {
-    private readonly IMapper _mapper;
     private readonly IRepositoryWrapper _repositoryWrapper;
     private readonly ILoggerService _logger;
 
-    public CreateRelatedFigureHandler(IRepositoryWrapper repositoryWrapper, IMapper mapper, ILoggerService logger)
+    public CreateRelatedFigureHandler(IRepositoryWrapper repositoryWrapper, ILoggerService logger)
     {
         _repositoryWrapper = repositoryWrapper;
-        _mapper = mapper;
         _logger = logger;
     }
 
@@ -49,7 +44,7 @@ public class CreateRelatedFigureHandler : IRequestHandler<CreateRelatedFigureCom
         await _repositoryWrapper.RelatedFigureRepository.CreateAsync(relation);
 
         var resultIsSuccess = await _repositoryWrapper.SaveChangesAsync() > 0;
-        if(resultIsSuccess)
+        if (resultIsSuccess)
         {
             return Result.Ok(Unit.Value);
         }

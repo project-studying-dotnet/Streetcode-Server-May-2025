@@ -1,20 +1,19 @@
 using Newtonsoft.Json;
 
-namespace Streetcode.DAL.Entities.Payment
+namespace Streetcode.DAL.Entities.Payment;
+
+public class InvoiceInfo
 {
-    public class InvoiceInfo
+    [JsonConstructor]
+    public InvoiceInfo(string invoiceId, string pageUrl)
     {
-        [JsonConstructor]
-        public InvoiceInfo(string invoiceId, string pageUrl)
-        {
-            InvoiceId = invoiceId;
-            PageUrl = pageUrl;
-        }
-
-        [JsonProperty("invoiceId")]
-        public string InvoiceId { get; }
-
-        [JsonProperty("pageUrl")]
-        public string PageUrl { get; }
+        InvoiceId = invoiceId;
+        PageUrl = pageUrl;
     }
+
+    [JsonProperty("invoiceId")]
+    public string InvoiceId { get; }
+
+    [JsonProperty("pageUrl")]
+    public string PageUrl { get; }
 }

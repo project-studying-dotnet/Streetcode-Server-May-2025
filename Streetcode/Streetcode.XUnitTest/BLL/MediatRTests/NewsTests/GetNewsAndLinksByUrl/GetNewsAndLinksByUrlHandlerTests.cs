@@ -4,7 +4,6 @@ using Streetcode.BLL.DTO.Media.Images;
 using Streetcode.BLL.DTO.News;
 using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.BLL.Interfaces.News;
-using Streetcode.BLL.MediatR.News.GetByUrl;
 using Streetcode.BLL.MediatR.News.GetNewsAndLinksByUrl;
 using Xunit;
 

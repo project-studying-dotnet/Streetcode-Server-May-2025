@@ -1,9 +1,8 @@
-namespace Streetcode.BLL.Enums
+namespace Streetcode.BLL.Enums;
+
+public enum ModelState
 {
-    public enum ModelState
-    {
-        Created,
-        Deleted,
-        Updated,
-    }
+    Created,
+    Deleted,
+    Updated,
 }
