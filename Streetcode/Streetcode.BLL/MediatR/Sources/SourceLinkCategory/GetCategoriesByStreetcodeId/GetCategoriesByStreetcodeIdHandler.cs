@@ -26,26 +26,34 @@ public class GetCategoriesByStreetcodeIdHandler : IRequestHandler<GetCategoriesB
 
     public async Task<Result<IEnumerable<SourceLinkCategoryDTO>>> Handle(GetCategoriesByStreetcodeIdQuery request, CancellationToken cancellationToken)
     {
-        var srcCategories = await _repositoryWrapper
-            .SourceCategoryRepository
-            .GetAllAsync(
-                predicate: sc => sc.Streetcodes.Any(s => s.Id == request.StreetcodeId),
-                include: scl => scl.Include(sc => sc.Image) !);
-
-        if (srcCategories is null)
+        try
         {
-            string errorMsg = $"Cant find any source category with the streetcode id {request.StreetcodeId}";
-            _logger.LogError(request, errorMsg);
-            return Result.Fail(new Error(errorMsg));
+            var srcCategories = await _repositoryWrapper
+                .SourceCategoryRepository
+                .GetAllAsync(
+                    predicate: sc => sc.Streetcodes.Any(s => s.Id == request.StreetcodeId),
+                    include: scl => scl.Include(sc => sc.Image) !);
+
+            if (srcCategories is null)
+            {
+                string errorMsg = $"Cant find any source category with the streetcode id {request.StreetcodeId}";
+                _logger.LogError(request, errorMsg);
+                return Result.Fail(new Error(errorMsg));
+            }
+
+            var mappedSrcCategories = _mapper.Map<IEnumerable<SourceLinkCategoryDTO>>(srcCategories);
+
+            foreach (var srcCategory in mappedSrcCategories)
+            {
+                srcCategory.Image.Base64 = await _blobService.FindFileInStorageAsBase64Async(srcCategory.Image.BlobName);
+            }
+
+            return Result.Ok(mappedSrcCategories);
         }
-
-        var mappedSrcCategories = _mapper.Map<IEnumerable<SourceLinkCategoryDTO>>(srcCategories);
-
-        foreach (var srcCategory in mappedSrcCategories)
+        catch (Exception ex)
         {
-            srcCategory.Image.Base64 = await _blobService.FindFileInStorageAsBase64Async(srcCategory.Image.BlobName);
+            _logger.LogError(request, ex.Message);
+            return Result.Fail(new Error(ex.Message));
         }
-
-        return Result.Ok(mappedSrcCategories);
     }
 }

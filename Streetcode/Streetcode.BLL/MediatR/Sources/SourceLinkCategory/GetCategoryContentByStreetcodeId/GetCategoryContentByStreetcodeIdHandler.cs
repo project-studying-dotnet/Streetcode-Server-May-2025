@@ -22,25 +22,33 @@ public class GetCategoryContentByStreetcodeIdHandler : IRequestHandler<GetCatego
 
     public async Task<Result<StreetcodeCategoryContentDTO>> Handle(GetCategoryContentByStreetcodeIdQuery request, CancellationToken cancellationToken)
     {
-        if ((await _repositoryWrapper.StreetcodeRepository
-                .GetFirstOrDefaultAsync(s => s.Id == request.streetcodeId)) == null)
+        try
         {
-            string errorMsg = $"No such streetcode with id = {request.streetcodeId}";
-            _logger.LogError(request, errorMsg);
-            return Result.Fail(new Error(errorMsg));
+            if ((await _repositoryWrapper.StreetcodeRepository
+                    .GetFirstOrDefaultAsync(s => s.Id == request.streetcodeId)) == null)
+            {
+                string errorMsg = $"No such streetcode with id = {request.streetcodeId}";
+                _logger.LogError(request, errorMsg);
+                return Result.Fail(new Error(errorMsg));
+            }
+
+            var streetcodeContent = await _repositoryWrapper.StreetcodeCategoryContentRepository
+                .GetFirstOrDefaultAsync(
+                    sc => sc.StreetcodeId == request.streetcodeId && sc.SourceLinkCategoryId == request.categoryId);
+
+            if (streetcodeContent == null)
+            {
+                string errorMsg = "The streetcode content is null";
+                _logger.LogError(request, errorMsg);
+                return Result.Fail(new Error(errorMsg));
+            }
+
+            return Result.Ok(_mapper.Map<StreetcodeCategoryContentDTO>(streetcodeContent));
         }
-
-        var streetcodeContent = await _repositoryWrapper.StreetcodeCategoryContentRepository
-            .GetFirstOrDefaultAsync(
-                sc => sc.StreetcodeId == request.streetcodeId && sc.SourceLinkCategoryId == request.categoryId);
-
-        if (streetcodeContent == null)
+        catch (Exception ex)
         {
-            string errorMsg = "The streetcode content is null";
-            _logger.LogError(request, errorMsg);
-            return Result.Fail(new Error(errorMsg));
+            _logger.LogError(request, ex.Message);
+            return Result.Fail(new Error(ex.Message));
         }
-
-        return Result.Ok(_mapper.Map<StreetcodeCategoryContentDTO>(streetcodeContent));
     }
 }

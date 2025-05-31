@@ -26,22 +26,30 @@ public class GetAllCategoriesHandler : IRequestHandler<GetAllCategoriesQuery, Re
 
     public async Task<Result<IEnumerable<SourceLinkCategoryDTO>>> Handle(GetAllCategoriesQuery request, CancellationToken cancellationToken)
     {
-        var allCategories = await _repositoryWrapper.SourceCategoryRepository.GetAllAsync(
-            include: cat => cat.Include(img => img.Image)!);
-        if (allCategories == null)
+        try
         {
-            const string errorMsg = $"Categories is null";
-            _logger.LogError(request, errorMsg);
-            return Result.Fail(new Error(errorMsg));
+            var allCategories = await _repositoryWrapper.SourceCategoryRepository.GetAllAsync(
+                include: cat => cat.Include(img => img.Image)!);
+            if (allCategories == null)
+            {
+                const string errorMsg = $"Categories is null";
+                _logger.LogError(request, errorMsg);
+                return Result.Fail(new Error(errorMsg));
+            }
+
+            var dtos = _mapper.Map<IEnumerable<SourceLinkCategoryDTO>>(allCategories);
+
+            foreach (var dto in dtos)
+            {
+                dto.Image.Base64 = await _blobService.FindFileInStorageAsBase64Async(dto.Image.BlobName);
+            }
+
+            return Result.Ok(dtos);
         }
-
-        var dtos = _mapper.Map<IEnumerable<SourceLinkCategoryDTO>>(allCategories);
-
-        foreach (var dto in dtos)
+        catch (Exception ex)
         {
-            dto.Image.Base64 = await _blobService.FindFileInStorageAsBase64Async(dto.Image.BlobName);
+            _logger.LogError(request, ex.Message);
+            return Result.Fail(new Error(ex.Message));
         }
-
-        return Result.Ok(dtos);
     }
 }
