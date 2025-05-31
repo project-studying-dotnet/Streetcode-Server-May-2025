@@ -2,6 +2,7 @@
 using FluentResults;
 using MediatR;
 using Streetcode.BLL.DTO.Partners;
+using Streetcode.BLL.Interfaces.Cache;
 using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.DAL.Repositories.Interfaces.Base;
 
@@ -12,12 +13,18 @@ public class DeletePartnerHandler : IRequestHandler<DeletePartnerCommand, Result
     private readonly IMapper _mapper;
     private readonly IRepositoryWrapper _repositoryWrapper;
     private readonly ILoggerService _logger;
+    private readonly ICacheInvalidationService _cacheInvalidationService;
 
-    public DeletePartnerHandler(IRepositoryWrapper repositoryWrapper, IMapper mapper, ILoggerService logger)
+    public DeletePartnerHandler(
+        IRepositoryWrapper repositoryWrapper, 
+        IMapper mapper, 
+        ILoggerService logger,
+        ICacheInvalidationService cacheInvalidationService)
     {
         _repositoryWrapper = repositoryWrapper;
         _mapper = mapper;
         _logger = logger;
+        _cacheInvalidationService = cacheInvalidationService;
     }
 
     public async Task<Result<PartnerDTO>> Handle(DeletePartnerCommand request, CancellationToken cancellationToken)
@@ -35,6 +42,7 @@ public class DeletePartnerHandler : IRequestHandler<DeletePartnerCommand, Result
             try
             {
                 await _repositoryWrapper.SaveChangesAsync();
+                await _cacheInvalidationService.InvalidateAllCacheAsync();
                 return Result.Ok(_mapper.Map<PartnerDTO>(partner));
             }
             catch (Exception ex)

@@ -1,3 +1,5 @@
+using FluentResults;
+using StackExchange.Redis;
 using Hangfire;
 using MediatR;
 using FluentValidation;
@@ -44,6 +46,7 @@ public static class ServiceCollectionExtensions
         services.AddMediatR(currentAssemblies);
         services.AddValidatorsFromAssemblies(currentAssemblies);
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CacheBehavior<,>));
 
         services.AddScoped<IBlobService, BlobService>();
         services.AddScoped<ILoggerService, LoggerService>();
@@ -68,7 +71,13 @@ public static class ServiceCollectionExtensions
                 opt.MigrationsHistoryTable("__EFMigrationsHistory", schema: "entity_framework");
             });
         });
-
+        
+        var redisConnectionString = configuration["Redis:ConnectionString"];
+        services.AddSingleton<IConnectionMultiplexer>(
+            ConnectionMultiplexer.Connect(redisConnectionString));
+        
+        services.AddDistributedMemoryCache();
+        
         services.AddHangfire(config =>
         {
             config.UseSqlServerStorage(connectionString);

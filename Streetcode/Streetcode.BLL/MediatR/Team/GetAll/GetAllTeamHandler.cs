@@ -3,6 +3,7 @@ using FluentResults;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Streetcode.BLL.DTO.Team;
+using Streetcode.BLL.Interfaces.Cache;
 using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.DAL.Repositories.Interfaces.Base;
 
@@ -14,7 +15,10 @@ public class GetAllTeamHandler : IRequestHandler<GetAllTeamQuery, Result<IEnumer
     private readonly IRepositoryWrapper _repositoryWrapper;
     private readonly ILoggerService _logger;
 
-    public GetAllTeamHandler(IRepositoryWrapper repositoryWrapper, IMapper mapper, ILoggerService logger)
+    public GetAllTeamHandler(
+        IRepositoryWrapper repositoryWrapper, 
+        IMapper mapper, 
+        ILoggerService logger)
     {
         _repositoryWrapper = repositoryWrapper;
         _mapper = mapper;
@@ -33,7 +37,7 @@ public class GetAllTeamHandler : IRequestHandler<GetAllTeamQuery, Result<IEnumer
             _logger.LogError(request, errorMsg);
             return Result.Fail(new Error(errorMsg));
         }
-
+        
         return Result.Ok(_mapper.Map<IEnumerable<TeamMemberDTO>>(team));
     }
 }
