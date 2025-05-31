@@ -9,6 +9,7 @@ namespace Streetcode.BLL.Behaviors;
 
 public sealed class CacheBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> 
     where TRequest : IRequest<TResponse>, ICacheable
+    where TResponse : ResultBase
 
 {
     private readonly IDistributedCache _cache;
@@ -32,7 +33,7 @@ public sealed class CacheBehavior<TRequest, TResponse> : IPipelineBehavior<TRequ
         {
             ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver
             {
-                DefaultMembersSearchFlags = BindingFlags.NonPublic | BindingFlags.Instance
+                DefaultMembersSearchFlags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public
             }
         };
         
