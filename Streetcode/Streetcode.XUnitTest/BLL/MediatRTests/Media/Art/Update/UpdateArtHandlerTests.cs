@@ -122,12 +122,19 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Media.Art.Update
         }
 
         [Fact]
-        public async Task Handle_BlobServiceThrowsExceptionWhenFetchingBase64_ReturnsFailResult()
+        public async Task Handle_BlobServiceThrowsExceptionWhenFetchingBase64_ThrowsException()
         {
             // Arrange
             var artUpdateRequest = new UpdateArtRequestDTO { Id = 1, Title = "Updated Title" };
             var command = new UpdateArtCommand(artUpdateRequest);
-            var existingArtEntity = new ArtEntity { Id = 1, Title = "Old Title", ImageId = 1, Image = new ImageEntity { Id = 1, BlobName = "image.png" } };
+
+            var existingArtEntity = new ArtEntity
+            {
+                Id = 1,
+                Title = "Old Title",
+                ImageId = 1,
+                Image = new ImageEntity { Id = 1, BlobName = "image.png" }
+            };
 
             _mockArtRepository.Setup(r => r.GetFirstOrDefaultAsync(
                     It.IsAny<Expression<Func<ArtEntity, bool>>>(),
@@ -137,18 +144,23 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Media.Art.Update
             _mockRepositoryWrapper.Setup(r => r.SaveChangesAsync()).ReturnsAsync(1);
 
             _mockMapper.Setup(m => m.Map<ArtDTO>(It.IsAny<ArtEntity>()))
-                .Returns(new ArtDTO { Id = 1, Title = "Updated Title", Image = new ImageDTO { BlobName = "image.png" } });
+                .Returns(new ArtDTO
+                {
+                    Id = 1,
+                    Title = "Updated Title",
+                    Image = new ImageDTO { BlobName = "image.png" }
+                });
 
-
+            var expectedExceptionMessage = "Failed to fetch Base64";
             _mockBlobService.Setup(s => s.FindFileInStorageAsBase64Async("image.png"))
-                .ThrowsAsync(new InvalidOperationException("Failed to fetch Base64"));
+                .ThrowsAsync(new InvalidOperationException(expectedExceptionMessage));
 
             // Act
-            var result = await _handler.Handle(command, CancellationToken.None);
+            Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
 
             // Assert
-            result.IsFailed.Should().BeTrue();
-            result.Errors.First().Message.Should().Contain("Не вдалося оновити об'єкт мистецтва: Failed to fetch Base64");
+            (await act.Should().ThrowAsync<InvalidOperationException>())
+                .WithMessage(expectedExceptionMessage);
         }
     }
 }
