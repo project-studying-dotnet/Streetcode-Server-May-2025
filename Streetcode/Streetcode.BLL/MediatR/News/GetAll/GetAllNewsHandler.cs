@@ -1,11 +1,12 @@
 ﻿using AutoMapper;
 using FluentResults;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Streetcode.BLL.DTO.News;
 using Streetcode.BLL.Interfaces.BlobStorage;
-using Streetcode.DAL.Repositories.Interfaces.Base;
-using Microsoft.EntityFrameworkCore;
 using Streetcode.BLL.Interfaces.Logging;
+using Streetcode.DAL.Repositories.Interfaces.Base;
 
 namespace Streetcode.BLL.MediatR.News.GetAll;
 
@@ -15,13 +16,19 @@ public class GetAllNewsHandler : IRequestHandler<GetAllNewsQuery, Result<IEnumer
     private readonly IMapper _mapper;
     private readonly IBlobService _blobService;
     private readonly ILoggerService _logger;
+    private readonly IStringLocalizer<GetAllNewsHandler> _localizer;
 
-    public GetAllNewsHandler(IRepositoryWrapper repositoryWrapper, IMapper mapper, IBlobService blobService, ILoggerService logger)
+    public GetAllNewsHandler(IRepositoryWrapper repositoryWrapper,
+        IMapper mapper,
+        IBlobService blobService, 
+        ILoggerService logger,
+        IStringLocalizer<GetAllNewsHandler> localizer)
     {
         _repositoryWrapper = repositoryWrapper;
         _mapper = mapper;
         _blobService = blobService;
         _logger = logger;
+        _localizer = localizer;
     }
 
     public async Task<Result<IEnumerable<NewsDTO>>> Handle(GetAllNewsQuery request, CancellationToken cancellationToken)
@@ -30,7 +37,7 @@ public class GetAllNewsHandler : IRequestHandler<GetAllNewsQuery, Result<IEnumer
             include: cat => cat.Include(img => img.Image));
         if (news == null)
         {
-            const string errorMsg = "There are no news in the database";
+            var errorMsg = _localizer["CannotConvertNullToNews"];
             _logger.LogError(request, errorMsg);
             return Result.Fail(errorMsg);
         }
