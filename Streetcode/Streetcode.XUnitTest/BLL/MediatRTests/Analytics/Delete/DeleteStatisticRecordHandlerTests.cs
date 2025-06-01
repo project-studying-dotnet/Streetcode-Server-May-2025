@@ -1,8 +1,5 @@
 ﻿using Xunit;
 using Moq;
-using System.Threading;
-using System.Threading.Tasks;
-using FluentResults;
 using Streetcode.BLL.MediatR.Analytics.Delete;
 using Streetcode.DAL.Repositories.Interfaces.Base;
 using Streetcode.DAL.Entities.Analytics;

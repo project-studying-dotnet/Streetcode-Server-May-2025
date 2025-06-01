@@ -21,29 +21,30 @@ public class DeleteStatisticRecordHandler : IRequestHandler<DeleteStatisticRecor
 
     public async Task<Result<Unit>> Handle(DeleteStatisticRecordCommand request, CancellationToken cancellationToken)
     {
+        var recordId = request.Id;
         var record = await _repositoryWrapper.StatisticRecordRepository
-            .GetFirstOrDefaultAsync(r => r.Id == request.Id);
+            .GetFirstOrDefaultAsync(r => r.Id == recordId);
 
         if (record == null)
         {
-            var message = $"StatisticRecord with Id {request.Id} not found.";
-            _logger.LogWarning(message);
-            return Result.Fail(new Error(message));
+            string errorMsg = $"No statistic record found by entered Id - {recordId}";
+            _logger.LogError(request, errorMsg);
+            return Result.Fail(errorMsg);
         }
 
         _repositoryWrapper.StatisticRecordRepository.Delete(record);
 
-        try
+        var resultIsSuccess = await _repositoryWrapper.SaveChangesAsync() > 0;
+
+        if (resultIsSuccess)
         {
-            await _repositoryWrapper.SaveChangesAsync();
-            _logger.LogInformation($"StatisticRecord with Id {request.Id} deleted successfully.");
             return Result.Ok(Unit.Value);
         }
-        catch (Exception ex)
+        else
         {
-            var errorMessage = $"Error deleting StatisticRecord with Id {request.Id}: {ex.Message}";
-            _logger.LogError(request, errorMessage);
-            return Result.Fail(new Error(errorMessage));
+            string errorMsg = $"Failed to delete statistic record with Id - {recordId}";
+            _logger.LogError(request, errorMsg);
+            return Result.Fail(new Error(errorMsg));
         }
     }
 }
