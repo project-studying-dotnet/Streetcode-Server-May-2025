@@ -31,28 +31,21 @@ public sealed class CacheBehavior<TRequest, TResponse> : IPipelineBehavior<TRequ
         {
             return await next(); 
         }
-        
-        var settings = new JsonSerializerSettings();
-        var genericType = typeof(TResponse).GetGenericArguments().FirstOrDefault();
-        if (genericType != null)
-        {
-            var converterType = typeof(ResultValueOnlyConverter<>).MakeGenericType(genericType);
-            var converter = (JsonConverter)Activator.CreateInstance(converterType)!;
-            settings.Converters.Add(converter);
-        }
+
+        var serializerSetting = GetSerializerSettings();
         
         string? cacheKey = GenerateCacheKey(request);
         
         var cachedData = await _cache.GetStringAsync(cacheKey);
         if (!string.IsNullOrEmpty(cachedData))
         {
-            var value = JsonConvert.DeserializeObject<TResponse>(cachedData, settings)!;
+            var value = JsonConvert.DeserializeObject<TResponse>(cachedData, serializerSetting)!;
             return value;
         }
         
         var response = await next();
         
-        var serializedResponse = JsonConvert.SerializeObject(response, settings)!;
+        var serializedResponse = JsonConvert.SerializeObject(response, serializerSetting)!;
         var expiration = cacheable.AbsoluteExpiration ?? TimeSpan.FromMinutes(5);
         
         await _cache.SetStringAsync(cacheKey, serializedResponse, new DistributedCacheEntryOptions
@@ -78,5 +71,19 @@ public sealed class CacheBehavior<TRequest, TResponse> : IPipelineBehavior<TRequ
         }
         
         return key;
+    }
+
+    private JsonSerializerSettings GetSerializerSettings()
+    {
+        var settings = new JsonSerializerSettings();
+        var genericType = typeof(TResponse).GetGenericArguments().FirstOrDefault();
+        if (genericType != null)
+        {
+            var converterType = typeof(ResultValueOnlyConverter<>).MakeGenericType(genericType);
+            var converter = (JsonConverter)Activator.CreateInstance(converterType)!;
+            settings.Converters.Add(converter);
+        }
+        
+        return settings;
     }
 }

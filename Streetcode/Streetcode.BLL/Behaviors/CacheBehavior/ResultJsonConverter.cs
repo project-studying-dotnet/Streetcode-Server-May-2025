@@ -5,7 +5,6 @@ public class ResultValueOnlyConverter<T> : JsonConverter<Result<T>>
 {
     public override void WriteJson(JsonWriter writer, Result<T> result, JsonSerializer serializer)
     {
-        // Serialize only the Value
         serializer.Serialize(writer, result.Value);
     }
 
