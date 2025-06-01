@@ -46,7 +46,7 @@ public class CreatePartnerHandler : IRequestHandler<CreatePartnerCommand, Result
             }
 
             await _repositoryWrapper.SaveChangesAsync();
-            await _cacheInvalidationService.InvalidateAllCacheAsync();
+            await _cacheInvalidationService.InvalidateAllCacheAsync(Constants.CacheSetKeys.Partners);
             return Result.Ok(_mapper.Map<PartnerDTO>(newPartner));
         }
         catch (Exception ex)

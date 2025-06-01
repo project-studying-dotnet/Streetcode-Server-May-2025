@@ -1,5 +1,6 @@
 ﻿using FluentResults;
 using MediatR;
+using Streetcode.BLL.Interfaces.Cache;
 using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.DAL.Repositories.Interfaces.Base;
 
@@ -9,9 +10,11 @@ public class DeleteFactHandler : IRequestHandler<DeleteFactCommand, Result<Unit>
 {
     private readonly IRepositoryWrapper _repositoryWrapper;
     private readonly ILoggerService _logger;
+    private readonly ICacheInvalidationService _cacheInvalidationService;
 
-    public DeleteFactHandler(IRepositoryWrapper repositoryWrapper, ILoggerService logger)
+    public DeleteFactHandler(IRepositoryWrapper repositoryWrapper, ILoggerService logger, ICacheInvalidationService cacheInvalidationService)
     {
+        _cacheInvalidationService = cacheInvalidationService;
         _repositoryWrapper = repositoryWrapper;
         _logger = logger;
     }
@@ -39,6 +42,7 @@ public class DeleteFactHandler : IRequestHandler<DeleteFactCommand, Result<Unit>
         if (resultIsSuccess)
         {
             _logger.LogInformation("DeleteFactCommand handled successfully");
+            await _cacheInvalidationService.InvalidateAllCacheAsync(Constants.CacheSetKeys.Facts);
             return Result.Ok(Unit.Value);
         }
         else

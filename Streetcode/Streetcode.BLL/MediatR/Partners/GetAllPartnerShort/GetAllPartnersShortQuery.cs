@@ -7,6 +7,7 @@ namespace Streetcode.BLL.MediatR.Partners.GetAllPartnerShort;
 
 public record GetAllPartnersShortQuery : IRequest<Result<IEnumerable<PartnerShortDTO>>>, ICacheable
 {
+    public string CacheSetKey { get; set; } = Constants.CacheSetKeys.Partners;
     public TimeSpan? AbsoluteExpiration => TimeSpan.FromMinutes(10);
-    public string? CustomCacheKey => null;
+    public string? CustomCacheKey => $"{nameof(GetAllPartnersShortQuery)}";
 }

@@ -3,6 +3,7 @@ using AutoMapper;
 using FluentAssertions;
 using Moq;
 using Streetcode.BLL.DTO.Streetcode.TextContent.Fact;
+using Streetcode.BLL.Interfaces.Cache;
 using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.BLL.MediatR.Streetcode.Fact.Update;
 using Streetcode.DAL.Repositories.Interfaces.Base;
@@ -16,13 +17,19 @@ public class UpdateFactsHandlerTests
     private readonly Mock<IRepositoryWrapper> _mockRepoWrapper;
     private readonly Mock<IMapper> _mockMapper;
     private readonly Mock<ILoggerService> _mockLoggerService;
+    private readonly Mock<ICacheInvalidationService> _mockCacheInvalidationService;
 
     public UpdateFactsHandlerTests()
     {
         _mockRepoWrapper = new Mock<IRepositoryWrapper>();
         _mockMapper = new Mock<IMapper>();
         _mockLoggerService = new Mock<ILoggerService>();
-        _handler = new UpdateFactsHandler(_mockLoggerService.Object, _mockMapper.Object, _mockRepoWrapper.Object);
+        _mockCacheInvalidationService = new Mock<ICacheInvalidationService>();
+        _handler = new UpdateFactsHandler(
+            _mockLoggerService.Object, 
+            _mockMapper.Object, 
+            _mockRepoWrapper.Object,
+            _mockCacheInvalidationService.Object);
     }
 
     [Fact]

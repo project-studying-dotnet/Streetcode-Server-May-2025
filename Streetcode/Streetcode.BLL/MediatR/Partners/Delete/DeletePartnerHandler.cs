@@ -42,7 +42,7 @@ public class DeletePartnerHandler : IRequestHandler<DeletePartnerCommand, Result
             try
             {
                 await _repositoryWrapper.SaveChangesAsync();
-                await _cacheInvalidationService.InvalidateAllCacheAsync();
+                await _cacheInvalidationService.InvalidateAllCacheAsync(Constants.CacheSetKeys.Partners);
                 return Result.Ok(_mapper.Map<PartnerDTO>(partner));
             }
             catch (Exception ex)

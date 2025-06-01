@@ -4,6 +4,7 @@ using FluentResults;
 using MediatR;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
+using StackExchange.Redis;
 
 namespace Streetcode.BLL.Behaviors;
 
@@ -13,10 +14,12 @@ public sealed class CacheBehavior<TRequest, TResponse> : IPipelineBehavior<TRequ
 
 {
     private readonly IDistributedCache _cache;
+    private readonly IDatabase _redisDb;
     
-    public CacheBehavior(IDistributedCache cache)
+    public CacheBehavior(IDistributedCache cache, IConnectionMultiplexer redis)
     {
         _cache = cache;
+        _redisDb = redis.GetDatabase();
     }
 
     public async Task<TResponse> Handle(
@@ -29,13 +32,14 @@ public sealed class CacheBehavior<TRequest, TResponse> : IPipelineBehavior<TRequ
             return await next(); 
         }
         
-        var settings = new JsonSerializerSettings
+        var settings = new JsonSerializerSettings();
+        var genericType = typeof(TResponse).GetGenericArguments().FirstOrDefault();
+        if (genericType != null)
         {
-            ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver
-            {
-                DefaultMembersSearchFlags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public
-            }
-        };
+            var converterType = typeof(ResultValueOnlyConverter<>).MakeGenericType(genericType);
+            var converter = (JsonConverter)Activator.CreateInstance(converterType)!;
+            settings.Converters.Add(converter);
+        }
         
         string? cacheKey = GenerateCacheKey(request);
         
@@ -57,30 +61,22 @@ public sealed class CacheBehavior<TRequest, TResponse> : IPipelineBehavior<TRequ
         },
         cancellationToken);
         
+        await _redisDb.SetAddAsync(cacheable.CacheSetKey, cacheKey);
+        
         return response;
     }
     
     private string GenerateCacheKey<TRequest>(TRequest request)
     {
+        var cacheable = request as ICacheable; 
         var typeName = typeof(TRequest).Name;
-        var props = typeof(TRequest).GetProperties();
+        var key = $"{cacheable.CacheSetKey}:{typeName}";
 
-        if (!props.Any())
+        if (cacheable.CustomCacheKey != null)
         {
-            return $"Cache:{typeName}";
+            key = $"{key}:{cacheable.CustomCacheKey}";
         }
-
-        var keyBuilder = new StringBuilder($"Cache:{typeName}");
-
-        foreach (var prop in props.OrderBy(p => p.Name))
-        {
-            var value = prop.GetValue(request);
-            
-            var valueStr = value?.ToString() ?? "null";
-
-            keyBuilder.Append($"|{prop.Name}:{valueStr}");
-        }
-
-        return keyBuilder.ToString();
+        
+        return key;
     }
 }

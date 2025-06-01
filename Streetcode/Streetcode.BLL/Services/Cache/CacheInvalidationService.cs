@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Caching.Distributed;
 using StackExchange.Redis;
 using Streetcode.BLL.Interfaces.Cache;
 
@@ -5,18 +6,24 @@ namespace Streetcode.BLL.Services.Cache;
 
 public class CacheInvalidationService : ICacheInvalidationService
 {
-    private readonly IConnectionMultiplexer _redis;
-    public async Task InvalidateAllCacheAsync()
-    {
-        const string cachePrefix = "Cache:";
-        
-        var endpoint = _redis.GetEndPoints().First();
-        var server = _redis.GetServer(endpoint);
-        var db = _redis.GetDatabase();
+    private readonly IDatabase _redisDb;
+    private readonly IDistributedCache _cache;
 
-        foreach (var key in server.Keys(pattern: $"{cachePrefix}*"))
+    public CacheInvalidationService(IConnectionMultiplexer redis, IDistributedCache cache)
+    {
+        _redisDb = redis.GetDatabase();
+        _cache = cache;
+    }
+    
+    public async Task InvalidateAllCacheAsync(string cacheSetKey)
+    {
+        var keys = await _redisDb.SetMembersAsync(cacheSetKey);
+        
+        foreach (var redisKey in keys)
         {
-            await db.KeyDeleteAsync(key);
+            await _cache.RemoveAsync(redisKey!);     
         }
+        
+        await _redisDb.KeyDeleteAsync(cacheSetKey);
     }
 }
