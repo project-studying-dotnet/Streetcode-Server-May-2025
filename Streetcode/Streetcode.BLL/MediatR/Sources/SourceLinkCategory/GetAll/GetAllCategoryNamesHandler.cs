@@ -22,15 +22,23 @@ public class GetAllCategoryNamesHandler : IRequestHandler<GetAllCategoryNamesQue
 
     public async Task<Result<IEnumerable<CategoryWithNameDTO>>> Handle(GetAllCategoryNamesQuery request, CancellationToken cancellationToken)
     {
-        var allCategories = await _repositoryWrapper.SourceCategoryRepository.GetAllAsync();
-
-        if (allCategories == null)
+        try
         {
-            const string errorMsg = $"Categories is null";
-            _logger.LogError(request, errorMsg);
-            return Result.Fail(new Error(errorMsg));
-        }
+            var allCategories = await _repositoryWrapper.SourceCategoryRepository.GetAllAsync();
 
-        return Result.Ok(_mapper.Map<IEnumerable<CategoryWithNameDTO>>(allCategories));
+            if (allCategories == null)
+            {
+                const string errorMsg = $"Categories is null";
+                _logger.LogError(request, errorMsg);
+                return Result.Fail(new Error(errorMsg));
+            }
+
+            return Result.Ok(_mapper.Map<IEnumerable<CategoryWithNameDTO>>(allCategories));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(request, ex.Message);
+            return Result.Fail(new Error(ex.Message));
+        }
     }
 }
