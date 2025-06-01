@@ -30,25 +30,33 @@ public class GetCategoryByIdHandler : IRequestHandler<GetCategoryByIdQuery, Resu
 
     public async Task<Result<SourceLinkCategoryDTO>> Handle(GetCategoryByIdQuery request, CancellationToken cancellationToken)
     {
-        var srcCategories = await _repositoryWrapper
-            .SourceCategoryRepository
-            .GetFirstOrDefaultAsync(
-                predicate: sc => sc.Id == request.Id,
-                include: scl => scl
-                    .Include(sc => sc.StreetcodeCategoryContents)
-                    .Include(sc => sc.Image) !);
-
-        if (srcCategories is null)
+        try
         {
-            string errorMsg = $"Cannot find any srcCategory by the corresponding id: {request.Id}";
-            _logger.LogError(request, errorMsg);
-            return Result.Fail(new Error(errorMsg));
+            var srcCategories = await _repositoryWrapper
+                .SourceCategoryRepository
+                .GetFirstOrDefaultAsync(
+                    predicate: sc => sc.Id == request.Id,
+                    include: scl => scl
+                        .Include(sc => sc.StreetcodeCategoryContents)
+                        .Include(sc => sc.Image) !);
+
+            if (srcCategories is null)
+            {
+                string errorMsg = $"Cannot find any srcCategory by the corresponding id: {request.Id}";
+                _logger.LogError(request, errorMsg);
+                return Result.Fail(new Error(errorMsg));
+            }
+
+            var mappedSrcCategories = _mapper.Map<SourceLinkCategoryDTO>(srcCategories);
+
+            mappedSrcCategories.Image.Base64 = await _blobService.FindFileInStorageAsBase64Async(mappedSrcCategories.Image.BlobName);
+
+            return Result.Ok(mappedSrcCategories);
         }
-
-        var mappedSrcCategories = _mapper.Map<SourceLinkCategoryDTO>(srcCategories);
-
-        mappedSrcCategories.Image.Base64 = await _blobService.FindFileInStorageAsBase64Async(mappedSrcCategories.Image.BlobName);
-
-        return Result.Ok(mappedSrcCategories);
+        catch (Exception ex)
+        {
+            _logger.LogError(request, ex.Message);
+            return Result.Fail(new Error(ex.Message));
+        }
     }
 }

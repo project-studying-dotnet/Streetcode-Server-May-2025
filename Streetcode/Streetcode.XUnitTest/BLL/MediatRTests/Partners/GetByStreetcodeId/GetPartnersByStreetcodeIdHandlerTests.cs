@@ -10,6 +10,7 @@ using Xunit;
 using Streetcode.DAL.Entities.Streetcode;
 
 using PartnerEntity = Streetcode.DAL.Entities.Partners.Partner;
+using Ardalis.Specification;
 
 namespace Streetcode.XUnitTest.BLL.MediatRTests.Partners.GetByStreetcodeId;
 
@@ -38,16 +39,22 @@ public class GetPartnersByStreetcodeIdHandlerTests
         var partnerDto = new PartnerDTO { Id = 1 };
 
         _repositoryWrapperMock
+            .Setup(r => r.PartnersRepository.ListAsync(
+                It.IsAny<ISpecification<PartnerEntity>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<PartnerEntity> { partner });
+
+        _repositoryWrapperMock
             .Setup(r => r.StreetcodeRepository.GetSingleOrDefaultAsync(
                 It.IsAny<Expression<Func<StreetcodeContent, bool>>>(),
                 null))
             .ReturnsAsync(new StreetcodeContent { Id = streetcodeId });
 
         _repositoryWrapperMock
-            .Setup(r => r.PartnersRepository.GetAllAsync(
-                It.IsAny<Expression<Func<PartnerEntity, bool>>>(),
-                It.IsAny<Func<IQueryable<PartnerEntity>, IIncludableQueryable<PartnerEntity, object>>>()))
-            .ReturnsAsync(new List<PartnerEntity> { partner });
+            .Setup(r => r.StreetcodeRepository.GetBySpecAsync(
+                It.IsAny<ISpecification<StreetcodeContent>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new StreetcodeContent { Id = streetcodeId });
 
         _mapperMock
            .Setup(m => m.Map<IEnumerable<PartnerDTO>>(It.IsAny<IEnumerable<PartnerEntity>>()))
@@ -71,15 +78,15 @@ public class GetPartnersByStreetcodeIdHandlerTests
         var streetcodeId = 1;
 
         _repositoryWrapperMock
-            .Setup(r => r.StreetcodeRepository.GetSingleOrDefaultAsync(
-                It.IsAny<Expression<Func<StreetcodeContent, bool>>>(),
-                null))
-            .ReturnsAsync(new StreetcodeContent { Id = streetcodeId });
+         .Setup(r => r.StreetcodeRepository.GetBySpecAsync(
+             It.IsAny<ISpecification<StreetcodeContent>>(),
+             It.IsAny<CancellationToken>()))
+         .ReturnsAsync(new StreetcodeContent { Id = streetcodeId });
 
         _repositoryWrapperMock
-            .Setup(r => r.PartnersRepository.GetAllAsync(
-                It.IsAny<Expression<Func<PartnerEntity, bool>>>(),
-                It.IsAny<Func<IQueryable<PartnerEntity>, IIncludableQueryable<PartnerEntity, object>>>()))
+            .Setup(r => r.PartnersRepository.ListAsync(
+                It.IsAny<ISpecification<PartnerEntity>>(),
+                It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<PartnerEntity>());
 
         _mapperMock
@@ -103,9 +110,9 @@ public class GetPartnersByStreetcodeIdHandlerTests
         var streetcodeId = 1;
 
         _repositoryWrapperMock
-            .Setup(r => r.StreetcodeRepository.GetSingleOrDefaultAsync(
-                It.IsAny<Expression<Func<StreetcodeContent, bool>>>(),
-                null))
+     .Setup(r => r.StreetcodeRepository.GetBySpecAsync(
+         It.IsAny<ISpecification<StreetcodeContent>>(),
+         It.IsAny<CancellationToken>()))
             .ReturnsAsync((StreetcodeContent)null);
 
         var query = new GetPartnersByStreetcodeIdQuery(streetcodeId);
@@ -127,15 +134,15 @@ public class GetPartnersByStreetcodeIdHandlerTests
         var streetcodeId = 1;
 
         _repositoryWrapperMock
-            .Setup(r => r.StreetcodeRepository.GetSingleOrDefaultAsync(
-                It.IsAny<Expression<Func<StreetcodeContent, bool>>>(),
-                null))
-            .ReturnsAsync(new StreetcodeContent { Id = streetcodeId });
+                .Setup(r => r.StreetcodeRepository.GetBySpecAsync(
+                    It.IsAny<ISpecification<StreetcodeContent>>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new StreetcodeContent { Id = streetcodeId });
 
         _repositoryWrapperMock
-           .Setup(r => r.PartnersRepository.GetAllAsync(
-               It.IsAny<Expression<Func<PartnerEntity, bool>>>(),
-               It.IsAny<Func<IQueryable<PartnerEntity>, IIncludableQueryable<PartnerEntity, object>>>()))
+            .Setup(r => r.PartnersRepository.ListAsync(
+                It.IsAny<ISpecification<PartnerEntity>>(),
+                It.IsAny<CancellationToken>()))
             .ReturnsAsync((List<PartnerEntity>)null);
 
         var query = new GetPartnersByStreetcodeIdQuery(streetcodeId);

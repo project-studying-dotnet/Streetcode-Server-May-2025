@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using AutoMapper;
+using FluentAssertions;
 using Moq;
 using Streetcode.BLL.DTO.Streetcode.TextContent.Fact;
 using Streetcode.BLL.Interfaces.Cache;
@@ -9,6 +10,7 @@ using Streetcode.DAL.Repositories.Interfaces.Base;
 using Xunit;
 
 using Entity = Streetcode.DAL.Entities.Streetcode.TextContent.Fact;
+using Image = Streetcode.DAL.Entities.Media.Images.Image;
 
 namespace Streetcode.XUnitTest.BLL.MediatRTests.Streetcode.Fact.Create;
 
@@ -58,12 +60,16 @@ public class CreateFactHandlerTests
         var requestDto = new FactUpdateCreateDTO
         {
             StreetcodeId = 0,
-            FactContent = "Some content"
+            Title = "Title",
+            FactContent = "Some content",
+            Image = GetImage(),
         };
         var mappedEntity = new Entity
         {
             StreetcodeId = 0,
-            FactContent = "Some content"
+            Title = "Title",
+            FactContent = "Some content",
+            Image = GetImage(),
         };
         _mapperMock
             .Setup(m => m.Map<Entity>(requestDto))
@@ -83,12 +89,16 @@ public class CreateFactHandlerTests
         var requestDto = new FactUpdateCreateDTO
         {
             StreetcodeId = 5,
-            FactContent = "Duplicate"
+            Title = "Title",
+            FactContent = "Duplicate",
+            Image = GetImage(),
         };
         var mappedEntity = new Entity
         {
             StreetcodeId = 5,
-            FactContent = "Duplicate"
+            Title = "Title",
+            FactContent = "Duplicate",
+            Image = GetImage(),
         };
         _mapperMock
             .Setup(m => m.Map<Entity>(requestDto))
@@ -113,12 +123,16 @@ public class CreateFactHandlerTests
         var requestDto = new FactUpdateCreateDTO
         {
             StreetcodeId = 10,
-            FactContent = "Unique"
+            Title = "Title",
+            FactContent = "Unique",
+            Image = GetImage(),
         };
         var mappedEntity = new Entity
         {
             StreetcodeId = 10,
-            FactContent = "Unique"
+            Title = "Title",
+            FactContent = "Unique",
+            Image = GetImage(),
         };
         _mapperMock
             .Setup(m => m.Map<Entity>(requestDto))
@@ -142,7 +156,9 @@ public class CreateFactHandlerTests
             .Returns(new FactUpdateCreateDTO
             {
                 StreetcodeId = 10,
-                FactContent = "Unique"
+                Title = "Title",
+                FactContent = "Unique",
+                Image = GetImage(),
             });
 
         // Act
@@ -159,12 +175,16 @@ public class CreateFactHandlerTests
         var requestDto = new FactUpdateCreateDTO
         {
             StreetcodeId = 20,
-            FactContent = "WillFail"
+            Title = "Title",
+            FactContent = "WillFail",
+            Image = GetImage(),
         };
         var mappedEntity = new Entity
         {
             StreetcodeId = 20,
-            FactContent = "WillFail"
+            Title = "Title",
+            FactContent = "WillFail",
+            Image = GetImage(),
         };
         _mapperMock
             .Setup(m => m.Map<Entity>(requestDto))
@@ -188,5 +208,96 @@ public class CreateFactHandlerTests
 
         // Assert
         Assert.True(result.IsFailed);
+    }
+
+    [Fact]
+    public async Task Handle_EmptyTitle_ReturnsError()
+    {
+        var requestDto = new FactUpdateCreateDTO
+        {
+            StreetcodeId = 1,
+            FactContent = "FactContent",
+            Image = GetImage(),
+        };
+        var mappedEntity = new Entity
+        {
+            StreetcodeId = 1,
+            FactContent = "FactContent",
+            Image = GetImage(),
+        };
+        _mapperMock
+           .Setup(m => m.Map<Entity>(requestDto))
+           .Returns(mappedEntity);
+
+        // Act
+        var result = await _handler.Handle(new CreateFactCommand(requestDto), CancellationToken.None);
+
+        // Assert
+        result.IsFailed.Should().BeTrue();
+        result.Errors.First().Message.Should().Contain("Заголовок факту є обов'язковим.");
+    }
+
+    [Fact]
+    public async Task Handle_EmptyFactContent_ReturnsErrors()
+    {
+        var requestDto = new FactUpdateCreateDTO
+        {
+            StreetcodeId = 1,
+            Title = "Title",
+            Image = GetImage(),
+        };
+        var mappedEntity = new Entity
+        {
+            StreetcodeId = 1,
+            Title = "Title",
+            Image = GetImage(),
+        };
+        _mapperMock
+           .Setup(m => m.Map<Entity>(requestDto))
+           .Returns(mappedEntity);
+
+        // Act
+        var result = await _handler.Handle(new CreateFactCommand(requestDto), CancellationToken.None);
+
+        // Assert
+        result.IsFailed.Should().BeTrue();
+        result.Errors.First().Message.Should().Contain("Основний текст факту є обов'язковим.");
+    }
+
+    [Fact]
+    public async Task Handle_EmptyImage_ReturnsErrors()
+    {
+        var requestDto = new FactUpdateCreateDTO
+        {
+            StreetcodeId = 1,
+            Title = "Title",
+            FactContent = "FactContent",
+        };
+        var mappedEntity = new Entity
+        {
+            StreetcodeId = 1,
+            Title = "Title",
+            FactContent = "FactContent",
+        };
+        _mapperMock
+           .Setup(m => m.Map<Entity>(requestDto))
+           .Returns(mappedEntity);
+
+        // Act
+        var result = await _handler.Handle(new CreateFactCommand(requestDto), CancellationToken.None);
+
+        // Assert
+        result.IsFailed.Should().BeTrue();
+        result.Errors.First().Message.Should().Contain("Зображення є обов'язковим.");
+    }
+
+    private Image GetImage()
+    {
+        return new Image
+        {
+            Id = 1,
+            BlobName = "test.jpg",
+            MimeType = "image/jpeg"
+        };
     }
 }

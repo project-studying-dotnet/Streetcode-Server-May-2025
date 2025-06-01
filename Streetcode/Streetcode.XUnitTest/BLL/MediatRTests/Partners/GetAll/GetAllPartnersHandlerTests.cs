@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using Ardalis.Specification;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore.Query;
 using Moq;
@@ -87,10 +88,10 @@ public class GetAllPartnersHandlerTests
     {
         // Arrange
         _repositoryWrapperMock
-            .Setup(r => r.PartnersRepository.GetAllAsync(
-                It.IsAny<Expression<Func<PartnerEntity, bool>>>(),
-                It.IsAny<Func<IQueryable<PartnerEntity>, IIncludableQueryable<PartnerEntity, object>>>()))
-            .ReturnsAsync((List<PartnerEntity>)null);
+       .Setup(r => r.PartnersRepository.ListAsync(
+           It.IsAny<ISpecification<PartnerEntity>>(),
+           It.IsAny<CancellationToken>()))
+       .ReturnsAsync((List<PartnerEntity>)null);
 
         var query = new GetAllPartnersQuery();
         var expectedMessage = "Cannot find any partners";
