@@ -39,7 +39,7 @@ public class BlobService : IBlobService
         return Convert.ToBase64String(decodedBytes);
     }
 
-    public async Task<string> SaveFileInStorageAsync(string base64, string name, string extension)
+    public async Task<string> SaveFileInStorageAsync(string base64, string name, string mimeType)
     {
         byte[] imageBytes = Convert.FromBase64String(base64);
         string createdFileName = $"{DateTime.Now}{name}"
@@ -50,7 +50,7 @@ public class BlobService : IBlobService
         string hashBlobStorageName = HashFunction(createdFileName);
 
         Directory.CreateDirectory(_blobPath);
-        await EncryptFileAsync(imageBytes, extension, hashBlobStorageName);
+        await EncryptFileAsync(imageBytes, mimeType, hashBlobStorageName);
 
         return hashBlobStorageName;
     }
