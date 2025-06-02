@@ -5,7 +5,7 @@ using UserService.WebApi.Services.Interfaces;
 namespace UserService.WebApi.Controllers.Users;
 
 [ApiController]
-[Route("auth")]
+[Route("/api/auth")]
 public class UsersController : ControllerBase
 {
     private readonly IAuthService _authService;
