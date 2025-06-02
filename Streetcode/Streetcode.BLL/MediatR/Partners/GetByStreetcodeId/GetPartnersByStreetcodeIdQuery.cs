@@ -9,5 +9,5 @@ public record GetPartnersByStreetcodeIdQuery(int StreetcodeId) : IRequest<Result
 {
     public string CacheSetKey { get; set; } = Constants.CacheSetKeys.Partners;
     public TimeSpan? AbsoluteExpiration => TimeSpan.FromMinutes(10);
-    public string? CustomCacheKey => $"{nameof(GetPartnersByStreetcodeIdQuery)}:{StreetcodeId}";
+    public string? CustomCacheKey => StreetcodeId.ToString();
 }

@@ -8,6 +8,6 @@ namespace Streetcode.BLL.MediatR.Streetcode.Fact.GetByStreetcodeId;
 public record GetFactByStreetcodeIdQuery(int StreetcodeId) : IRequest<Result<IEnumerable<FactDTO>>>, ICacheable
 {
     public string CacheSetKey { get; set; } = Constants.CacheSetKeys.Facts;
-    public string? CustomCacheKey { get; } = $"{nameof(GetFactByStreetcodeIdQuery)}";
+    public string? CustomCacheKey { get; } = StreetcodeId.ToString();
     public TimeSpan? AbsoluteExpiration { get; } = TimeSpan.FromMinutes(10);
 }

@@ -8,6 +8,6 @@ namespace Streetcode.BLL.MediatR.Partners.GetAll;
 public record GetAllPartnersQuery : IRequest<Result<IEnumerable<PartnerDTO>>>, ICacheable
 {
     public string CacheSetKey { get; set; } = Constants.CacheSetKeys.Partners;
-    public string? CustomCacheKey { get; } = $"{nameof(GetAllPartnersQuery)}";
+    public string? CustomCacheKey => null;
     public TimeSpan? AbsoluteExpiration { get; } = TimeSpan.FromMinutes(10);
 }
