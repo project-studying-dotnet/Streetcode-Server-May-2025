@@ -24,10 +24,8 @@ public class CreateStatisticRecordHandlerTests
         _mockRepositoryWrapper = new Mock<IRepositoryWrapper>();
         _mockMapper = new Mock<IMapper>();
         _mockLogger = new Mock<ILoggerService>();
-        _mockMediator = new Mock<IMediator>();
 
         _handler = new CreateStatisticRecordHandler(
-            _mockMediator.Object,
             _mockRepositoryWrapper.Object,
             _mockLogger.Object,
             _mockMapper.Object);
