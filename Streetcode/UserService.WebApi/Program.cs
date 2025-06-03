@@ -14,7 +14,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddAutoMapper(typeof(Program));
 
-builder.Services.AddDbContext<UserServiseDbContext>(options =>
+builder.Services.AddDbContext<UserServiceDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
