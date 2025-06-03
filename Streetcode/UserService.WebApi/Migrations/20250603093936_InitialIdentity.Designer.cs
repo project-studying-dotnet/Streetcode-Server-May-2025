@@ -11,7 +11,7 @@ using UserService.WebApi.Data;
 
 namespace UserService.WebApi.Migrations
 {
-    [DbContext(typeof(UserServiseDbContext))]
+    [DbContext(typeof(UserServiceDbContext))]
     [Migration("20250603093936_InitialIdentity")]
     partial class InitialIdentity
     {

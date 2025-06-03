@@ -10,7 +10,7 @@ using UserService.WebApi.Data;
 
 namespace UserService.WebApi.Migrations
 {
-    [DbContext(typeof(UserServiseDbContext))]
+    [DbContext(typeof(UserServiceDbContext))]
     partial class UserServiseDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
