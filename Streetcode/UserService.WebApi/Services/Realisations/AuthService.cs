@@ -34,7 +34,6 @@ public class AuthService : IAuthService
         }
 
         var newUser = _mapper.Map<User>(registerUserDTO);
-        newUser.UserName = registerUserDTO.Email;
 
         var result = await _userManager.CreateAsync(newUser, registerUserDTO.Password);
         if (!result.Succeeded)

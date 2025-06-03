@@ -31,8 +31,7 @@ public class UsersController : ControllerBase
 
         if (result.IsSuccess)
         {
-            var responseDto = _mapper.Map<RegisterUserDTO>(result.Value);
-            responseDto.Password = null; 
+            var responseDto = _mapper.Map<UserResponseDTO>(result.Value);
             return Ok(responseDto);
         }
 

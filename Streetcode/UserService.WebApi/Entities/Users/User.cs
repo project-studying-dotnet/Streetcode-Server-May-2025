@@ -12,7 +12,4 @@ public class User : IdentityUser
     [Required]
     [MaxLength(50)]
     public string Surname { get; set; }
-
-    [Required]
-    public UserRole Role { get; set; }
 }

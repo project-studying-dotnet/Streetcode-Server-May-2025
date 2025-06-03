@@ -17,15 +17,8 @@ public class RegisterUserDTO
     public string Email { get; set; }
 
     [Required]
-    [MaxLength(20)]
-    public string Login { get; set; }
-
-    [Required]
     [MinLength(6)]
     [MaxLength(20)]
     public string Password { get; set; }
-
-    [Required]
-    public UserRole Role { get; set; }
 }
 

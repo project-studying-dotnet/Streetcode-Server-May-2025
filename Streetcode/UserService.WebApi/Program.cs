@@ -4,6 +4,7 @@ using UserService.WebApi.Data;
 using UserService.WebApi.Data.Repositories.Interfaces;
 using UserService.WebApi.Data.Repositories.Realisations;
 using UserService.WebApi.Entities.Users;
+using UserService.WebApi.Mapping.Users;
 using UserService.WebApi.Services.Interfaces;
 using UserService.WebApi.Services.Realisations;
 
@@ -18,6 +19,8 @@ builder.Services.AddDbContext<UserServiseDbContext>(options =>
 
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+
+builder.Services.AddAutoMapper(typeof(UserProfile));
 
 builder.Services.AddSwaggerGen();
 
