@@ -5,9 +5,9 @@ using UserService.WebApi.Entities.Users;
 namespace UserService.WebApi.Data.Repositories.Realisations;
 public class UsersRepository : IUsersRepository
 {
-    private readonly UserServiseDbContext _context;
+    private readonly UserServiceDbContext _context;
 
-    public UsersRepository(UserServiseDbContext context)
+    public UsersRepository(UserServiceDbContext context)
     {
         _context = context;
     }
