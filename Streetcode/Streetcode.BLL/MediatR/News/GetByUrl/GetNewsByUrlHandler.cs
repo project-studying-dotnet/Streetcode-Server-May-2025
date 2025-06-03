@@ -1,5 +1,6 @@
 ﻿using FluentResults;
 using MediatR;
+using Microsoft.Extensions.Localization;
 using Streetcode.BLL.DTO.News;
 using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.BLL.Interfaces.News;
@@ -10,10 +11,14 @@ public class GetNewsByUrlHandler : IRequestHandler<GetNewsByUrlQuery, Result<New
 {
     private readonly ILoggerService _logger;
     private readonly INewsService _newsService;
-    public GetNewsByUrlHandler(ILoggerService logger, INewsService newsService)
+    private readonly IStringLocalizer<GetNewsByUrlHandler> _localizer;
+    public GetNewsByUrlHandler(ILoggerService logger,
+        INewsService newsService,
+        IStringLocalizer<GetNewsByUrlHandler> localizer)
     {
         _newsService = newsService;
         _logger = logger;
+        _localizer = localizer;
     }
 
     public async Task<Result<NewsDTO>> Handle(GetNewsByUrlQuery request, CancellationToken cancellationToken)
@@ -23,8 +28,9 @@ public class GetNewsByUrlHandler : IRequestHandler<GetNewsByUrlQuery, Result<New
 
         if (newsDto is null)
         {
-            string errorMsg = $"No news by entered Url - {url}";
+            var errorMsg = _localizer["NoNewsByEnteredUrl", url];
             _logger.LogError(request, errorMsg);
+
             return Result.Fail(errorMsg);
         }
 

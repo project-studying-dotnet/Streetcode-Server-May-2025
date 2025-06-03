@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
-using AutoMapper;
 using Moq;
 using FluentAssertions;
+using Microsoft.Extensions.Localization;
 using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.BLL.MediatR.News.Delete;
 using Streetcode.DAL.Entities.Media.Images;
@@ -9,20 +9,21 @@ using Streetcode.DAL.Entities.News;
 using Streetcode.DAL.Repositories.Interfaces.Base;
 using Xunit;
 
-namespace Streetcode.XUnitTest.BLL.MediatRTests.NewsTests;
+namespace Streetcode.XUnitTest.BLL.MediatRTests.NewsTests.Delete;
 
 public class DeleteNewsHandlerTests
 {
-    private readonly Mock<IMapper> _mockMapper;
     private readonly Mock<ILoggerService> _logger;
     private readonly Mock<IRepositoryWrapper> _repositoryWrapper;
+    private readonly Mock<IStringLocalizer<DeleteNewsHandler>> _localizer;
     private readonly DeleteNewsHandler _handler;
 
     public DeleteNewsHandlerTests()
     {
         _logger = new Mock<ILoggerService>();
         _repositoryWrapper = new Mock<IRepositoryWrapper>();
-        _handler = new DeleteNewsHandler(_repositoryWrapper.Object, _logger.Object);
+        _localizer = new Mock<IStringLocalizer<DeleteNewsHandler>>();
+        _handler = new DeleteNewsHandler(_repositoryWrapper.Object, _logger.Object, _localizer.Object);
     }
 
     [Fact]
@@ -70,7 +71,17 @@ public class DeleteNewsHandlerTests
     {
         // Arrange
         var testNews = GetNews();
-        var errorMessage = $"No news found by entered Id - {testNews.Id}";
+
+        var localized = new LocalizedString(
+            "NoNewsFoundById",
+            $"No news found by entered Id - {testNews.Id}"
+        );
+        _localizer
+            .Setup(l => l["NoNewsFoundById", testNews.Id])
+            .Returns(localized);
+
+        var errorMessage = localized.Value;
+
         SetUpMockRepositoryGetFirstOrDefaultAsync(null);
 
         // Act
@@ -86,7 +97,17 @@ public class DeleteNewsHandlerTests
     {
         // Arrange
         var testNews = GetNews();
-        var errorMessage = "Failed to delete news";
+
+        var localized = new LocalizedString(
+            "FailedToDeleteNews",
+            "Failed to delete news"
+        );
+        _localizer
+            .Setup(l => l["FailedToDeleteNews"])
+            .Returns(localized);
+
+        var errorMessage = localized.Value;
+
         SetUpMockRepositoryGetFirstOrDefaultAsync(testNews);
         _repositoryWrapper.Setup(r => r.ImageRepository.Delete(testNews.Image));
         _repositoryWrapper.Setup(r => r.NewsRepository.Delete(testNews));
