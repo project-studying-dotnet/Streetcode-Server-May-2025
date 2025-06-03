@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using UserService.WebApi.Entities.Users;
 
 namespace UserService.WebApi.Data;
 
-public class UserServiseDbContext : DbContext
+public class UserServiseDbContext : IdentityDbContext<User>
 {
     public UserServiseDbContext()
     {

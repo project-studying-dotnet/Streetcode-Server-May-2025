@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using UserService.WebApi.Data;
 using UserService.WebApi.Data.Repositories.Interfaces;
 using UserService.WebApi.Data.Repositories.Realisations;
+using UserService.WebApi.Entities.Users;
 using UserService.WebApi.Services.Interfaces;
 using UserService.WebApi.Services.Realisations;
 
@@ -15,10 +17,22 @@ builder.Services.AddDbContext<UserServiseDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
-builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddIdentity<User, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 6;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireLowercase = false;
+
+    options.User.RequireUniqueEmail = true;
+})
+    .AddEntityFrameworkStores<UserServiseDbContext>()
+    .AddDefaultTokenProviders();
 
 var app = builder.Build();
 
