@@ -65,6 +65,7 @@
   <ItemGroup>
     <Folder Include="Controllers\Analytics\" />
     <Folder Include="Controllers\Newss\" />
+    <Folder Include="Endpoints\" />
   </ItemGroup>
 
 </Project>
