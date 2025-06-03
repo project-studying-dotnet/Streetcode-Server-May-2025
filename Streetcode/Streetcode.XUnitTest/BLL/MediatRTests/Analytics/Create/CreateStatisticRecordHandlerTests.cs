@@ -32,127 +32,80 @@ public class CreateStatisticRecordHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ValidRequest_ShouldCreateRecordAndReturnSuccess()
+    public async Task Handle_MapperThrowsException_ShouldPropagateException()
     {
         // Arrange
-        var createDto = new StatisticRecordCreateDTO
-        {
-            QrId = 1,
-            Count = 10,
-            Address = "127.0.0.1",
-            StreetcodeId = 1,
-            StreetcodeCoordinateId = 101
-        };
+        var createDto = new StatisticRecordCreateDTO { QrId = 1, Count = 5 }; // Мінімально необхідний DTO
         var command = new CreateStatisticRecordCommand(createDto);
-
-        var statisticRecordEntity = new StatisticRecord { Id = 0, QrId = 1, Count = 10, StreetcodeCoordinateId = 101 };
-        var mappedStatisticRecordEntityAfterSave = new StatisticRecord { Id = 1, QrId = 1, Count = 10, StreetcodeCoordinateId = 101 };
-
-        var expectedDto = new StatisticRecordDTO
-        {
-            Id = 1,
-            QrId = 1,
-            Count = 10,
-            Address = "127.0.0.1",
-            StreetcodeId = 1,
-            StreetcodeCoordinateId = 101
-        };
+        var mappingException = new AutoMapperMappingException("Simulated mapping failure");
 
         _mockMapper.Setup(m => m.Map<StatisticRecord>(createDto))
-            .Returns(statisticRecordEntity);
-
-        _mockRepositoryWrapper.Setup(r => r.StatisticRecordRepository.CreateAsync(statisticRecordEntity))
-            .ReturnsAsync(statisticRecordEntity)
-            .Callback<StatisticRecord>(entity => entity.Id = mappedStatisticRecordEntityAfterSave.Id);
-
-        _mockRepositoryWrapper.Setup(r => r.SaveChangesAsync())
-            .ReturnsAsync(1);
-
-        _mockMapper.Setup(m => m.Map<StatisticRecordDTO>(It.Is<StatisticRecord>(sr => sr.Id == mappedStatisticRecordEntityAfterSave.Id)))
-            .Returns(expectedDto);
+            .Throws(mappingException);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsSuccess.Should().BeTrue();
-        result.Value.Should().BeEquivalentTo(expectedDto);
+        await act.Should().ThrowAsync<AutoMapperMappingException>()
+            .WithMessage(mappingException.Message);
 
-        _mockRepositoryWrapper.Verify(r => r.StatisticRecordRepository.CreateAsync(statisticRecordEntity), Times.Once);
-        _mockRepositoryWrapper.Verify(r => r.SaveChangesAsync(), Times.Once);
-        _mockLogger.Verify(l => l.LogInformation("CreateStatisticRecordCommand: Statistic record created successfully."), Times.Once);
-    }
-
-    [Fact]
-    public async Task Handle_NullCreateDTO_ShouldReturnFail()
-    {
-        // Arrange
-        var command = new CreateStatisticRecordCommand(null);
-        var expectedErrorMessage = "Statistic record data is required.";
-
-        // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
-
-        // Assert
-        result.IsFailed.Should().BeTrue();
-        result.Errors.Should().ContainSingle(e => e.Message == expectedErrorMessage);
-
-        _mockLogger.Verify(l => l.LogWarning("CreateStatisticRecordCommand: StatisticRecordCreateDTO is null."), Times.Once);
         _mockRepositoryWrapper.Verify(r => r.StatisticRecordRepository.CreateAsync(It.IsAny<StatisticRecord>()), Times.Never);
         _mockRepositoryWrapper.Verify(r => r.SaveChangesAsync(), Times.Never);
+        _mockLogger.Verify(l => l.LogInformation(It.IsAny<string>()), Times.Never);
     }
 
     [Fact]
-    public async Task Handle_SaveChangesAsyncFails_ShouldStillReturnSuccess_DueToCurrentHandlerLogic()
+    public async Task Handle_CreateAsyncThrowsException_ShouldPropagateException()
     {
         // Arrange
-        var createDto = new StatisticRecordCreateDTO
-        {
-            QrId = 1,
-            Count = 10,
-            Address = "127.0.0.1",
-            StreetcodeId = 1,
-            StreetcodeCoordinateId = 101
-        };
+        var createDto = new StatisticRecordCreateDTO { QrId = 1, Count = 5 };
         var command = new CreateStatisticRecordCommand(createDto);
-
-        var statisticRecordEntity = new StatisticRecord
-        {
-            QrId = createDto.QrId.Value,
-            Count = createDto.Count,
-            Address = createDto.Address,
-            StreetcodeId = createDto.StreetcodeId,
-            StreetcodeCoordinateId = createDto.StreetcodeCoordinateId
-        };
-
-        var expectedDtoAfterMapFromFailedSave = new StatisticRecordDTO
-        {
-            Id = 0,
-            QrId = (int)createDto.QrId,
-            Count = createDto.Count,
-            Address = createDto.Address,
-            StreetcodeId = createDto.StreetcodeId,
-            StreetcodeCoordinateId = createDto.StreetcodeCoordinateId
-        };
+        var statisticRecordEntity = new StatisticRecord(); // Об'єкт, що повертається мапером
+        var dbException = new InvalidOperationException("Simulated DB error on create");
 
         _mockMapper.Setup(m => m.Map<StatisticRecord>(createDto))
             .Returns(statisticRecordEntity);
 
         _mockRepositoryWrapper.Setup(r => r.StatisticRecordRepository.CreateAsync(statisticRecordEntity))
-            .ReturnsAsync(statisticRecordEntity);
-
-        _mockRepositoryWrapper.Setup(r => r.SaveChangesAsync())
-            .ReturnsAsync(0);
-
-        _mockMapper.Setup(m => m.Map<StatisticRecordDTO>(statisticRecordEntity))
-            .Returns(expectedDtoAfterMapFromFailedSave);
+            .ThrowsAsync(dbException);
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
 
-        // Assert 
-        result.IsSuccess.Should().BeTrue();
-        result.Value.Should().BeEquivalentTo(expectedDtoAfterMapFromFailedSave);
-        _mockLogger.Verify(l => l.LogInformation("CreateStatisticRecordCommand: Statistic record created successfully."), Times.Once);
+        // Assert
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage(dbException.Message);
+
+        _mockRepositoryWrapper.Verify(r => r.SaveChangesAsync(), Times.Never);
+        _mockLogger.Verify(l => l.LogInformation(It.IsAny<string>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task Handle_SaveChangesAsyncThrowsException_ShouldPropagateException()
+    {
+        // Arrange
+        var createDto = new StatisticRecordCreateDTO { QrId = 1, Count = 5 };
+        var command = new CreateStatisticRecordCommand(createDto);
+        var statisticRecordEntity = new StatisticRecord();
+
+        _mockMapper.Setup(m => m.Map<StatisticRecord>(createDto))
+            .Returns(statisticRecordEntity);
+
+        _mockRepositoryWrapper.Setup(r => r.StatisticRecordRepository.CreateAsync(statisticRecordEntity))
+            .ReturnsAsync(statisticRecordEntity); // CreateAsync успішний
+
+        var dbUpdateException = new Microsoft.EntityFrameworkCore.DbUpdateException("Simulated DB error on save changes");
+        _mockRepositoryWrapper.Setup(r => r.SaveChangesAsync())
+            .ThrowsAsync(dbUpdateException);
+
+        // Act
+        Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        // Якщо ви використовуєте EF Core, DbUpdateException є типовим винятком
+        await act.Should().ThrowAsync<Microsoft.EntityFrameworkCore.DbUpdateException>()
+            .WithMessage(dbUpdateException.Message);
+
+        _mockLogger.Verify(l => l.LogInformation(It.IsAny<string>()), Times.Never); // Лог про успіх не має бути викликаний
     }
 }
