@@ -4,6 +4,7 @@ using UserService.WebApi.Data;
 using UserService.WebApi.Data.Repositories.Interfaces;
 using UserService.WebApi.Data.Repositories.Realisations;
 using UserService.WebApi.Entities.Users;
+using UserService.WebApi.Extensions;
 using UserService.WebApi.Mapping.Users;
 using UserService.WebApi.Services.Interfaces;
 using UserService.WebApi.Services.Realisations;
@@ -44,6 +45,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebAPIv5 v1"));
 }
+
+await app.Services.SeedIdentityAsync(); // uncomment for seeding data
 
 app.MapControllers();
 
