@@ -13,8 +13,8 @@ jobs:
   build:
     name: Build and analyze
     runs-on: windows-latest
+
     steps:
-      
       - name: Checkout
         uses: actions/checkout@v2
       - name: Set up JDK 17
@@ -45,16 +45,6 @@ jobs:
           name: test-results
           path: "**/*.trx"
 
-      - name: Display Test Results
-        uses: dorny/test-reporter@v2
-        if: ${{ !cancelled() }}
-        with:
-            name: Test results
-            artifact: test-results
-            path: "**/*.trx"
-            reporter: dotnet-trx
-            fail-on-error: true
-      
       - name: SonarScanner Analysis
         id: sonar
         run: |
