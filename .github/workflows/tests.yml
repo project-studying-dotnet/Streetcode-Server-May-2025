@@ -1,14 +1,12 @@
 name: Test results
 on:
-  workflow_run:
-    workflows:
-      - SonarCloud
-    types:
-      - completed
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
-  report:
+  test-report:
     runs-on: windows-latest
+    needs: build
     steps:
       - uses: dorny/test-reporter@v2
         with:
@@ -16,4 +14,5 @@ jobs:
           artifact: test-results
           path: "**/*.trx"
           reporter: dotnet-trx
+          list-tests: failed
           fail-on-error: true
