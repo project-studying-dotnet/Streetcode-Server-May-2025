@@ -58,6 +58,7 @@ jobs:
     name: Test Results
     runs-on: windows-latest
     needs: build
+    if: always()
 
     steps:
       - uses: dorny/test-reporter@v2
