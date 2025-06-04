@@ -1,13 +1,13 @@
-﻿using System.Linq.Expressions;
-using AutoMapper;
-using MediatR;
+﻿using Xunit;
 using Moq;
+using Streetcode.BLL.MediatR.Analytics.Delete;
+using Streetcode.DAL.Repositories.Interfaces.Base;
+using Streetcode.DAL.Entities.Analytics;
 using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.BLL.MediatR.Analytics.Create;
-using Streetcode.BLL.MediatR.Analytics.Delete;
-using Streetcode.DAL.Entities.Analytics;
-using Streetcode.DAL.Repositories.Interfaces.Base;
-using Xunit;
+using AutoMapper;
+using MediatR;
+using System.Linq.Expressions;
 
 namespace Streetcode.XUnitTest.BLL.MediatRTests.Analytics.Delete;
 
@@ -57,7 +57,7 @@ public class DeleteStatisticRecordHandlerTests
         var result = await handler.Handle(command, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        Assert.True(result.IsSuccess);
         _mockRepositoryWrapper.Verify(r => r.StatisticRecordRepository.Delete(record), Times.Once);
         _mockRepositoryWrapper.Verify(r => r.SaveChangesAsync(), Times.Once);
     }
