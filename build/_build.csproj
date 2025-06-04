@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -29,6 +29,14 @@
     <ProjectReference Include="..\Streetcode\DbUpdate\DbUpdate.csproj" />
     <ProjectReference Include="..\Streetcode\Streetcode.DAL\Streetcode.DAL.csproj" />
     <ProjectReference Include="..\Streetcode\Streetcode.WebApi\Streetcode.WebApi.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="..\.github\workflows\tests.yml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="..\.github\workflows\tests.yml" />
   </ItemGroup>
 
 </Project>

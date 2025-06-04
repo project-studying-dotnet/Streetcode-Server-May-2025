@@ -63,3 +63,18 @@ jobs:
           dotnet build ./Streetcode/Streetcode.sln --configuration Release
           dotnet test ./Streetcode/Streetcode.XUnitTest/Streetcode.XUnitTest.csproj --configuration Release --no-build --verbosity normal
           dotnet sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+  
+  test-report:
+    name: Test Results
+    runs-on: windows-latest
+    needs: build
+
+    steps:
+      - uses: dorny/test-reporter@v2
+        with:
+          name: Test results
+          artifact: test-results
+          path: "**/*.trx"
+          reporter: dotnet-trx
+          list-tests: failed
+          fail-on-error: true
