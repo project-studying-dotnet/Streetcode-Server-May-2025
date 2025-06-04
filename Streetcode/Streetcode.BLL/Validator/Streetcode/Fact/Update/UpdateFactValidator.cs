@@ -11,5 +11,6 @@ public sealed class UpdateFactValidator : AbstractValidator<UpdateFactsCommand>
         RuleFor(c => c.FactDTO.Title).ValidTitle();
         RuleFor(c => c.FactDTO.FactContent).ValidText();
         RuleFor(c => c.FactDTO.StreetcodeId).ValidId();
+        RuleFor(c => c.FactDTO.ImageDescription).ValidImageDescription();
     }
 }
