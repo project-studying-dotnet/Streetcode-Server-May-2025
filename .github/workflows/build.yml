@@ -46,6 +46,16 @@ jobs:
           name: test-results
           path: "**/*.trx"
 
+      - name: Test Results
+        uses: dorny/test-reporter@v2
+        with:
+          name: Test results
+          artifact: test-results
+          path: "**/*.trx"
+          reporter: dotnet-trx
+          list-tests: failed
+          fail-on-error: true   
+
       - name: SonarScanner Analysis
         id: sonar
         run: |
