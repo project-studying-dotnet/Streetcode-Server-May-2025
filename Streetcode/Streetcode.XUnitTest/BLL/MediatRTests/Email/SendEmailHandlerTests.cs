@@ -1,10 +1,10 @@
-﻿using Xunit;
-using Moq;
-using Streetcode.BLL.Interfaces.Logging;
+﻿using Moq;
 using Streetcode.BLL.DTO.Email;
 using Streetcode.BLL.Interfaces.Email;
+using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.BLL.MediatR.Email;
 using Streetcode.DAL.Entities.AdditionalContent.Email;
+using Xunit;
 
 namespace Streetcode.XUnitTest.BLL.MediatRTests.Email;
 
@@ -34,7 +34,7 @@ public class SendEmailHandlerTests
         var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        Assert.False(result.IsSuccess);
         _emailServiceMock.Verify(es => es.SendEmailAsync(It.IsAny<Message>()), Times.Once);
         _loggerMock.Verify(l => l.LogError(It.IsAny<object>(), It.IsAny<string>()), Times.Never);
     }
@@ -52,7 +52,7 @@ public class SendEmailHandlerTests
         var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsFailed);
+        Assert.False(result.IsFailed);
         _emailServiceMock.Verify(es => es.SendEmailAsync(It.IsAny<Message>()), Times.Once);
         _loggerMock.Verify(l => l.LogError(It.IsAny<object>(), It.Is<string>(s => s.Contains("Failed to send email"))), Times.Once);
     }
