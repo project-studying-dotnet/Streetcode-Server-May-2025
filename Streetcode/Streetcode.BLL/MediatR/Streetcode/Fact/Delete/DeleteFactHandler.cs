@@ -42,7 +42,7 @@ public class DeleteFactHandler : IRequestHandler<DeleteFactCommand, Result<Unit>
         if (resultIsSuccess)
         {
             _logger.LogInformation("DeleteFactCommand handled successfully");
-            await _cacheInvalidationService.InvalidateAllCacheAsync(Constants.CacheSetKeys.Facts);
+            await _cacheInvalidationService.InvalidateCacheAsync(Constants.CacheSetKeys.Facts);
             return Result.Ok(Unit.Value);
         }
         else

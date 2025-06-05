@@ -57,7 +57,7 @@ public class UpdateFactsHandler : IRequestHandler<UpdateFactsCommand, Result<Fac
             return Result.Fail(new Error(errorMsg));
         }
 
-        await _cacheInvalidationService.InvalidateAllCacheAsync(Constants.CacheSetKeys.Facts);
+        await _cacheInvalidationService.InvalidateCacheAsync(Constants.CacheSetKeys.Facts);
         return Result.Ok(_mapper.Map<FactDTO>(fact));
     }
 }

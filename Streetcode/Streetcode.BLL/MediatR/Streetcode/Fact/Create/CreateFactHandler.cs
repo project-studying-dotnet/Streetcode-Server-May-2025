@@ -63,7 +63,7 @@ public class CreateFactHandler : IRequestHandler<CreateFactCommand, Result<FactD
 
         if (isSuccessResult)
         {
-            await _cacheInvalidationService.InvalidateAllCacheAsync(Constants.CacheSetKeys.Facts);
+            await _cacheInvalidationService.InvalidateCacheAsync(Constants.CacheSetKeys.Facts);
             return Result.Ok(_mapper.Map<FactDTO>(entity));
         }
         else

@@ -15,7 +15,7 @@ public class CacheInvalidationService : ICacheInvalidationService
         _cache = cache;
     }
     
-    public async Task InvalidateAllCacheAsync(string cacheSetKey)
+    public async Task InvalidateCacheAsync(string cacheSetKey)
     {
         var keys = await _redisDb.SetMembersAsync(cacheSetKey);
         

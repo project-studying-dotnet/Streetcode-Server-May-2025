@@ -48,7 +48,6 @@ public static class ServiceCollectionExtensions
         services.AddMediatR(currentAssemblies);
         services.AddValidatorsFromAssemblies(currentAssemblies);
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CacheBehavior<,>));
 
         services.AddScoped<IBlobService, BlobService>();
         services.AddScoped<ILoggerService, LoggerService>();
@@ -57,10 +56,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IInstagramService, InstagramService>();
         services.AddScoped<ITextService, AddTermsToTextService>();
         services.AddScoped<INewsService, NewsService>();
-        services.AddSingleton<ICacheInvalidationService, CacheInvalidationService>();
     }
 
-    public static void AddApplicationServices(this IServiceCollection services, ConfigurationManager configuration)
+    public static void AddApplicationServices(this IServiceCollection services, ConfigurationManager configuration, IWebHostEnvironment environment)
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection");
         var emailConfig = configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>();
@@ -74,12 +72,29 @@ public static class ServiceCollectionExtensions
                 opt.MigrationsHistoryTable("__EFMigrationsHistory", schema: "entity_framework");
             });
         });
-        
-        var redisConnectionString = configuration["Redis:ConnectionString"];
-        services.AddSingleton<IConnectionMultiplexer>(
-            ConnectionMultiplexer.Connect(redisConnectionString));
-        
-        services.AddDistributedMemoryCache();
+
+        if (environment.IsDevelopment())
+        {
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CacheBehavior<,>));
+            
+            var redisConnectionString = configuration["Redis:ConnectionString"];
+            if (string.IsNullOrWhiteSpace(redisConnectionString))
+            {
+                throw new InvalidOperationException("Redis connection string must be provided in Development environment.");
+            }
+            
+            services.AddSingleton<IConnectionMultiplexer>(
+                ConnectionMultiplexer.Connect(redisConnectionString!));
+            services.AddSingleton<ICacheInvalidationService, CacheInvalidationService>();
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = redisConnectionString;
+            });
+        }
+        else
+        {
+            services.AddScoped<ICacheInvalidationService, NoOpCacheInvalidatonService>();
+        }
         
         services.AddHangfire(config =>
         {

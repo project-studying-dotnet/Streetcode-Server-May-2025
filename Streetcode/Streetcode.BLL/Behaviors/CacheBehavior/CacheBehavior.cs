@@ -13,10 +13,10 @@ public sealed class CacheBehavior<TRequest, TResponse> : IPipelineBehavior<TRequ
     where TResponse : ResultBase
 
 {
-    private readonly IDistributedCache _cache;
-    private readonly IDatabase _redisDb;
+    private readonly IDistributedCache? _cache;
+    private readonly IDatabase? _redisDb;
     
-    public CacheBehavior(IDistributedCache cache, IConnectionMultiplexer redis)
+    public CacheBehavior(IDistributedCache? cache, IConnectionMultiplexer? redis)
     {
         _cache = cache;
         _redisDb = redis.GetDatabase();
@@ -27,7 +27,7 @@ public sealed class CacheBehavior<TRequest, TResponse> : IPipelineBehavior<TRequ
         RequestHandlerDelegate<TResponse> next, 
         CancellationToken cancellationToken)
     {
-        if (request is not ICacheable cacheable)
+        if (request is not ICacheable cacheable || _cache == null || _redisDb == null)
         {
             return await next(); 
         }

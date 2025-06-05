@@ -75,7 +75,7 @@ public class UpdatePartnerHandler : IRequestHandler<UpdatePartnerCommand, Result
             var dbo = _mapper.Map<PartnerDTO>(partner);
             dbo.Streetcodes = request.Partner.Streetcodes;
 
-            await _cacheInvalidationService.InvalidateAllCacheAsync(Constants.CacheSetKeys.Partners);
+            await _cacheInvalidationService.InvalidateCacheAsync(Constants.CacheSetKeys.Partners);
             
             return Result.Ok(dbo);
         }

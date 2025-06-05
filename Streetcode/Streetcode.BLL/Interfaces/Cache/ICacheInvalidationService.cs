@@ -2,5 +2,5 @@ namespace Streetcode.BLL.Interfaces.Cache;
 
 public interface ICacheInvalidationService
 {
-    Task InvalidateAllCacheAsync(string cacheSetKey);
+    Task InvalidateCacheAsync(string cacheSetKey);
 }
