@@ -1,7 +1,7 @@
 ﻿using FluentResults;
 using MediatR;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 using Streetcode.BLL.DTO.Streetcode.TextContent.Fact;
 using Streetcode.BLL.MediatR.Streetcode.Fact.Create;
@@ -18,49 +18,76 @@ public static class FactEndpoints
 {
     public static void MapFactEndpoints(this IEndpointRouteBuilder app)
     {
+        app.MapGet("api/Fact/GetAll", GetAll).WithOpenApi();
 
-       
+        var group = app.MapGroup("api/Fact")
+            .WithTags("Fact")
+            .WithOpenApi()
+            .RequireAuthorization();
+
+        group.MapGet("GetById/{id:int}", GetById).AllowAnonymous();
+        group.MapGet("ByStreetcode/{streetcodeId:int}", GetByStreetcodeId);
+        group.MapPost("Create", Create);
+        group.MapPut("Update", Update);
+        group.MapPatch("{streetcodeId:int}/Reorder", Reorder);
+
+        group.MapDelete("Delete/{id:int}", async (int id, IMediator mediator) =>
+        {
+            var logicResult = await mediator.Send(new DeleteFactCommand(id));
+
+            return ApiResultMapper.HandleResult(logicResult);
+        });
     }
 
-    [HttpGet]
-    private static async Task<IResult> GetAll()
+    private static async Task<IResult> GetAll(IMediator mediator)
     {
-        return HandleResult(await Mediator.Send(new GetAllFactsQuery()));
+        var logicResult = await mediator.Send(new GetAllFactsQuery());
+
+        return ApiResultMapper.HandleResult(logicResult);
     }
 
-    [HttpGet("{id:int}")]
-    private static async Task<IResult> GetById([FromRoute] int id)
+    private static async Task<IResult> GetById(int id, IMediator mediator)
     {
-        return HandleResult(await Mediator.Send(new GetFactByIdQuery(id)));
+        var logicResult = await mediator.Send(new GetFactByIdQuery(id));
+
+        return ApiResultMapper.HandleResult(logicResult);
     }
 
-    [HttpGet("{streetcodeId:int}")]
-    private static async Task<IResult> GetByStreetcodeId([FromRoute] int streetcodeId)
+    private static async Task<IResult> GetByStreetcodeId(int streetcodeId, IMediator mediator)
     {
-        return HandleResult(await Mediator.Send(new GetFactByStreetcodeIdQuery(streetcodeId)));
+        var logicResult = await mediator.Send(new GetFactByStreetcodeIdQuery(streetcodeId));
+
+        return ApiResultMapper.HandleResult(logicResult);
     }
 
-    [HttpPost]
-    private static async Task<IResult> Create([FromBody] FactUpdateCreateDTO fact)
+    private static async Task<IResult> Create(FactUpdateCreateDTO fact, IMediator mediator)
     {
-        return HandleResult(await Mediator.Send(new CreateFactCommand(fact)));
+        var logicResult = await mediator.Send(new CreateFactCommand(fact));
+
+        return ApiResultMapper.HandleResult(logicResult);
     }
 
-    [HttpPut]
-    private static async Task<IResult> Update([FromBody] FactDTO fact)
+    private static async Task<IResult> Update(FactDTO fact, IMediator mediator)
     {
-        return HandleResult(await Mediator.Send(new UpdateFactsCommand(fact)));
+        var logicResult = await mediator.Send(new UpdateFactsCommand(fact));
+
+        return ApiResultMapper.HandleResult(logicResult);
     }
 
-    [HttpDelete("{id:int}")]
-    private static async Task<IResult> Delete([FromRoute] int id)
+    private static async Task<IResult> Delete(int id, IMediator mediator)
     {
-        return HandleResult(await Mediator.Send(new DeleteFactCommand(id)));
+        var logicResult = await mediator.Send(new DeleteFactCommand(id));
+
+        return ApiResultMapper.HandleResult(logicResult);
     }
 
-    [HttpPatch("{streetcodeId:int}/Reorder")]
-    private static async Task<IResult> Reorder([FromBody] IEnumerable<FactReorderDTO> factReorderDtos, [FromRoute] int streetcodeId)
+    private static async Task<IResult> Reorder(
+        int streetcodeId,
+        [FromBody] IEnumerable<FactReorderDTO> factReorderDtos,
+        IMediator mediator)
     {
-        return HandleResult(await Mediator.Send(new ReorderFactsCommand(factReorderDtos, streetcodeId)));
+        var logicResult = await mediator.Send(new ReorderFactsCommand(factReorderDtos, streetcodeId));
+
+        return ApiResultMapper.HandleResult(logicResult);
     }
 }
