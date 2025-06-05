@@ -1,11 +1,11 @@
 using Hangfire;
 using Streetcode.BLL.Services.BlobStorageService;
+using Streetcode.WebApi.Endpoints;
 using Streetcode.WebApi.Extensions;
 using Streetcode.WebApi.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.ConfigureApplication();
-
 builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddSwaggerServices();
 builder.Services.AddCustomServices();
@@ -13,6 +13,7 @@ builder.Services.ConfigureBlob(builder);
 builder.Services.ConfigurePayment(builder);
 builder.Services.ConfigureInstagram(builder);
 builder.Services.ConfigureSerilog(builder);
+
 var app = builder.Build();
 
 if (app.Environment.EnvironmentName == "Local")
@@ -27,7 +28,7 @@ else
 
 await app.ApplyMigrations();
 
-// await app.SeedDataAsync(); // uncomment for seeding data in local
+//await app.SeedDataAsync(); // uncomment for seeding data in local
 app.UseCors();
 app.UseHttpsRedirection();
 app.UseRouting();
@@ -54,6 +55,7 @@ if (app.Environment.EnvironmentName != "Local")
 }
 
 app.MapControllers();
+app.MapFactEndpoints();
 
 app.Run();
 public partial class Program
