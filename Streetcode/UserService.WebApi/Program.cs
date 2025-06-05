@@ -25,6 +25,8 @@ builder.Services.AddAutoMapper(typeof(UserProfile));
 
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddJwtAuthentication(builder.Configuration);
+
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
