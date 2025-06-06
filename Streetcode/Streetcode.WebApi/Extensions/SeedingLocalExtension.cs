@@ -1409,6 +1409,49 @@ public static class SeedingLocalExtension
                                 await dbContext.SaveChangesAsync();
                             }
                         }
+
+                        if (!dbContext.Comments.Any())
+                        {
+                            dbContext.Comments.AddRange(
+                                new Comment
+                                {
+                                    Text = "Це перший коментар до стріткоду 1!",
+                                    UserId = 1,
+                                    StreetcodeId = 1,
+                                    IsApproved = false,
+                                    CreatedAt = DateTime.Now
+                                },
+                                new Comment
+                                {
+                                    Text = "Це другий коментар до стріткоду 1!",
+                                    UserId = 1,
+                                    StreetcodeId = 1,
+                                    IsApproved = true,
+                                    ApprovedByAdminId = 1,
+                                    CreatedAt = DateTime.Now
+                                },
+                                new Comment
+                                {
+                                    Text = "Це перший коментар до стріткоду 2!",
+                                    UserId = 1,
+                                    StreetcodeId = 2,
+                                    IsApproved = true,
+                                    ApprovedByAdminId = 1,
+                                    CreatedAt = DateTime.Now
+                                },
+                                new Comment
+                                {
+                                    Text = "Це відповідь на перший коментар!",
+                                    UserId = 1,
+                                    StreetcodeId = 1,
+                                    ParentCommentId = 1,
+                                    IsApproved = true,
+                                    ApprovedByAdminId = 1,
+                                    CreatedAt = DateTime.Now
+                                }
+                            );
+                            await dbContext.SaveChangesAsync();
+                        }
                     }
                 }
 
