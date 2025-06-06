@@ -18,25 +18,17 @@ public static class FactEndpoints
 {
     public static void MapFactEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapGet("api/Fact/GetAll", GetAll).WithOpenApi();
-
         var group = app.MapGroup("api/Fact")
-            .WithTags("Fact")
-            .WithOpenApi()
-            .RequireAuthorization();
+            .WithTags("FactMinimalApi")
+            .WithOpenApi();
 
-        group.MapGet("GetById/{id:int}", GetById).AllowAnonymous();
+        group.MapGet("api/Fact/GetAll", GetAll);
+        group.MapGet("GetById/{id:int}", GetById);
         group.MapGet("ByStreetcode/{streetcodeId:int}", GetByStreetcodeId);
         group.MapPost("Create", Create);
         group.MapPut("Update", Update);
         group.MapPatch("{streetcodeId:int}/Reorder", Reorder);
-
-        group.MapDelete("Delete/{id:int}", async (int id, IMediator mediator) =>
-        {
-            var logicResult = await mediator.Send(new DeleteFactCommand(id));
-
-            return ApiResultMapper.HandleResult(logicResult);
-        });
+        group.MapDelete("Delete/{id:int}", Delete);
     }
 
     private static async Task<IResult> GetAll(IMediator mediator)
