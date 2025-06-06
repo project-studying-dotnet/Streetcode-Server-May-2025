@@ -76,6 +76,8 @@ public sealed class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<
                             && m.GetParameters().Length == 1);
 
             var genericFail = failMethod.MakeGenericMethod(payloadType);
+            /*TODO - instead of catching a ValidationException through
+            ValidationExceptionHandler, 500 is returned instead*/
             var instance = genericFail.Invoke(null, new object?[] { errors });
 
             return (TResponse)instance!;
