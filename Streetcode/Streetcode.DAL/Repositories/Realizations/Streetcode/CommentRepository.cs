@@ -3,7 +3,7 @@ using Streetcode.DAL.Persistence;
 using Streetcode.DAL.Repositories.Interfaces.Streetcode;
 using Streetcode.DAL.Repositories.Realizations.Base;
 
-namespace Streetcode.DAL.Repositories.Realizations.Streetcode
+namespace Streetcode.DAL.Repositories.Realizations.Streetcode;
     
 public class CommentRepository : RepositoryBase<Comment>, ICommentRepository
 {

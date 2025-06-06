@@ -1427,7 +1427,6 @@ public static class SeedingLocalExtension
                                     UserId = 1,
                                     StreetcodeId = 1,
                                     IsApproved = true,
-                                    ApprovedByAdminId = 1,
                                     CreatedAt = DateTime.Now
                                 },
                                 new Comment
@@ -1436,7 +1435,6 @@ public static class SeedingLocalExtension
                                     UserId = 1,
                                     StreetcodeId = 2,
                                     IsApproved = true,
-                                    ApprovedByAdminId = 1,
                                     CreatedAt = DateTime.Now
                                 },
                                 new Comment
@@ -1446,7 +1444,6 @@ public static class SeedingLocalExtension
                                     StreetcodeId = 1,
                                     ParentCommentId = 1,
                                     IsApproved = true,
-                                    ApprovedByAdminId = 1,
                                     CreatedAt = DateTime.Now
                                 }
                             );

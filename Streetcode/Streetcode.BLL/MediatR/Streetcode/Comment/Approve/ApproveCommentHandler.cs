@@ -2,8 +2,6 @@ using FluentResults;
 using MediatR;
 using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.DAL.Repositories.Interfaces.Base;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Streetcode.BLL.MediatR.Streetcode.Comment.Approve;
 
@@ -27,8 +25,9 @@ public class ApproveCommentHandler : IRequestHandler<ApproveCommentCommand, Resu
             _logger.LogError(request, errorMsg);
             return Result.Fail(errorMsg);
         }
+        
         comment.IsApproved = true;
-        await _repositoryWrapper.CommentRepository.UpdateAsync(comment);
+        _repositoryWrapper.CommentRepository.Update(comment);
         await _repositoryWrapper.SaveChangesAsync();
         return Result.Ok();
     }
