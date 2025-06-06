@@ -55,7 +55,7 @@ if (app.Environment.EnvironmentName != "Local")
 }
 
 app.MapControllers();
-app.MapFactEndpoints();
+//app.MapFactEndpoints();
 
 app.Run();
 public partial class Program
