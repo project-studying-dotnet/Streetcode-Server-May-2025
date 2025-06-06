@@ -8,7 +8,7 @@ public interface ITokenService
 {
     Task<Result<TokenResultDTO>> GenerateTokensAsync(User user, CancellationToken cancellationToken);
 
-    Task<Result<TokenResultDTO>> RefreshTokensAsync(string refreshToken, CancellationToken cancellationToken);
+    Task<Result<TokenResultDTO>> RefreshAccessTokenAsync(string refreshToken, CancellationToken cancellationToken);
 
     Task<Result<bool>> RevokeRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken);
 }
