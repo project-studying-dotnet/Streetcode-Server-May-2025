@@ -10,7 +10,7 @@ using Streetcode.BLL.MediatR.Streetcode.Fact.Reorder;
 
 namespace Streetcode.WebApi.Controllers.Streetcode.TextContent;
 
-public class FactController : BaseApiController
+public class FactControllerController : BaseApiController
 {
     [HttpGet]
     public async Task<IActionResult> GetAll()
