@@ -85,14 +85,12 @@ public class CreateTermHandlerTests
     {
         Title = "Term Title",
         Description = "Some term description",
-        StreetcodeId = 1
     };
 
     private static Entity GetMappedEntity(TermCreateDTO dto) => new()
     {
         Title = dto.Title,
         Description = dto.Description,
-        StreetcodeId = dto.StreetcodeId
     };
 
     private static TermDTO GetExpectedDto(Entity entity) => new()
