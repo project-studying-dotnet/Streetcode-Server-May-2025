@@ -2,6 +2,7 @@
 using FluentResults;
 using MediatR;
 using Streetcode.BLL.DTO.Partners;
+using Streetcode.BLL.Interfaces.Cache;
 using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.DAL.Entities.Partners;
 using Streetcode.DAL.Repositories.Interfaces.Base;
@@ -13,12 +14,18 @@ public class UpdatePartnerHandler : IRequestHandler<UpdatePartnerCommand, Result
     private readonly IMapper _mapper;
     private readonly IRepositoryWrapper _repositoryWrapper;
     private readonly ILoggerService _logger;
+    private readonly ICacheInvalidationService _cacheInvalidationService;
 
-    public UpdatePartnerHandler(IRepositoryWrapper repositoryWrapper, IMapper mapper, ILoggerService logger)
+    public UpdatePartnerHandler(
+        IRepositoryWrapper repositoryWrapper, 
+        IMapper mapper, 
+        ILoggerService logger,
+        ICacheInvalidationService cacheInvalidationService)
     {
         _repositoryWrapper = repositoryWrapper;
         _mapper = mapper;
         _logger = logger;
+        _cacheInvalidationService = cacheInvalidationService;
     }
 
     public async Task<Result<PartnerDTO>> Handle(UpdatePartnerCommand request, CancellationToken cancellationToken)
@@ -67,6 +74,9 @@ public class UpdatePartnerHandler : IRequestHandler<UpdatePartnerCommand, Result
             await _repositoryWrapper.SaveChangesAsync();
             var dbo = _mapper.Map<PartnerDTO>(partner);
             dbo.Streetcodes = request.Partner.Streetcodes;
+
+            await _cacheInvalidationService.InvalidateCacheAsync(Constants.CacheSetKeys.Partners);
+            
             return Result.Ok(dbo);
         }
         catch (Exception ex)

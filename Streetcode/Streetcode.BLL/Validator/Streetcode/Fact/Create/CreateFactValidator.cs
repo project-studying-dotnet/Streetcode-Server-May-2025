@@ -10,5 +10,6 @@ public sealed class CreateFactValidator : AbstractValidator<CreateFactCommand>
         RuleFor(c => c.NewFact.Title).ValidTitle();
         RuleFor(c => c.NewFact.FactContent).ValidText();
         RuleFor(c => c.NewFact.StreetcodeId).ValidId();
+        RuleFor(c => c.NewFact.ImageDescription).ValidImageDescription();
     }
 }

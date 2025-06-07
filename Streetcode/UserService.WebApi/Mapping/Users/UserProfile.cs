@@ -8,8 +8,9 @@ public class UserProfile : Profile
     public UserProfile()
     {
         CreateMap<RegisterUserDTO, User>()
-            .ForMember(dest => dest.Id, opt => opt.Ignore())
-            .ReverseMap();
+            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email));
+
+        CreateMap<User, UserResponseDTO>();
     }
 }
 

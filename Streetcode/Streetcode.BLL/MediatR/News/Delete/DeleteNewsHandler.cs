@@ -1,5 +1,6 @@
 ﻿using FluentResults;
 using MediatR;
+using Microsoft.Extensions.Localization;
 using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.DAL.Repositories.Interfaces.Base;
 
@@ -9,10 +10,15 @@ public class DeleteNewsHandler : IRequestHandler<DeleteNewsCommand, Result<Unit>
 {
     private readonly IRepositoryWrapper _repositoryWrapper;
     private readonly ILoggerService _logger;
-    public DeleteNewsHandler(IRepositoryWrapper repositoryWrapper, ILoggerService logger)
+    private readonly IStringLocalizer<DeleteNewsHandler> _localizer;
+
+    public DeleteNewsHandler(IRepositoryWrapper repositoryWrapper,
+        ILoggerService logger,
+        IStringLocalizer<DeleteNewsHandler> localizer)
     {
         _repositoryWrapper = repositoryWrapper;
         _logger = logger;
+        _localizer = localizer;
     }
 
     public async Task<Result<Unit>> Handle(DeleteNewsCommand request, CancellationToken cancellationToken)
@@ -21,7 +27,7 @@ public class DeleteNewsHandler : IRequestHandler<DeleteNewsCommand, Result<Unit>
         var news = await _repositoryWrapper.NewsRepository.GetFirstOrDefaultAsync(n => n.Id == id);
         if (news == null)
         {
-            string errorMsg = $"No news found by entered Id - {id}";
+            var errorMsg = _localizer["NoNewsFoundById", id];
             _logger.LogError(request, errorMsg);
             return Result.Fail(errorMsg);
         }
@@ -39,7 +45,7 @@ public class DeleteNewsHandler : IRequestHandler<DeleteNewsCommand, Result<Unit>
         }
         else
         {
-            string errorMsg = "Failed to delete news";
+            var errorMsg = _localizer["FailedToDeleteNews"];
             _logger.LogError(request, errorMsg);
             return Result.Fail(new Error(errorMsg));
         }

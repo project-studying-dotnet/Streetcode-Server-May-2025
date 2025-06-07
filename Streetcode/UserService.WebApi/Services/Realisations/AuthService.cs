@@ -1,49 +1,50 @@
 ﻿using AutoMapper;
 using FluentResults;
+using Microsoft.AspNetCore.Identity;
 using UserService.WebApi.Data.Repositories.Interfaces;
 using UserService.WebApi.DTO.Users;
 using UserService.WebApi.Entities.Users;
 using UserService.WebApi.Services.Interfaces;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace UserService.WebApi.Services.Realisations;
 public class AuthService : IAuthService
 {
-    private readonly IUsersRepository _usersRepository;
-    private readonly IPasswordHasher _passwordHasher;
     private readonly IMapper _mapper;
     private readonly ILogger<AuthService> _logger;
+    private readonly UserManager<User> _userManager;
 
     public AuthService(
-        IUsersRepository usersRepository, 
-        IPasswordHasher passwordHasher, 
         IMapper mapper,
-        ILogger<AuthService> logger)
+        ILogger<AuthService> logger,
+        UserManager<User> userManager)
     {
-        _usersRepository = usersRepository;
-        _passwordHasher = passwordHasher;
         _mapper = mapper;
         _logger = logger;
+        _userManager = userManager;
     }
-    
-    public async Task<Result<RegisterUserDTO>> Register(RegisterUserDTO registerUserDTO, CancellationToken cancellationToken)
+
+    public async Task<Result<User>> Register(RegisterUserDTO registerUserDTO, CancellationToken cancellationToken)
     {
-        var hashedPassword = _passwordHasher.Generate(registerUserDTO.Password);
+        var existingUser = await _userManager.FindByEmailAsync(registerUserDTO.Email);
+
+        if (existingUser != null)
+        {
+            return Result.Fail<User>("User with this email already exists");
+        }
 
         var newUser = _mapper.Map<User>(registerUserDTO);
 
-        await _usersRepository.AddAsync(newUser, cancellationToken);
-
-        var resultIsSuccess = await _usersRepository.SaveChangesAsync() > 0;
-
-        if (!resultIsSuccess)
+        var result = await _userManager.CreateAsync(newUser, registerUserDTO.Password);
+        if (!result.Succeeded)
         {
-            const string errorMsg = "Failed to create a user";
-            _logger.LogError(errorMsg);
-            return Result.Fail<RegisterUserDTO>(errorMsg);
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            _logger.LogError($"Failed to create user: {errors}");
+            return Result.Fail<User>($"Failed to create user: {errors}");
         }
 
         _logger.LogInformation("Created user with id {UserId}", newUser.Id);
-        return Result.Ok(_mapper.Map<RegisterUserDTO>(newUser));
+        return Result.Ok(newUser);
     }
 }
 

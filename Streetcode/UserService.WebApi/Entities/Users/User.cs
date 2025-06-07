@@ -1,27 +1,18 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using UserService.WebApi.Entities.Auth;
 
 namespace UserService.WebApi.Entities.Users;
-public class User
+public class User : IdentityUser
 {
-    [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int Id { get; set; }
     [Required]
     [MaxLength(50)]
     public string Name { get; set; }
+
     [Required]
     [MaxLength(50)]
     public string Surname { get; set; }
-    [Required]
-    [EmailAddress]
-    public string Email { get; set; }
-    [Required]
-    [MaxLength(20)]
-    public string Login { get; set; }
-    [Required]
-    [MaxLength(20)]
-    public string Password { get; set; }
-    [Required]
-    public UserRole Role { get; set; }
+
+    public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 }

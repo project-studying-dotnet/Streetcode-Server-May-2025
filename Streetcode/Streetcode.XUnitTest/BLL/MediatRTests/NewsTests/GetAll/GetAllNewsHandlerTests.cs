@@ -1,6 +1,7 @@
 using AutoMapper;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.Extensions.Localization;
 using Moq;
 using Streetcode.BLL.DTO.Media.Images;
 using Streetcode.BLL.DTO.News;
@@ -11,7 +12,7 @@ using Streetcode.DAL.Entities.News;
 using Streetcode.DAL.Repositories.Interfaces.Base;
 using Xunit;
 
-namespace Streetcode.XUnitTest.BLL.MediatRTests.NewsTests;
+namespace Streetcode.XUnitTest.BLL.MediatRTests.NewsTests.GetAll;
 
 public class GetAllNewsHandlerTests
 {
@@ -19,6 +20,7 @@ public class GetAllNewsHandlerTests
     private readonly Mock<ILoggerService> _mockLoggerService;
     private readonly Mock<IRepositoryWrapper> _mockRepository;
     private readonly Mock<IBlobService> _mockBlobService;
+    private readonly Mock<IStringLocalizer<GetAllNewsHandler>> _localizerMock;
     private readonly GetAllNewsHandler _handler;
 
     public GetAllNewsHandlerTests()
@@ -27,7 +29,12 @@ public class GetAllNewsHandlerTests
         _mockLoggerService = new Mock<ILoggerService>();
         _mockRepository = new Mock<IRepositoryWrapper>();
         _mockBlobService = new Mock<IBlobService>();
-        _handler = new GetAllNewsHandler(_mockRepository.Object, _mockMapper.Object, _mockBlobService.Object, _mockLoggerService.Object);
+        _localizerMock = new Mock<IStringLocalizer<GetAllNewsHandler>>();
+        _handler = new GetAllNewsHandler(_mockRepository.Object,
+            _mockMapper.Object,
+            _mockBlobService.Object,
+            _mockLoggerService.Object,
+            _localizerMock.Object);
     }
 
     [Fact]
@@ -55,7 +62,16 @@ public class GetAllNewsHandlerTests
     public async Task Handle_NullNewsCollection_ShouldReturnError()
     {
         // Arrange
-        var errorMessage = "There are no news in the database";
+        var localized = new LocalizedString(
+            "CannotConvertNullToNews",
+            "Cannot convert null to news"
+        );
+        _localizerMock
+            .Setup(l => l["CannotConvertNullToNews"])
+            .Returns(localized);
+
+        var errorMessage = localized.Value;
+
         SetUpMockRepository(null);
 
         // Act

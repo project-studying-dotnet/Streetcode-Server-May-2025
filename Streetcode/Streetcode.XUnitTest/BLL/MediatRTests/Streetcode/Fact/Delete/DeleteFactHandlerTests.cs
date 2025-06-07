@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using FluentAssertions;
 using Moq;
+using Streetcode.BLL.Interfaces.Cache;
 using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.BLL.MediatR.Streetcode.Fact.Delete;
 using Streetcode.DAL.Entities.Media.Images;
@@ -13,6 +14,7 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Streetcode.Fact.Delete;
 
 public class DeleteFactHandlerTests
 {
+    private readonly Mock<ICacheInvalidationService> _cacheInvalidationService;
     private readonly Mock<ILoggerService> _logger;
     private readonly Mock<IRepositoryWrapper> _repositoryWrapper;
     private readonly DeleteFactHandler _handler;
@@ -21,7 +23,8 @@ public class DeleteFactHandlerTests
     {
         _logger = new Mock<ILoggerService>();
         _repositoryWrapper = new Mock<IRepositoryWrapper>();
-        _handler = new DeleteFactHandler(_repositoryWrapper.Object, _logger.Object);
+        _cacheInvalidationService = new Mock<ICacheInvalidationService>();
+        _handler = new DeleteFactHandler(_repositoryWrapper.Object, _logger.Object, _cacheInvalidationService.Object);
     }
 
     [Fact]

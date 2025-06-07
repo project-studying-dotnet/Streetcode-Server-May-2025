@@ -5,7 +5,9 @@ namespace Streetcode.BLL.Validator;
 public static class CommonRules
 {
     public static IRuleBuilderOptions<T, string> ValidTitle<T>(this IRuleBuilder<T, string> rule) =>
-        rule.NotEmpty();
+        rule.NotEmpty()
+        .MaximumLength(100)
+        .WithMessage("Title cannot be more than 100 characters");
 
     public static IRuleBuilderOptions<T, string> ValidText<T>(this IRuleBuilder<T, string> rule) =>
         rule.NotEmpty();
@@ -24,4 +26,8 @@ public static class CommonRules
 
     public static IRuleBuilderOptions<T, int> ValidId<T>(this IRuleBuilder<T, int> rule) =>
         rule.GreaterThan(0);
+
+    public static IRuleBuilderOptions<T, string?> ValidImageDescription<T>(this IRuleBuilder<T, string?> rule) =>
+        rule.MaximumLength(200)
+            .WithMessage("Image description cannot be more than 200 characters");
 }

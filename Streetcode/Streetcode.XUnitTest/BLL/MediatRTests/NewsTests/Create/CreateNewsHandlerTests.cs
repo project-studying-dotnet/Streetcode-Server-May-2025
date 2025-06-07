@@ -1,20 +1,22 @@
-using Xunit;
-using Moq;
-using FluentAssertions;
 using AutoMapper;
+using FluentAssertions;
+using Microsoft.Extensions.Localization;
+using Moq;
+using Streetcode.BLL.DTO.News;
 using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.BLL.MediatR.News.Create;
-using Streetcode.BLL.DTO.News;
 using Streetcode.DAL.Entities.News;
 using Streetcode.DAL.Repositories.Interfaces.Base;
+using Xunit;
 
-namespace Streetcode.XUnitTest.BLL.MediatRTests.NewsTests;
+namespace Streetcode.XUnitTest.BLL.MediatRTests.NewsTests.Create;
 
 public class CreateNewsHandlerTests
 {
     private readonly Mock<IMapper> _mapper;
     private readonly Mock<IRepositoryWrapper> _repositoryWrapper;
     private readonly Mock<ILoggerService> _loggerService;
+    private readonly Mock<IStringLocalizer<CreateNewsHandler>> _localizer;
     private readonly CreateNewsHandler _handler;
 
     public CreateNewsHandlerTests()
@@ -22,7 +24,11 @@ public class CreateNewsHandlerTests
         _mapper = new Mock<IMapper>();
         _repositoryWrapper = new Mock<IRepositoryWrapper>();
         _loggerService = new Mock<ILoggerService>();
-        _handler = new CreateNewsHandler(_mapper.Object, _repositoryWrapper.Object, _loggerService.Object);
+        _localizer = new Mock<IStringLocalizer<CreateNewsHandler>>();
+        _handler = new CreateNewsHandler(_mapper.Object,
+            _repositoryWrapper.Object,
+            _loggerService.Object,
+            _localizer.Object);
     }
 
     [Fact]
@@ -54,7 +60,17 @@ public class CreateNewsHandlerTests
     {
         // Arrange
         var newsDto = new NewsDTO();
-        var errorMessage = "Cannot convert null to news";
+
+        var localized = new LocalizedString(
+            "CannotConvertNullToNews",
+            "Cannot convert null to news"
+        );
+        _localizer
+            .Setup(l => l["CannotConvertNullToNews"])
+            .Returns(localized);
+
+        var errorMessage = localized.Value;
+
         _mapper.Setup(x => x.Map<News>(It.IsAny<NewsDTO>()))
             .Returns((News)null);
 
@@ -70,6 +86,16 @@ public class CreateNewsHandlerTests
     public async Task Handler_WhenSaveChangesIsFalse_ShouldReturnErrorMessage()
     {
         // Arrange
+        var localized = new LocalizedString(
+            "FailedToCreateNews",
+            "Failed to create a news"
+        );
+        _localizer
+            .Setup(l => l["FailedToCreateNews"])
+            .Returns(localized);
+
+        var errorMessage = localized.Value;
+
         var news = GetNews();
         _mapper.Setup(x => x.Map<News>(It.IsAny<NewsDTO>()))
             .Returns(news);
@@ -82,7 +108,7 @@ public class CreateNewsHandlerTests
 
         // Assert
         result.IsFailed.Should().BeTrue();
-        result.Errors.Should().ContainSingle().Which.Message.Should().Be("Failed to create a news");
+        result.Errors.Should().ContainSingle().Which.Message.Should().Be(errorMessage);
     }
 
     private NewsDTO GetNewsDto()
