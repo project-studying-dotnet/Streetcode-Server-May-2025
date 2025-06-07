@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UserService.WebApi.Data;
 
@@ -11,9 +12,11 @@ using UserService.WebApi.Data;
 namespace UserService.WebApi.Migrations
 {
     [DbContext(typeof(UserServiceDbContext))]
-    partial class UserServiseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250605132235_AddRefreshTokenEntity")]
+    partial class AddRefreshTokenEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
