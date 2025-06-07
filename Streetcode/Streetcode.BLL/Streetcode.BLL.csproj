@@ -41,10 +41,59 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Mapping\Analytics\" />
     <Folder Include="Exceptions\" />
     <Folder Include="DTO\Instagram\" />
-    <Folder Include="MediatR\Analytics\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources\MediatR\News\Create\CreateNewsHandler.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CreateNewsHandler.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\MediatR\News\Delete\DeleteNewsHandler.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>DeleteNewsHandler.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\MediatR\News\GetAll\GetAllNewsHandler.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>GetAllNewsHandler.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\MediatR\News\GetById\GetNewsByIdHandler.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>GetNewsByIdHandler.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\MediatR\News\GetByUrl\GetNewsByUrlHandler.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>GetNewsByUrlHandler.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\MediatR\News\Create\CreateNewsHandler.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>CreateNewsHandler.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\MediatR\News\Delete\DeleteNewsHandler.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>DeleteNewsHandler.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\MediatR\News\GetAll\GetAllNewsHandler.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>GetAllNewsHandler.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\MediatR\News\GetById\GetNewsByIdHandler.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>GetNewsByIdHandler.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\MediatR\News\GetByUrl\GetNewsByUrlHandler.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>GetNewsByUrlHandler.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

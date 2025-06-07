@@ -1,4 +1,4 @@
-using AutoMapper;
+п»їusing AutoMapper;
 using FluentAssertions;
 using Moq;
 using Streetcode.BLL.DTO.Streetcode.TextContent.Fact;
@@ -127,7 +127,7 @@ public class UpdateFactsHandlerTests
 
         // Assert
         result.IsFailed.Should().BeTrue();
-        result.Errors.First().Message.Should().Contain("Заголовок факту є обов'язковим.");
+        result.Errors.First().Message.Should().Contain("Р—Р°РіРѕР»РѕРІРѕРє С„Р°РєС‚Сѓ С” РѕР±РѕРІ'СЏР·РєРѕРІРёРј.");
     }
 
     [Fact]
@@ -154,7 +154,7 @@ public class UpdateFactsHandlerTests
 
         // Assert
         result.IsFailed.Should().BeTrue();
-        result.Errors.First().Message.Should().Contain("Основний текст факту є обов'язковим.");
+        result.Errors.First().Message.Should().Contain("РћСЃРЅРѕРІРЅРёР№ С‚РµРєСЃС‚ С„Р°РєС‚Сѓ С” РѕР±РѕРІ'СЏР·РєРѕРІРёРј.");
     }
 
     [Fact]
@@ -181,7 +181,7 @@ public class UpdateFactsHandlerTests
 
         // Assert
         result.IsFailed.Should().BeTrue();
-        result.Errors.First().Message.Should().Contain("Зображення є обов'язковим.");
+        result.Errors.First().Message.Should().Contain("Р—РѕР±СЂР°Р¶РµРЅРЅСЏ С” РѕР±РѕРІ'СЏР·РєРѕРІРёРј.");
     }
 
     private Entity GetFact()

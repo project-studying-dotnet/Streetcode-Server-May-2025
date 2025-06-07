@@ -1,15 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using UserService.WebApi.Entities.Users;
 
 namespace UserService.WebApi.Data;
 
-public class UserServiseDbContext : DbContext
+public class UserServiceDbContext : IdentityDbContext<User>
 {
-    public UserServiseDbContext()
+    public UserServiceDbContext()
     {
     }
 
-    public UserServiseDbContext(DbContextOptions<UserServiseDbContext> options)
+    public UserServiceDbContext(DbContextOptions<UserServiceDbContext> options)
     : base(options)
     {
     }

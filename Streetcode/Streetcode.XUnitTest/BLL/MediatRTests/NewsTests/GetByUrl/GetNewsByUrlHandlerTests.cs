@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Microsoft.Extensions.Localization;
 using Moq;
 using Streetcode.BLL.DTO.Media.Images;
 using Streetcode.BLL.DTO.News;
@@ -7,19 +8,23 @@ using Streetcode.BLL.Interfaces.News;
 using Streetcode.BLL.MediatR.News.GetByUrl;
 using Xunit;
 
-namespace Streetcode.XUnitTest.BLL.MediatRTests.NewsTests;
+namespace Streetcode.XUnitTest.BLL.MediatRTests.NewsTests.GetByUrl;
 
 public class GetNewsByUrlHandlerTests
 {
     private readonly Mock<ILoggerService> _mockLoggerService;
     private readonly Mock<INewsService> _mockNewsService;
+    private readonly Mock<IStringLocalizer<GetNewsByUrlHandler>> _localizerMock;
     private readonly GetNewsByUrlHandler _handler;
 
     public GetNewsByUrlHandlerTests()
     {
         _mockLoggerService = new Mock<ILoggerService>();
         _mockNewsService = new Mock<INewsService>();
-        _handler = new GetNewsByUrlHandler(_mockLoggerService.Object, _mockNewsService.Object);
+        _localizerMock = new Mock<IStringLocalizer<GetNewsByUrlHandler>>();
+        _handler = new GetNewsByUrlHandler(_mockLoggerService.Object,
+            _mockNewsService.Object,
+            _localizerMock.Object);
     }
 
     [Fact]
@@ -45,7 +50,15 @@ public class GetNewsByUrlHandlerTests
     {
         // Arrange
         var url = "/test";
-        var errorMessage = $"No news by entered Url - {url}";
+        var localized = new LocalizedString(
+            "NoNewsByEnteredUrl",
+            $"No news by entered Url - {url}"
+        );
+        _localizerMock
+            .Setup(l => l["NoNewsByEnteredUrl", url])
+            .Returns(localized);
+
+        var errorMessage = localized.Value;
         _mockNewsService.Setup(x => x.GetNewsByUrlAsync(url))
             .ReturnsAsync((NewsDTO)null);
 

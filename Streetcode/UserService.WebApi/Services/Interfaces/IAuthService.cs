@@ -1,9 +1,10 @@
 ﻿using FluentResults;
 using UserService.WebApi.DTO.Users;
+using UserService.WebApi.Entities.Users;
 
 namespace UserService.WebApi.Services.Interfaces;
 public interface IAuthService
 {
-    Task<Result<RegisterUserDTO>> Register(RegisterUserDTO registerUserDTO, CancellationToken cancellationToken);
+    Task<Result<User>> Register(RegisterUserDTO registerUserDTO, CancellationToken cancellationToken);
 }
 

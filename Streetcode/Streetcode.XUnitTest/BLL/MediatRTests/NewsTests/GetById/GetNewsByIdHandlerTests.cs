@@ -1,7 +1,7 @@
-using System.Linq.Expressions;
 using AutoMapper;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.Extensions.Localization;
 using Moq;
 using Streetcode.BLL.DTO.Media.Images;
 using Streetcode.BLL.DTO.News;
@@ -10,9 +10,10 @@ using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.BLL.MediatR.News.GetById;
 using Streetcode.DAL.Entities.News;
 using Streetcode.DAL.Repositories.Interfaces.Base;
+using System.Linq.Expressions;
 using Xunit;
 
-namespace Streetcode.XUnitTest.BLL.MediatRTests.NewsTests;
+namespace Streetcode.XUnitTest.BLL.MediatRTests.NewsTests.GetById;
 
 public class GetNewsByIdHandlerTests
 {
@@ -20,6 +21,7 @@ public class GetNewsByIdHandlerTests
     private readonly Mock<IRepositoryWrapper> _mockRepository;
     private readonly Mock<IMapper> _mockMapper;
     private readonly Mock<IBlobService> _mockBlobService;
+    private readonly Mock<IStringLocalizer<GetNewsByIdHandler>> _localizerMock;
     private readonly GetNewsByIdHandler _handler;
 
     public GetNewsByIdHandlerTests()
@@ -28,7 +30,12 @@ public class GetNewsByIdHandlerTests
         _mockRepository = new Mock<IRepositoryWrapper>();
         _mockMapper = new Mock<IMapper>();
         _mockBlobService = new Mock<IBlobService>();
-        _handler = new GetNewsByIdHandler(_mockMapper.Object, _mockRepository.Object, _mockBlobService.Object, _mockLoggerService.Object);
+        _localizerMock = new Mock<IStringLocalizer<GetNewsByIdHandler>>();
+        _handler = new GetNewsByIdHandler(_mockMapper.Object,
+            _mockRepository.Object,
+            _mockBlobService.Object,
+            _mockLoggerService.Object,
+            _localizerMock.Object);
     }
 
     [Fact]
@@ -78,7 +85,17 @@ public class GetNewsByIdHandlerTests
     {
         // Arrange
         var news = GetNew();
-        var errorMessage = $"No news by entered Id - {news.Id}";
+
+        var localized = new LocalizedString(
+            "NoNewsByEnteredId",
+            $"No news by entered Id - {news.Id}"
+        );
+        _localizerMock
+            .Setup(l => l["NoNewsByEnteredId", news.Id])
+            .Returns(localized);
+
+        var errorMessage = localized.Value;
+
         SetUpMockRepository(news);
         SetUpMockMapperWithNull();
         SetUpMockBlobService(null);

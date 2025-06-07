@@ -41,6 +41,8 @@ public static class ServiceCollectionExtensions
 
     public static void AddCustomServices(this IServiceCollection services)
     {
+        services.AddLocalization(options => options.ResourcesPath = "Resources");
+
         services.AddRepositoryServices();
         services.AddFeatureManagement();
         var currentAssemblies = AppDomain.CurrentDomain.GetAssemblies();
