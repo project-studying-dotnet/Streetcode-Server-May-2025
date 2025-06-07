@@ -5,6 +5,7 @@ using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.BLL.MediatR.Partners.Delete;
 using Streetcode.DAL.Repositories.Interfaces.Base;
 using System.Linq.Expressions;
+using Streetcode.BLL.Interfaces.Cache;
 using Xunit;
 
 using PartnerEntity = Streetcode.DAL.Entities.Partners.Partner;
@@ -13,6 +14,7 @@ namespace Streetcode.XUnitTest.BLL.MediatRTests.Partners.Delete;
 
 public class DeletePartnerHandlerTests
 {
+    private readonly Mock<ICacheInvalidationService> _cacheInvalidationServiceMock;
     private readonly Mock<IMapper> _mapperMock;
     private readonly Mock<ILoggerService> _loggerMock;
     private readonly Mock<IRepositoryWrapper> _repositoryWrapperMock;
@@ -23,7 +25,12 @@ public class DeletePartnerHandlerTests
         _mapperMock = new Mock<IMapper>();
         _loggerMock = new Mock<ILoggerService>();
         _repositoryWrapperMock = new Mock<IRepositoryWrapper>();
-        _handler = new DeletePartnerHandler(_repositoryWrapperMock.Object, _mapperMock.Object, _loggerMock.Object);
+        _cacheInvalidationServiceMock = new Mock<ICacheInvalidationService>();
+        _handler = new DeletePartnerHandler(
+            _repositoryWrapperMock.Object, 
+            _mapperMock.Object, 
+            _loggerMock.Object,
+            _cacheInvalidationServiceMock.Object);
     }
 
     [Fact]

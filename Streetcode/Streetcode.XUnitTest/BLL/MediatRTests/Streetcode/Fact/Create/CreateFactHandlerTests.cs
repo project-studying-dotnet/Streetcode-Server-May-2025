@@ -3,6 +3,7 @@ using AutoMapper;
 using FluentAssertions;
 using Moq;
 using Streetcode.BLL.DTO.Streetcode.TextContent.Fact;
+using Streetcode.BLL.Interfaces.Cache;
 using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.BLL.MediatR.Streetcode.Fact.Create;
 using Streetcode.DAL.Repositories.Interfaces.Base;
@@ -18,6 +19,7 @@ public class CreateFactHandlerTests
     private readonly Mock<IRepositoryWrapper> _repositoryWrapperMock;
     private readonly Mock<IMapper> _mapperMock;
     private readonly Mock<ILoggerService> _loggerMock;
+    private readonly Mock<ICacheInvalidationService> _cacheInvalidationServiceMock;
     private readonly CreateFactHandler _handler;
 
     public CreateFactHandlerTests()
@@ -25,11 +27,13 @@ public class CreateFactHandlerTests
         _repositoryWrapperMock = new Mock<IRepositoryWrapper>();
         _mapperMock = new Mock<IMapper>();
         _loggerMock = new Mock<ILoggerService>();
+        _cacheInvalidationServiceMock = new Mock<ICacheInvalidationService>();
 
         _handler = new CreateFactHandler(
             _repositoryWrapperMock.Object,
             _mapperMock.Object,
-            _loggerMock.Object
+            _loggerMock.Object,
+            _cacheInvalidationServiceMock.Object
         );
     }
 

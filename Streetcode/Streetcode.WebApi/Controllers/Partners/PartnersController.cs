@@ -13,7 +13,8 @@ public class PartnersController : BaseApiController
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        return HandleResult(await Mediator.Send(new GetAllPartnersQuery()));
+        var result = HandleResult(await Mediator.Send(new GetAllPartnersQuery()));
+        return result;
     }
 
     [HttpGet]

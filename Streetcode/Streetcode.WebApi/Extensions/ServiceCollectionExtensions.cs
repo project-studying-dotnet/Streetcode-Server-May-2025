@@ -1,3 +1,5 @@
+using FluentResults;
+using StackExchange.Redis;
 using Hangfire;
 using MediatR;
 using FluentValidation;
@@ -23,7 +25,9 @@ using Streetcode.BLL.Interfaces.Text;
 using Streetcode.BLL.Services.Text;
 using Streetcode.BLL.Behaviors;
 using Serilog.Events;
+using Streetcode.BLL.Interfaces.Cache;
 using Streetcode.BLL.Interfaces.News;
+using Streetcode.BLL.Services.Cache;
 using Streetcode.BLL.Services.News;
 
 namespace Streetcode.WebApi.Extensions;
@@ -56,7 +60,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<INewsService, NewsService>();
     }
 
-    public static void AddApplicationServices(this IServiceCollection services, ConfigurationManager configuration)
+    public static void AddApplicationServices(this IServiceCollection services, ConfigurationManager configuration, IWebHostEnvironment environment)
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection");
         var emailConfig = configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>();
@@ -71,6 +75,29 @@ public static class ServiceCollectionExtensions
             });
         });
 
+        if (environment.IsDevelopment())
+        {
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CacheBehavior<,>));
+            
+            var redisConnectionString = configuration["Redis:ConnectionString"];
+            if (string.IsNullOrWhiteSpace(redisConnectionString))
+            {
+                throw new InvalidOperationException("Redis connection string must be provided in Development environment.");
+            }
+            
+            services.AddSingleton<IConnectionMultiplexer>(
+                ConnectionMultiplexer.Connect(redisConnectionString!));
+            services.AddSingleton<ICacheInvalidationService, CacheInvalidationService>();
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = redisConnectionString;
+            });
+        }
+        else
+        {
+            services.AddScoped<ICacheInvalidationService, NoOpCacheInvalidatonService>();
+        }
+        
         services.AddHangfire(config =>
         {
             config.UseSqlServerStorage(connectionString);
