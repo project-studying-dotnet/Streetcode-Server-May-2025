@@ -18,11 +18,11 @@ public static class FactEndpoints
 {
     public static void MapFactEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("api/Fact")
+        var group = app.MapGroup("api/FactMinimalApi")
             .WithTags("FactMinimalApi")
             .WithOpenApi();
 
-        group.MapGet("api/Fact/GetAll", GetAll);
+        group.MapGet("GetAll", GetAll);
         group.MapGet("GetById/{id:int}", GetById);
         group.MapGet("ByStreetcode/{streetcodeId:int}", GetByStreetcodeId);
         group.MapPost("Create", Create);
