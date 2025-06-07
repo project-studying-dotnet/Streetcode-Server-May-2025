@@ -20,10 +20,13 @@ builder.Services.AddDbContext<UserServiceDbContext>(options =>
 
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddAutoMapper(typeof(UserProfile));
 
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddJwtAuthentication(builder.Configuration);
 
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
