@@ -7,7 +7,7 @@ using UserService.WebApi.Services.Interfaces;
 namespace UserService.WebApi.Controllers.Users;
 
 [ApiController]
-[Route("/api/auth")]
+[Route("api/[controller]/[action]")]
 public class UsersController : ControllerBase
 {
     private readonly IAuthService _authService;

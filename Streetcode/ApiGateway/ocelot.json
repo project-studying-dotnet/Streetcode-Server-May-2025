@@ -4,14 +4,14 @@
       "DownstreamPathTemplate": "/api/{controller}/{action}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5000 } ],
-      "UpstreamPathTemplate": "/api/{controller}/{action}",
+      "UpstreamPathTemplate": "/streetcode/api/{controller}/{action}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]
     },
     {
-      "DownstreamPathTemplate": "/api/{everything}",
+      "DownstreamPathTemplate": "/api/{controller}/{action}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5002 } ],
-      "UpstreamPathTemplate": "/api/{everything}",
+      "UpstreamPathTemplate": "/user/api/{controller}/{action}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]
     }
   ],
