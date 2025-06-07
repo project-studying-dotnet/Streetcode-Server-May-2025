@@ -106,6 +106,8 @@ public class RepositoryWrapper : IRepositoryWrapper
 
     private IStreetcodeImageRepository _streetcodeImageRepository;
 
+    private ICommentRepository _commentRepository;
+
     public RepositoryWrapper(StreetcodeDbContext streetcodeDbContext)
     {
         _streetcodeDbContext = streetcodeDbContext;
@@ -554,6 +556,19 @@ public class RepositoryWrapper : IRepositoryWrapper
 			return _streetcodeImageRepository;
 		}
 	}
+
+    public ICommentRepository CommentRepository
+    {
+        get
+        {
+            if (_commentRepository is null)
+            {
+                _commentRepository = new CommentRepository(_streetcodeDbContext);
+            }
+            
+            return _commentRepository;
+        }
+    }
 
     public int SaveChanges()
     {

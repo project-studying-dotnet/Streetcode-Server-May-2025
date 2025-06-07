@@ -18,8 +18,5 @@ public class Term
     [MaxLength(500)]
     public string? Description { get; set; }
 
-    [ForeignKey(nameof(Streetcode))]
-    public int StreetcodeId { get; set; }
-
     public List<RelatedTerm> RelatedTerms { get; set; } = new();
 }

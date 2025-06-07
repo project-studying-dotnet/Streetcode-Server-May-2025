@@ -9,6 +9,5 @@ public sealed class CreateTermValidator : AbstractValidator<CreateTermCommand>
     {
         RuleFor(cmd => cmd.Term.Title).ValidTitle();
         RuleFor(cmd => cmd.Term.Description).ValidText();
-        RuleFor(cmd => cmd.Term.StreetcodeId).ValidId();
     }
 }
