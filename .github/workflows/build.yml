@@ -13,8 +13,8 @@ jobs:
   build:
     name: Build and analyze
     runs-on: windows-latest
+
     steps:
-      
       - name: Checkout
         uses: actions/checkout@v2
       - name: Set up JDK 17
@@ -38,9 +38,15 @@ jobs:
         run: dotnet build ./Streetcode/Streetcode.sln --configuration Release --no-restore
 
       - name: Test and Code Coverage
-        run: dotnet-coverage collect "dotnet test ./Streetcode/Streetcode.XUnitTest/Streetcode.XUnitTest.csproj --configuration Release --results-directory ./coverage --logger trx" -f xml -o coverage.xml
+        run: dotnet-coverage collect "dotnet test ./Streetcode/Streetcode.XUnitTest/Streetcode.XUnitTest.csproj --configuration Release --results-directory ./coverage --logger trx;LogFileName=test-results.trx" -f xml -o coverage.xml
 
-    
+      - name: Save Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: "**/*.trx"
+
       - name: SonarScanner Analysis
         id: sonar
         run: |
@@ -48,3 +54,20 @@ jobs:
           dotnet build ./Streetcode/Streetcode.sln --configuration Release
           dotnet test ./Streetcode/Streetcode.XUnitTest/Streetcode.XUnitTest.csproj --configuration Release --no-build --verbosity normal
           dotnet sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+  
+  test-report:
+    name: Test Results
+    runs-on: windows-latest
+    needs: build
+    if: always()
+
+    steps:
+      - uses: dorny/test-reporter@v2
+        with:
+          name: Test results
+          artifact: test-results
+          path: "**/*.trx"
+          reporter: dotnet-trx
+          list-suites: failed
+          list-tests: failed
+          fail-on-error: true
