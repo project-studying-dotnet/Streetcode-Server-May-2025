@@ -164,14 +164,14 @@ public class UsersControllerTests
     public async Task RefreshToken_ServiceSuccess_ReturnsOkWithToken()
     {
         // Arrange
-        var req = new RefreshTokenRequestDTO { RefreshToken = "refresh" };
+        var request = new RefreshTokenRequestDTO { RefreshToken = "refresh" };
         var token = new TokenResponseDTO { AccessToken = "new-jwt", AccessTokenExpiresAt = DateTime.UtcNow };
 
-        _authServiceMock.Setup(a => a.RefreshTokenAsync(req.RefreshToken, default))
+        _authServiceMock.Setup(a => a.RefreshTokenAsync(request, default))
              .ReturnsAsync(Result.Ok(token));
 
         // Act
-        var result = await _controller.RefreshToken(req, default);
+        var result = await _controller.RefreshToken(request, default);
 
         // Assert
         var ok = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -182,12 +182,12 @@ public class UsersControllerTests
     public async Task RefreshToken_ServiceFail_ReturnsBadRequestWithErrors()
     {
         // Arrange
-        var req = new RefreshTokenRequestDTO { RefreshToken = "expired" };
-        _authServiceMock.Setup(a => a.RefreshTokenAsync(req.RefreshToken, default))
+        var request = new RefreshTokenRequestDTO { RefreshToken = "expired" };
+        _authServiceMock.Setup(a => a.RefreshTokenAsync(request, default))
              .ReturnsAsync(Result.Fail<TokenResponseDTO>("expired / revoked"));
 
         // Act
-        var result = await _controller.RefreshToken(req, default);
+        var result = await _controller.RefreshToken(request, default);
 
         // Assert
         var bad = result.Should().BeOfType<BadRequestObjectResult>().Subject;
