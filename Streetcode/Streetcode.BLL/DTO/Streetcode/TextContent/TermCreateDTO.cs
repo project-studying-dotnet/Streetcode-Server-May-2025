@@ -4,5 +4,4 @@ public class TermCreateDTO
 {
     public string Title { get; set; }
     public string Description { get; set; }
-    public int StreetcodeId { get; set; }
 }
