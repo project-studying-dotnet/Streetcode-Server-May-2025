@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using UserService.WebApi.Data;
@@ -8,6 +9,7 @@ using UserService.WebApi.Extensions;
 using UserService.WebApi.Mapping.Users;
 using UserService.WebApi.Services.Interfaces;
 using UserService.WebApi.Services.Realisations;
+using UserService.WebApi.Validators.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,14 +21,16 @@ builder.Services.AddDbContext<UserServiceDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+
+builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestDTOValidator>();
 
 builder.Services.AddAutoMapper(typeof(UserProfile));
 
 builder.Services.AddSwaggerGen();
-
-builder.Services.AddJwtAuthentication(builder.Configuration);
 
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
@@ -41,6 +45,10 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
     .AddEntityFrameworkStores<UserServiceDbContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.AddJwtAuthentication(builder.Configuration);
+
+builder.Services.AddSwaggerWithJwt();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -50,6 +58,10 @@ if (app.Environment.IsDevelopment())
 }
 
 await app.Services.SeedIdentityAsync(); // uncomment for seeding data
+
+app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 
