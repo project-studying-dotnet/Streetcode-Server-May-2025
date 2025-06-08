@@ -6,6 +6,7 @@ using FluentValidation.Results;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Newtonsoft.Json.Linq;
 using UserService.WebApi.DTO.Auth.Requests;
 using UserService.WebApi.DTO.Auth.Responses;
 using UserService.WebApi.DTO.Users;
@@ -218,8 +219,11 @@ public class AuthServiceTests
     [InlineData(" ")]
     public async Task RefreshToken_InvalidToken_ReturnsFail(string? refreshToken)
     {
+        // Arrange
+        var request = new RefreshTokenRequestDTO { RefreshToken = refreshToken! };
+
         // Act
-        var result = await _authService.RefreshTokenAsync(refreshToken!, CancellationToken.None);
+        var result = await _authService.RefreshTokenAsync(request, CancellationToken.None);
 
         // Assert
         result.IsSuccess.Should().BeFalse();
@@ -231,11 +235,13 @@ public class AuthServiceTests
     {
         // Arrange
         const string token = "refresh";
+        var request = new RefreshTokenRequestDTO { RefreshToken = token };
+
         _tokenServiceMock.Setup(t => t.RefreshAccessTokenAsync(token, default))
             .ReturnsAsync(Result.Fail<TokenResponseDTO>("not found"));
 
         // Act
-        var result = await _authService.RefreshTokenAsync(token, CancellationToken.None);
+        var result = await _authService.RefreshTokenAsync(request, CancellationToken.None);
 
         // Assert
         result.IsSuccess.Should().BeFalse();
@@ -247,13 +253,15 @@ public class AuthServiceTests
     {
         // Arrange
         const string refreshToken = "refresh";
+        var request = new RefreshTokenRequestDTO { RefreshToken = refreshToken };
+
         var tokenResponse = CreateTokenResponse();
 
         _tokenServiceMock.Setup(t => t.RefreshAccessTokenAsync(refreshToken, default))
             .ReturnsAsync(Result.Ok(tokenResponse));
 
         // Act
-        var result = await _authService.RefreshTokenAsync(refreshToken, CancellationToken.None);
+        var result = await _authService.RefreshTokenAsync(request, CancellationToken.None);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
