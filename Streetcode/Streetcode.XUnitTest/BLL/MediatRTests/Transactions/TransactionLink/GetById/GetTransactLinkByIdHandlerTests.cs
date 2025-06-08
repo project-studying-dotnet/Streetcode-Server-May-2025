@@ -1,22 +1,12 @@
-﻿using Ardalis.Specification;
-using AutoMapper;
+﻿using AutoMapper;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore.Query;
 using Moq;
-using Streetcode.BLL.DTO.Partners;
 using Streetcode.BLL.DTO.Transactions;
 using Streetcode.BLL.Interfaces.Logging;
-using Streetcode.BLL.MediatR.Partners.GetById;
-using Streetcode.BLL.MediatR.Transactions.TransactionLink.GetAll;
 using Streetcode.BLL.MediatR.Transactions.TransactionLink.GetById;
-using Streetcode.DAL.Entities.Partners;
 using Streetcode.DAL.Repositories.Interfaces.Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
 using TransactionLinkEntity = Streetcode.DAL.Entities.Transactions.TransactionLink;

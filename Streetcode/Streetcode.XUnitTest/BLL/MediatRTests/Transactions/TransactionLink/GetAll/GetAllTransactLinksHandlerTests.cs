@@ -1,5 +1,4 @@
-﻿using Ardalis.Specification;
-using AutoMapper;
+﻿using AutoMapper;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore.Query;
 using Moq;
