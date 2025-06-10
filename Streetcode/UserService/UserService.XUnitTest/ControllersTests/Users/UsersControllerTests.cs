@@ -1,27 +1,24 @@
-﻿using AutoMapper;
-using FluentResults;
-using Microsoft.AspNetCore.Mvc;
-using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FluentResults;
 using UserService.WebApi.Controllers.Users;
 using UserService.WebApi.DTO.Users;
 using UserService.WebApi.Entities.Users;
 using UserService.WebApi.Services.Interfaces;
-
-namespace UserService.XUnitTest.ControllersTests.Users;
-
 using AutoMapper;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using Xunit;
+using UserService.WebApi.DTO.Auth.Requests;
+using UserService.WebApi.DTO.Auth.Responses;
+
+namespace UserService.XUnitTest.ControllersTests.Users;
 
 public class UsersControllerTests
 {
+    private static readonly string WrongCredentialsMsg = "wrong";
+    private static readonly string RefreshExpiredMsg = "expired / revoked";
+    private static readonly string[] WrongCredentialsArray = [WrongCredentialsMsg];
+    private static readonly string[] RefreshExpiredArray = [RefreshExpiredMsg];
+
     private readonly Mock<IAuthService> _authServiceMock;
     private readonly Mock<IMapper> _mapperMock;
     private readonly UsersController _controller;
@@ -122,5 +119,78 @@ public class UsersControllerTests
         var badRequestResult = result as BadRequestObjectResult;
         var errorResponse = badRequestResult!.Value;
         errorResponse.Should().BeEquivalentTo(new { Error = "User with this email already exists" });
+    }
+
+    [Fact]
+    public async Task Login_ServiceSuccess_ReturnsOkWithToken()
+    {
+        // Arrange
+        var req = new LoginRequestDTO { Email = "kobilinskiyn@gmail.com", Password = "Pwd123!" };
+        var token = new TokenResponseDTO
+        {
+            AccessToken = "jwt",
+            AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(15),
+            RefreshToken = "r",
+            RefreshTokenExpiresAt = DateTime.UtcNow.AddDays(7)
+        };
+
+        _authServiceMock.Setup(a => a.LoginAsync(req, default)).ReturnsAsync(Result.Ok(token));
+
+        // Act
+        var result = await _controller.Login(req, default);
+
+        // Assert
+        var ok = result.Should().BeOfType<OkObjectResult>().Subject;
+        ok.Value.Should().BeEquivalentTo(token);
+    }
+
+    [Fact]
+    public async Task Login_ServiceFail_ReturnsBadRequestWithErrors()
+    {
+        // Arrange
+        var req = new LoginRequestDTO { Email = "nikita@mail.com", Password = "bad" };
+        _authServiceMock.Setup(a => a.LoginAsync(req, default))
+             .ReturnsAsync(Result.Fail<TokenResponseDTO>("wrong"));
+
+        // Act
+        var result = await _controller.Login(req, default);
+
+        // Assert
+        var bad = result.Should().BeOfType<BadRequestObjectResult>().Subject;
+        bad.Value.Should().BeEquivalentTo(new { Errors = WrongCredentialsArray });
+    }
+
+    [Fact]
+    public async Task RefreshToken_ServiceSuccess_ReturnsOkWithToken()
+    {
+        // Arrange
+        var request = new RefreshTokenRequestDTO { RefreshToken = "refresh" };
+        var token = new TokenResponseDTO { AccessToken = "new-jwt", AccessTokenExpiresAt = DateTime.UtcNow };
+
+        _authServiceMock.Setup(a => a.RefreshTokenAsync(request, default))
+             .ReturnsAsync(Result.Ok(token));
+
+        // Act
+        var result = await _controller.RefreshToken(request, default);
+
+        // Assert
+        var ok = result.Should().BeOfType<OkObjectResult>().Subject;
+        ok.Value.Should().BeEquivalentTo(token);
+    }
+
+    [Fact]
+    public async Task RefreshToken_ServiceFail_ReturnsBadRequestWithErrors()
+    {
+        // Arrange
+        var request = new RefreshTokenRequestDTO { RefreshToken = "expired" };
+        _authServiceMock.Setup(a => a.RefreshTokenAsync(request, default))
+             .ReturnsAsync(Result.Fail<TokenResponseDTO>("expired / revoked"));
+
+        // Act
+        var result = await _controller.RefreshToken(request, default);
+
+        // Assert
+        var bad = result.Should().BeOfType<BadRequestObjectResult>().Subject;
+        bad.Value.Should().BeEquivalentTo(new { Errors = RefreshExpiredArray });
     }
 }

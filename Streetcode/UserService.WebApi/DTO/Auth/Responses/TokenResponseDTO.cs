@@ -1,6 +1,6 @@
-﻿namespace UserService.WebApi.DTO.Auth;
+﻿namespace UserService.WebApi.DTO.Auth.Responses;
 
-public class TokenResultDTO
+public class TokenResponseDTO
 {
     public string AccessToken { get; set; } = null!;
     public DateTime AccessTokenExpiresAt { get; set; }
