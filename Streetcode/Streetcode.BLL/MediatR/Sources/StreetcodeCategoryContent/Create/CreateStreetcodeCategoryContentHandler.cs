@@ -42,13 +42,12 @@ public class CreateStreetcodeCategoryContentHandler : IRequestHandler<CreateStre
             return Result.Fail<StreetcodeCategoryContentDTO>(errorMessage);
         }
         
-        await _repositoryWrapper.StreetcodeCategoryContentRepository.CreateAsync(categoryContent);
+        var result = await _repositoryWrapper.StreetcodeCategoryContentRepository.CreateAsync(categoryContent);
         var isSuccessResult = await _repositoryWrapper.SaveChangesAsync() > 0;
 
         if (isSuccessResult)
         {
-            var result = _mapper.Map<StreetcodeCategoryContentDTO>(categoryContent);
-            return Result.Ok(result);
+            return Result.Ok(_mapper.Map<StreetcodeCategoryContentDTO>(result));
         }
         else
         {
