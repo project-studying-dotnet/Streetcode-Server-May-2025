@@ -13,5 +13,8 @@ public class CommentProfile : Profile
                 .MapFrom(src => src.User))
             .ForMember(dest => dest.Replies, opt => opt
                 .MapFrom(src => src.Replies));
+
+        CreateMap<Comment, AdminCommentDTO>()
+            .ForMember(dest => dest.StreetcodeName, opt => opt.MapFrom(src => src.Streetcode.Title));
     }
 }
