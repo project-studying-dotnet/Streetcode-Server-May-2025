@@ -1,6 +1,8 @@
 using MMLib.SwaggerForOcelot.DependencyInjection;
+using Ocelot.Cache.CacheManager;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
+using Ocelot.Provider.Polly;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,10 +10,15 @@ builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
 
-builder.Services.AddOcelot();
+builder.Services.AddOcelot()
+    .AddCacheManager(settings =>
+    {
+        settings.WithDictionaryHandle();
+    })
+    .AddPolly();
 
-var app = builder.Build();
+var app = builder.Build(); 
 
-await app.UseOcelot();
+app.UseOcelot().Wait();
 
 app.Run();
