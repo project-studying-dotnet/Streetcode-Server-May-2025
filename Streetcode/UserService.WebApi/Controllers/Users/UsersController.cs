@@ -1,14 +1,12 @@
 ﻿using AutoMapper;
-using FluentResults;
 using Microsoft.AspNetCore.Mvc;
+using UserService.WebApi.DTO.Auth.Requests;
 using UserService.WebApi.DTO.Users;
 using UserService.WebApi.Services.Interfaces;
 
 namespace UserService.WebApi.Controllers.Users;
 
-[ApiController]
-[Route("api/[controller]/[action]")]
-public class UsersController : ControllerBase
+public class UsersController : BaseApiController
 {
     private readonly IAuthService _authService;
     private readonly IMapper _mapper;
@@ -36,6 +34,24 @@ public class UsersController : ControllerBase
         }
 
         return BadRequest(new { Error = result.Errors.FirstOrDefault()?.Message });
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Login([FromBody] LoginRequestDTO request,
+        CancellationToken cancellationToken)
+    {
+        var result = await _authService.LoginAsync(request, cancellationToken);
+
+        return HandleResult(result);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestDTO request, 
+        CancellationToken cancellationToken)
+    {
+        var result = await _authService.RefreshTokenAsync(request, cancellationToken);
+
+        return HandleResult(result);
     }
 }
 

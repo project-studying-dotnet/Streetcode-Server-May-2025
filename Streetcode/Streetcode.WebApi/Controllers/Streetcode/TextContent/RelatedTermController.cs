@@ -27,9 +27,9 @@ public class RelatedTermController : BaseApiController
         return HandleResult(await Mediator.Send(new UpdateRelatedTermCommand(id, relatedTerm)));
     }
 
-    [HttpDelete("{word}")]
-    public async Task<IActionResult> Delete([FromRoute] string word)
+    [HttpDelete("{word}/{termId:int}")]
+    public async Task<IActionResult> Delete([FromRoute] string word, [FromRoute] int termId)
     {
-        return HandleResult(await Mediator.Send(new DeleteRelatedTermCommand(word)));
+        return HandleResult(await Mediator.Send(new DeleteRelatedTermCommand(word, termId)));
     }
 }

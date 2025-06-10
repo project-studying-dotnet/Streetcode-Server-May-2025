@@ -30,9 +30,9 @@ public class DeleteRelatedTermHandlerTests
         _mockRepositoryWrapper.Setup(x => x.RelatedTermRepository).Returns(_mockRelatedTermRepository.Object);
     }
 
-    private async Task<Result<RelatedTermDTO>> ArrangeAndActAsync(string wordToFind, RelatedTerm foundEntity = null, int saveChangesResult = 1, RelatedTermDTO mappedDtoResult = null)
+    private async Task<Result<RelatedTermDTO>> ArrangeAndActAsync(string wordToFind, int termId, RelatedTerm foundEntity = null, int saveChangesResult = 1, RelatedTermDTO mappedDtoResult = null)
     {
-        var command = new DeleteRelatedTermCommand(wordToFind);
+        var command = new DeleteRelatedTermCommand(wordToFind, termId);
 
         _mockRelatedTermRepository.Setup(repo => repo.GetFirstOrDefaultAsync(
             It.IsAny<Expression<System.Func<RelatedTerm, bool>>>(),
@@ -64,7 +64,7 @@ public class DeleteRelatedTermHandlerTests
         var mappedDto = new RelatedTermDTO { Id = 1, Word = existingWord, TermId = 1 };
 
         // Act
-        var result = await ArrangeAndActAsync(existingWord, foundEntity, 1, mappedDto);
+        var result = await ArrangeAndActAsync(existingWord, foundEntity.TermId, foundEntity, 1, mappedDto);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -79,7 +79,7 @@ public class DeleteRelatedTermHandlerTests
         var mappedDto = new RelatedTermDTO { Id = 1, Word = existingWord, TermId = 1 };
 
         // Act
-        var result = await ArrangeAndActAsync(existingWord, foundEntity, 1, mappedDto);
+        var result = await ArrangeAndActAsync(existingWord, foundEntity.TermId, foundEntity, 1, mappedDto);
 
         // Assert
         result.Value.Should().BeEquivalentTo(mappedDto);
@@ -94,7 +94,7 @@ public class DeleteRelatedTermHandlerTests
         var mappedDto = new RelatedTermDTO { Id = 1, Word = existingWord, TermId = 1 };
 
         // Act
-        await ArrangeAndActAsync(existingWord, foundEntity, 1, mappedDto);
+        await ArrangeAndActAsync(existingWord, foundEntity.TermId, foundEntity, 1, mappedDto);
 
         // Assert
         _mockRelatedTermRepository.Verify(
@@ -111,7 +111,7 @@ public class DeleteRelatedTermHandlerTests
         var mappedDto = new RelatedTermDTO { Id = 1, Word = existingWord, TermId = 1 };
 
         // Act
-        await ArrangeAndActAsync(existingWord, foundEntity, 1, mappedDto);
+        await ArrangeAndActAsync(existingWord, foundEntity.TermId, foundEntity, 1, mappedDto);
 
         // Assert
         _mockRelatedTermRepository.Verify(repo => repo.Delete(foundEntity), Times.Once);
@@ -126,7 +126,7 @@ public class DeleteRelatedTermHandlerTests
         var mappedDto = new RelatedTermDTO { Id = 1, Word = existingWord, TermId = 1 };
 
         // Act
-        await ArrangeAndActAsync(existingWord, foundEntity, 1, mappedDto);
+        await ArrangeAndActAsync(existingWord, foundEntity.TermId, foundEntity, 1, mappedDto);
 
         // Assert
         _mockRepositoryWrapper.Verify(repo => repo.SaveChangesAsync(), Times.Once);
@@ -141,7 +141,7 @@ public class DeleteRelatedTermHandlerTests
         var mappedDto = new RelatedTermDTO { Id = 1, Word = existingWord, TermId = 1 };
 
         // Act
-        await ArrangeAndActAsync(existingWord, foundEntity, 1, mappedDto);
+        await ArrangeAndActAsync(existingWord, foundEntity.TermId, foundEntity, 1, mappedDto);
 
         // Assert
         _mockMapper.Verify(m => m.Map<RelatedTermDTO>(foundEntity), Times.Once);
@@ -156,7 +156,7 @@ public class DeleteRelatedTermHandlerTests
         var mappedDto = new RelatedTermDTO { Id = 1, Word = existingWord, TermId = 1 };
 
         // Act
-        await ArrangeAndActAsync(existingWord, foundEntity, 1, mappedDto);
+        await ArrangeAndActAsync(existingWord, foundEntity.TermId, foundEntity, 1, mappedDto);
 
         // Assert
         _mockLogger.Verify(logger => logger.LogError(It.IsAny<DeleteRelatedTermCommand>(), It.IsAny<string>()), Times.Never);
@@ -168,9 +168,10 @@ public class DeleteRelatedTermHandlerTests
     {
         // Arrange
         var wordToFind = "NonExistingWord";
+        var termId = 0;
 
         // Act
-        var result = await ArrangeAndActAsync(wordToFind, null);
+        var result = await ArrangeAndActAsync(wordToFind, termId, null);
 
         // Assert
         result.IsFailed.Should().BeTrue();
@@ -181,10 +182,11 @@ public class DeleteRelatedTermHandlerTests
     {
         // Arrange
         var wordToFind = "NonExistingWord";
-        var expectedErrorMessage = $"Cannot find a related term: {wordToFind}";
+        var termId = 0;
+        var expectedErrorMessage = $"Cannot find a related term: {wordToFind} for term ID {termId}";
 
         // Act
-        var result = await ArrangeAndActAsync(wordToFind, null);
+        var result = await ArrangeAndActAsync(wordToFind, termId, null);
 
         // Assert
         result.Errors.Should().ContainSingle(e => e.Message == expectedErrorMessage);
@@ -195,9 +197,10 @@ public class DeleteRelatedTermHandlerTests
     {
         // Arrange
         var wordToFind = "NonExistingWord";
+        var termId = 0;
 
         // Act
-        await ArrangeAndActAsync(wordToFind, null);
+        await ArrangeAndActAsync(wordToFind, termId, null);
 
         // Assert
         _mockRelatedTermRepository.Verify(
@@ -210,9 +213,10 @@ public class DeleteRelatedTermHandlerTests
     {
         // Arrange
         var wordToFind = "NonExistingWord";
+        var termId = 0;
 
         // Act
-        await ArrangeAndActAsync(wordToFind, null);
+        await ArrangeAndActAsync(wordToFind, termId, null);
 
         // Assert
         _mockRelatedTermRepository.Verify(repo => repo.Delete(It.IsAny<RelatedTerm>()), Times.Never);
@@ -223,9 +227,10 @@ public class DeleteRelatedTermHandlerTests
     {
         // Arrange
         var wordToFind = "NonExistingWord";
+        var termId = 0;
 
         // Act
-        await ArrangeAndActAsync(wordToFind, null);
+        await ArrangeAndActAsync(wordToFind, termId, null);
 
         // Assert
         _mockRepositoryWrapper.Verify(repo => repo.SaveChangesAsync(), Times.Never);
@@ -236,9 +241,10 @@ public class DeleteRelatedTermHandlerTests
     {
         // Arrange
         var wordToFind = "NonExistingWord";
+        var termId = 0;
 
         // Act
-        await ArrangeAndActAsync(wordToFind, null);
+        await ArrangeAndActAsync(wordToFind, termId, null);
 
         // Assert
         _mockMapper.Verify(m => m.Map<RelatedTermDTO>(It.IsAny<RelatedTerm>()), Times.Never);
@@ -249,17 +255,17 @@ public class DeleteRelatedTermHandlerTests
     {
         // Arrange
         var wordToFind = "NonExistingWord";
-        var expectedErrorMessage = $"Cannot find a related term: {wordToFind}";
+        var termId = 0;
+        var expectedErrorMessage = $"Cannot find a related term: {wordToFind} for term ID {termId}";
 
         // Act
-        await ArrangeAndActAsync(wordToFind, null);
+        await ArrangeAndActAsync(wordToFind, termId, null);
 
         // Assert
         _mockLogger.Verify(
             logger => logger.LogError(It.IsAny<DeleteRelatedTermCommand>(), expectedErrorMessage),
             Times.Once);
     }
-
 
     [Fact]
     public async Task Handle_SaveChangesAsyncReturnsZero_ShouldReturnFailureResult()
@@ -270,7 +276,7 @@ public class DeleteRelatedTermHandlerTests
         var mappedDto = new RelatedTermDTO { Id = 1, Word = existingWord, TermId = 1 };
 
         // Act
-        var result = await ArrangeAndActAsync(existingWord, foundEntity, 0, mappedDto);
+        var result = await ArrangeAndActAsync(existingWord, foundEntity.TermId, foundEntity, 0, mappedDto);
 
         // Assert
         result.IsFailed.Should().BeTrue();
@@ -286,7 +292,7 @@ public class DeleteRelatedTermHandlerTests
         var expectedErrorMessage = "Failed to delete a related term";
 
         // Act
-        var result = await ArrangeAndActAsync(existingWord, foundEntity, 0, mappedDto);
+        var result = await ArrangeAndActAsync(existingWord, foundEntity.TermId, foundEntity, 0, mappedDto);
 
         // Assert
         result.Errors.Should().ContainSingle(e => e.Message == expectedErrorMessage);
@@ -301,7 +307,7 @@ public class DeleteRelatedTermHandlerTests
         var mappedDto = new RelatedTermDTO { Id = 1, Word = existingWord, TermId = 1 };
 
         // Act
-        await ArrangeAndActAsync(existingWord, foundEntity, 0, mappedDto);
+        await ArrangeAndActAsync(existingWord, foundEntity.TermId, foundEntity, 0, mappedDto);
 
         // Assert
         _mockRelatedTermRepository.Verify(
@@ -318,7 +324,7 @@ public class DeleteRelatedTermHandlerTests
         var mappedDto = new RelatedTermDTO { Id = 1, Word = existingWord, TermId = 1 };
 
         // Act
-        await ArrangeAndActAsync(existingWord, foundEntity, 0, mappedDto);
+        await ArrangeAndActAsync(existingWord, foundEntity.TermId, foundEntity, 0, mappedDto);
 
         // Assert
         _mockRelatedTermRepository.Verify(repo => repo.Delete(foundEntity), Times.Once);
@@ -333,7 +339,7 @@ public class DeleteRelatedTermHandlerTests
         var mappedDto = new RelatedTermDTO { Id = 1, Word = existingWord, TermId = 1 };
 
         // Act
-        await ArrangeAndActAsync(existingWord, foundEntity, 0, mappedDto);
+        await ArrangeAndActAsync(existingWord, foundEntity.TermId, foundEntity, 0, mappedDto);
 
         // Assert
         _mockRepositoryWrapper.Verify(repo => repo.SaveChangesAsync(), Times.Once);
@@ -348,7 +354,7 @@ public class DeleteRelatedTermHandlerTests
         var mappedDto = new RelatedTermDTO { Id = 1, Word = existingWord, TermId = 1 };
 
         // Act
-        await ArrangeAndActAsync(existingWord, foundEntity, 0, mappedDto);
+        await ArrangeAndActAsync(existingWord, foundEntity.TermId, foundEntity, 0, mappedDto);
 
         // Assert
         _mockMapper.Verify(m => m.Map<RelatedTermDTO>(foundEntity), Times.Once);
@@ -364,7 +370,7 @@ public class DeleteRelatedTermHandlerTests
         var expectedErrorMessage = "Failed to delete a related term";
 
         // Act
-        await ArrangeAndActAsync(existingWord, foundEntity, 0, mappedDto);
+        await ArrangeAndActAsync(existingWord, foundEntity.TermId, foundEntity, 0, mappedDto);
 
         // Assert
         _mockLogger.Verify(
@@ -381,7 +387,7 @@ public class DeleteRelatedTermHandlerTests
         var foundEntity = new RelatedTerm { Id = 1, Word = existingWord, TermId = 1 };
 
         // Act
-        var result = await ArrangeAndActAsync(existingWord, foundEntity, 1, null); // mappedDtoResult is null
+        var result = await ArrangeAndActAsync(existingWord, foundEntity.TermId, foundEntity, 1, null); // mappedDtoResult is null
 
         // Assert
         result.IsFailed.Should().BeTrue();
@@ -396,7 +402,7 @@ public class DeleteRelatedTermHandlerTests
         var expectedErrorMessage = "Failed to delete a related term";
 
         // Act
-        var result = await ArrangeAndActAsync(existingWord, foundEntity, 1, null); // mappedDtoResult is null
+        var result = await ArrangeAndActAsync(existingWord, foundEntity.TermId, foundEntity, 1, null); // mappedDtoResult is null
 
         // Assert
         result.Errors.Should().ContainSingle(e => e.Message == expectedErrorMessage);
@@ -410,7 +416,7 @@ public class DeleteRelatedTermHandlerTests
         var foundEntity = new RelatedTerm { Id = 1, Word = existingWord, TermId = 1 };
 
         // Act
-        await ArrangeAndActAsync(existingWord, foundEntity, 1, null);
+        await ArrangeAndActAsync(existingWord, foundEntity.TermId, foundEntity, 1, null);
 
         // Assert
         _mockRelatedTermRepository.Verify(
@@ -426,7 +432,7 @@ public class DeleteRelatedTermHandlerTests
         var foundEntity = new RelatedTerm { Id = 1, Word = existingWord, TermId = 1 };
 
         // Act
-        await ArrangeAndActAsync(existingWord, foundEntity, 1, null);
+        await ArrangeAndActAsync(existingWord, foundEntity.TermId, foundEntity, 1, null);
 
         // Assert
         _mockRelatedTermRepository.Verify(repo => repo.Delete(foundEntity), Times.Once);
@@ -440,7 +446,7 @@ public class DeleteRelatedTermHandlerTests
         var foundEntity = new RelatedTerm { Id = 1, Word = existingWord, TermId = 1 };
 
         // Act
-        await ArrangeAndActAsync(existingWord, foundEntity, 1, null);
+        await ArrangeAndActAsync(existingWord, foundEntity.TermId, foundEntity, 1, null);
 
         // Assert
         _mockRepositoryWrapper.Verify(repo => repo.SaveChangesAsync(), Times.Once);
@@ -454,7 +460,7 @@ public class DeleteRelatedTermHandlerTests
         var foundEntity = new RelatedTerm { Id = 1, Word = existingWord, TermId = 1 };
 
         // Act
-        await ArrangeAndActAsync(existingWord, foundEntity, 1, null);
+        await ArrangeAndActAsync(existingWord, foundEntity.TermId, foundEntity, 1, null);
 
         // Assert
         _mockMapper.Verify(m => m.Map<RelatedTermDTO>(foundEntity), Times.Once);
@@ -469,7 +475,7 @@ public class DeleteRelatedTermHandlerTests
         var expectedErrorMessage = "Failed to delete a related term";
 
         // Act
-        await ArrangeAndActAsync(existingWord, foundEntity, 1, null);
+        await ArrangeAndActAsync(existingWord, foundEntity.TermId, foundEntity, 1, null);
 
         // Assert
         _mockLogger.Verify(

@@ -8,7 +8,7 @@ using System.Security.Cryptography;
 using System.Text;
 using UserService.WebApi.Configurations;
 using UserService.WebApi.Data.Repositories.Interfaces;
-using UserService.WebApi.DTO.Auth;
+using UserService.WebApi.DTO.Auth.Responses;
 using UserService.WebApi.Entities.Auth;
 using UserService.WebApi.Entities.Users;
 using UserService.WebApi.Services.Interfaces;
@@ -31,7 +31,7 @@ public class TokenService : ITokenService
         _userManager = userManager;
     }
 
-    public async Task<Result<TokenResultDTO>> GenerateTokensAsync(User user, CancellationToken cancellationToken)
+    public async Task<Result<TokenResponseDTO>> GenerateTokensAsync(User user, CancellationToken cancellationToken)
     {
         var userRoles = await _userManager.GetRolesAsync(user);
 
@@ -57,7 +57,7 @@ public class TokenService : ITokenService
         var changesSaved = await _refreshTokenRepository.SaveChangesAsync(cancellationToken) > 0;
         if (changesSaved)
         {
-            var tokenResultDto = new TokenResultDTO
+            var tokenResponseDto = new TokenResponseDTO
             {
                 AccessToken = accessToken,
                 AccessTokenExpiresAt = accessTokenExpiry,
@@ -66,39 +66,39 @@ public class TokenService : ITokenService
                 RefreshTokenExpiresAt = refreshTokenExpiry
             };
 
-            return Result.Ok(tokenResultDto);
+            return Result.Ok(tokenResponseDto);
         }
         else
         {
-            return Result.Fail<TokenResultDTO>("Failed to save RefreshToken.");
+            return Result.Fail<TokenResponseDTO>("Failed to save RefreshToken.");
         }
     }
 
-    public async Task<Result<TokenResultDTO>> RefreshAccessTokenAsync(
+    public async Task<Result<TokenResponseDTO>> RefreshAccessTokenAsync(
         string refreshToken,
         CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(refreshToken))
         {
-            return Result.Fail<TokenResultDTO>("Refresh token is null or empty.");
+            return Result.Fail<TokenResponseDTO>("Refresh token is null or empty.");
         }
 
         var existingRefreshToken = await _refreshTokenRepository.GetByTokenAsync(refreshToken, cancellationToken);
         if (existingRefreshToken == null)
         {
-            return Result.Fail<TokenResultDTO>("Invalid refresh token.");
+            return Result.Fail<TokenResponseDTO>("Invalid refresh token.");
         }
 
         if (existingRefreshToken.IsRevoked)
         {
-            return Result.Fail<TokenResultDTO>("Refresh token has been revoked.");
+            return Result.Fail<TokenResponseDTO>("Refresh token has been revoked.");
         }
 
         if (existingRefreshToken.ExpiresAt < DateTime.UtcNow)
         {
             await RevokeRefreshTokenAsync(existingRefreshToken.Token, cancellationToken);
 
-            return Result.Fail<TokenResultDTO>("Refresh token has expired.");
+            return Result.Fail<TokenResponseDTO>("Refresh token has expired.");
         }
 
         var user = existingRefreshToken.User!;
@@ -108,7 +108,7 @@ public class TokenService : ITokenService
 
         var accessToken = CreateJwtAccessToken(user, userRoles, accessTokenExpiry);
 
-        var tokenResultDto = new TokenResultDTO
+        var tokenResponseDto = new TokenResponseDTO
         {
             AccessToken = accessToken,
             AccessTokenExpiresAt = accessTokenExpiry,
@@ -117,7 +117,7 @@ public class TokenService : ITokenService
             RefreshTokenExpiresAt = existingRefreshToken.ExpiresAt
         };
 
-        return Result.Ok(tokenResultDto);
+        return Result.Ok(tokenResponseDto);
     }
 
     public async Task<Result<bool>> RevokeRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken)
