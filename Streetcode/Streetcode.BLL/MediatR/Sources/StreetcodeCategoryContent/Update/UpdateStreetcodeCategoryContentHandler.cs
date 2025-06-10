@@ -6,6 +6,7 @@ using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.BLL.MediatR.Sources.StreetcodeCategoryContent.Update;
 using Streetcode.DAL.Repositories.Interfaces.Base;
 
+namespace Streetcode.BLL.MediatR.Sources.StreetcodeCategoryContent.Update;
 public class UpdateStreetcodeCategoryContentHandler : IRequestHandler<UpdateStreetcodeCategoryContentCommand, Result<StreetcodeCategoryContentDTO>>
 {
     private readonly IRepositoryWrapper _repository;
