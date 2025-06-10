@@ -13,4 +13,5 @@ public class StreetcodeCategoryContentDTO
 
     [Required]
     public int StreetcodeId { get; set; }
+    public int Id { get; set; }
 }
