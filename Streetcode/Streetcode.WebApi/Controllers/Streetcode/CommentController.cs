@@ -30,6 +30,9 @@ public class CommentController : BaseApiController
     {
         var result = await Mediator.Send(new GetPendingCommentsQuery());
 
+        return HandleResult(result);
+    }
+
     [HttpPut]
     public async Task<IActionResult> Update([FromBody] UpdateCommentDTO updateCommentDto)
     {
