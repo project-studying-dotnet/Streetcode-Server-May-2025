@@ -10,5 +10,7 @@ internal class StreetcodeCategoryContentProfile : Profile
     {
         CreateMap<StreetcodeCategoryContent, StreetcodeCategoryContentDTO>()
             .ReverseMap();
+
+        CreateMap<CategoryContentCreateDTO, StreetcodeCategoryContent>();
     }
 }

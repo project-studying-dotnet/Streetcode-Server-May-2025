@@ -48,4 +48,8 @@
 		<ProjectReference Include="..\Streetcode.DAL\Streetcode.DAL.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="BLL\MediatRTests\Streetcode\Comment\Update\" />
+	</ItemGroup>
+
 </Project>
