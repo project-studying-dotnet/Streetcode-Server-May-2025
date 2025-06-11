@@ -1,0 +1,39 @@
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/api/{controller}/{action}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "localhost", "Port": 5001 }],
+      "UpstreamPathTemplate": "/streetcode/api/{controller}/{action}",
+      "UpstreamHttpMethod": ["GET", "POST", "PUT", "DELETE"],
+      "FileCacheOptions": {
+        "TtlSeconds": 60,
+        "Region": "streetcode_cache"
+      },
+      "QoSOptions": {
+        "ExceptionsAllowedBeforeBreaking": 3,
+        "DurationOfBreak": 10000,
+        "TimeoutValue": 3000
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/{controller}/{action}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "localhost", "Port": 7113 }],
+      "UpstreamPathTemplate": "/user/api/{controller}/{action}",
+      "UpstreamHttpMethod": ["GET", "POST", "PUT", "DELETE"],
+      "FileCacheOptions": {
+        "TtlSeconds": 60,
+        "Region": "user_cache"
+      },
+      "QoSOptions": {
+        "ExceptionsAllowedBeforeBreaking": 3,
+        "DurationOfBreak": 10000,
+        "TimeoutValue": 3000
+      }
+    }
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "https://localhost:7035"
+  }
+}
