@@ -26,7 +26,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UserService", "UserService"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UserService.WebApi", "UserService.WebApi\UserService.WebApi.csproj", "{226FD87C-C659-4F19-9D6F-B104737E877D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserService.XUnitTest", "UserService\UserService.XUnitTest\UserService.XUnitTest.csproj", "{0B372C24-CA2F-4A63-BCDA-E50EF8DB5822}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UserService.XUnitTest", "UserService\UserService.XUnitTest\UserService.XUnitTest.csproj", "{0B372C24-CA2F-4A63-BCDA-E50EF8DB5822}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ApiGateway", "ApiGateway", "{6053A963-15D0-49FB-B4CF-8EC7ABD507EA}"
 EndProject
