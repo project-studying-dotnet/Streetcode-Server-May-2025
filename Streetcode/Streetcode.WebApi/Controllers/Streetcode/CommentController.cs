@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using Streetcode.BLL.DTO.Streetcode.Comment;
+using Streetcode.BLL.MediatR.Streetcode.Comment.Create;
 using Streetcode.BLL.DTO.Streetcode;
 using Streetcode.BLL.MediatR.Streetcode.Comment.Delete;
 using Streetcode.BLL.MediatR.Streetcode.Comment.GetByStreetcodeId;
@@ -12,6 +14,13 @@ public class CommentController : BaseApiController
     public async Task<IActionResult> GetByStreetcodeId([FromRoute] int streetcodeId)
     {
         var result = await Mediator.Send(new GetCommentsByStreetcodeIdQuery(streetcodeId));
+        return HandleResult(result);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Create([FromRoute] CreateCommentDTO comment)
+    {
+        var result = await Mediator.Send(new CreateCommentCommand(comment));
         return HandleResult(result);
     }
 
