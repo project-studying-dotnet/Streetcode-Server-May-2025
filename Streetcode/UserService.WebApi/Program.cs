@@ -15,6 +15,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+builder.Services.AddCommunication(builder.Configuration);
+
 builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddDbContext<UserServiceDbContext>(options =>

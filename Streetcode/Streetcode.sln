@@ -32,6 +32,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ApiGateway", "ApiGateway", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiGateway", "ApiGateway\ApiGateway.csproj", "{463724F7-8AD6-4B2C-8CEA-FA27C9442C60}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts", "Contracts\Contracts.csproj", "{2B002257-D131-4952-B664-E614A8F1F2B5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -68,8 +70,18 @@ Global
 		{226FD87C-C659-4F19-9D6F-B104737E877D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{226FD87C-C659-4F19-9D6F-B104737E877D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{226FD87C-C659-4F19-9D6F-B104737E877D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B372C24-CA2F-4A63-BCDA-E50EF8DB5822}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B372C24-CA2F-4A63-BCDA-E50EF8DB5822}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B372C24-CA2F-4A63-BCDA-E50EF8DB5822}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B372C24-CA2F-4A63-BCDA-E50EF8DB5822}.Release|Any CPU.Build.0 = Release|Any CPU
 		{463724F7-8AD6-4B2C-8CEA-FA27C9442C60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{463724F7-8AD6-4B2C-8CEA-FA27C9442C60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{463724F7-8AD6-4B2C-8CEA-FA27C9442C60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{463724F7-8AD6-4B2C-8CEA-FA27C9442C60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B002257-D131-4952-B664-E614A8F1F2B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B002257-D131-4952-B664-E614A8F1F2B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B002257-D131-4952-B664-E614A8F1F2B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B002257-D131-4952-B664-E614A8F1F2B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

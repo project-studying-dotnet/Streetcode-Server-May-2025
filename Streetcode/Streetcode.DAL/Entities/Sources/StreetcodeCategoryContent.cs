@@ -23,5 +23,4 @@ public class StreetcodeCategoryContent
 
     public SourceLinkCategory? SourceLinkCategory { get; set; }
     public StreetcodeContent? Streetcode { get; set; }
-    public int Id { get; set; }
 }
