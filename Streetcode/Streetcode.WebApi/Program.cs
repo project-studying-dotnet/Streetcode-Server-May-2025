@@ -2,6 +2,7 @@ using Hangfire;
 using Streetcode.BLL.Services.BlobStorageService;
 using Streetcode.WebApi.Extensions;
 using Streetcode.WebApi.Middlewares;
+using Streetcode.WebApi.Services.MessageConsumers;
 using Streetcode.WebApi.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +13,8 @@ builder.Services.AddSwaggerServices();
 builder.Services.AddCustomServices();
 builder.Services.AddExceptionHandler<ValidationExceptionHandler>();
 builder.Services.AddProblemDetails();
+builder.Services.AddAzureServiceBusIntegration(builder.Configuration);
+builder.Services.AddHostedService<UserRegistrationBackgroundService>();
 builder.Services.ConfigureBlob(builder);
 builder.Services.ConfigurePayment(builder);
 builder.Services.ConfigureInstagram(builder);

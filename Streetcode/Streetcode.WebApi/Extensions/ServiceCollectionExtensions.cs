@@ -1,3 +1,4 @@
+using Azure.Messaging.ServiceBus;
 using FluentResults;
 using StackExchange.Redis;
 using Hangfire;
@@ -5,6 +6,7 @@ using MediatR;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.BLL.Services.Logging;
@@ -29,6 +31,7 @@ using Streetcode.BLL.Interfaces.Cache;
 using Streetcode.BLL.Interfaces.News;
 using Streetcode.BLL.Services.Cache;
 using Streetcode.BLL.Services.News;
+using Streetcode.WebApi.Configurations;
 
 namespace Streetcode.WebApi.Extensions;
 
@@ -134,6 +137,26 @@ public static class ServiceCollectionExtensions
             opt.SwaggerDoc("v1", new OpenApiInfo { Title = "MyApi", Version = "v1" });
             opt.CustomSchemaIds(x => x.FullName);
         });
+    }
+
+    public static IServiceCollection AddAzureServiceBusIntegration(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        services.Configure<ServiceBusSettings>(
+            configuration.GetSection("AzureServiceBus")
+        );
+
+        services.AddSingleton(sp =>
+        {
+            var settings = sp
+                .GetRequiredService<IOptions<ServiceBusSettings>>()
+                .Value;
+
+            return new ServiceBusClient(settings.ConnectionString);
+        });
+
+        return services;
     }
 
     public class CorsConfiguration
