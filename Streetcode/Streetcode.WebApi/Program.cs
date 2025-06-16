@@ -9,7 +9,7 @@ builder.Host.ConfigureApplication();
 
 builder.Services.AddApplicationServices(builder.Configuration, builder.Environment);
 builder.Services.AddSwaggerServices();
-builder.Services.AddCustomServices();
+builder.Services.AddCustomServices(builder.Environment);
 builder.Services.AddExceptionHandler<ValidationExceptionHandler>();
 builder.Services.AddProblemDetails();
 builder.Services.ConfigureBlob(builder);

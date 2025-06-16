@@ -25,18 +25,18 @@ public class BlobService : IBlobService
     {
         string[] splitedName = name.Split('.');
 
-        byte[] decodedBytes = await DecryptFileAsync(splitedName[0], splitedName[1]);
+        byte[] decryptedBytes = await DecryptFileAsync(splitedName[0], splitedName[1]);
 
-        return new MemoryStream(decodedBytes);
+        return new MemoryStream(decryptedBytes);
     }
 
     public async Task<string> FindFileInStorageAsBase64Async(string name)
     {
         string[] splitedName = name.Split('.');
 
-        byte[] decodedBytes = await DecryptFileAsync(splitedName[0], splitedName[1]);
+        byte[] decryptedBytes = await DecryptFileAsync(splitedName[0], splitedName[1]);
 
-        return Convert.ToBase64String(decodedBytes);
+        return Convert.ToBase64String(decryptedBytes);
     }
 
     public async Task<string> SaveFileInStorageAsync(string base64, string name, string mimeType)

@@ -39,7 +39,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
     }
 
-    public static void AddCustomServices(this IServiceCollection services)
+    public static void AddCustomServices(this IServiceCollection services, IWebHostEnvironment environment)
     {
         services.AddLocalization(options => options.ResourcesPath = "Resources");
 
@@ -51,13 +51,21 @@ public static class ServiceCollectionExtensions
         services.AddValidatorsFromAssemblies(currentAssemblies);
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
-        services.AddScoped<IBlobService, BlobService>();
         services.AddScoped<ILoggerService, LoggerService>();
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IPaymentService, PaymentService>();
         services.AddScoped<IInstagramService, InstagramService>();
         services.AddScoped<ITextService, AddTermsToTextService>();
         services.AddScoped<INewsService, NewsService>();
+
+        if (environment.IsDevelopment())
+        {
+            services.AddScoped<IBlobService, AzureBlobService>();
+        }
+        else
+        {
+            services.AddScoped<IBlobService, BlobService>();
+        }
     }
 
     public static void AddApplicationServices(this IServiceCollection services, ConfigurationManager configuration, IWebHostEnvironment environment)
@@ -97,6 +105,8 @@ public static class ServiceCollectionExtensions
         {
             services.AddScoped<ICacheInvalidationService, NoOpCacheInvalidatonService>();
         }
+        
+        services.Configure<AzureBlobSettings>(configuration.GetSection("AzureBlobStorage"));
         
         services.AddHangfire(config =>
         {
