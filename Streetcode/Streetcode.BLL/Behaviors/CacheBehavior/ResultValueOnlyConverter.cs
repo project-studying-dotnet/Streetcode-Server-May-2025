@@ -1,6 +1,8 @@
 using FluentResults;
 using Newtonsoft.Json;
 
+namespace Streetcode.BLL.Behaviors;
+
 public class ResultValueOnlyConverter<T> : JsonConverter<Result<T>>
 {
     public override void WriteJson(JsonWriter writer, Result<T> result, JsonSerializer serializer)
