@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Streetcode.BLL.DTO.Streetcode.Comment;
 using Streetcode.BLL.MediatR.Streetcode.Comment.Create;
 using Streetcode.BLL.DTO.Streetcode;
 using Streetcode.BLL.MediatR.Streetcode.Comment.Delete;
 using Streetcode.BLL.MediatR.Streetcode.Comment.GetByStreetcodeId;
+using Streetcode.BLL.MediatR.Streetcode.Comment.GetPending;
 using Streetcode.BLL.MediatR.Streetcode.Comment.Update;
 
 namespace Streetcode.WebApi.Controllers.Streetcode;
@@ -28,6 +30,14 @@ public class CommentController : BaseApiController
     public async Task<IActionResult> Delete([FromRoute] int commentId)
     {
         var result = await Mediator.Send(new DeleteCommentCommand(commentId));
+
+        return HandleResult(result);
+    }
+
+    [HttpGet("admin/pending")]
+    public async Task<IActionResult> GetPendingComments()
+    {
+        var result = await Mediator.Send(new GetPendingCommentsQuery());
 
         return HandleResult(result);
     }
