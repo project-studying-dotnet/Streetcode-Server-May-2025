@@ -10,7 +10,7 @@ public class BaseApiController : ControllerBase
     {
         if (result.IsSuccess)
         {
-            return result.Value == null
+            return EqualityComparer<T>.Default.Equals(result.Value, default)
                 ? NotFound()
                 : Ok(result.Value);
         }
