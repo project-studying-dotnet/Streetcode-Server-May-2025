@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Streetcode.BLL.MediatR.Streetcode.Comment.Delete;
 
-public record DeleteCommentCommand(int CommentId) : IRequest<Result<Unit>>;
+public record DeleteCommentCommand(int Id) : IRequest<Result>;
