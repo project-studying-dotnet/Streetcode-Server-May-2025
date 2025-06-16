@@ -18,6 +18,7 @@
     <PackageReference Include="EPPlus" Version="6.1.1" />
     <PackageReference Include="FluentResults" Version="3.15.1" />
     <PackageReference Include="Hangfire" Version="1.7.33" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="8.4.1" />
     <PackageReference Include="MediatR" Version="11.1.0" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.16" />
