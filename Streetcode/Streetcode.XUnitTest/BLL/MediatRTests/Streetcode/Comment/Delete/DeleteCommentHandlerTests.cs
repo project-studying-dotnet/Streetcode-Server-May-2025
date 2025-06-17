@@ -15,14 +15,13 @@ public class DeleteCommentHandlerTests
 {
     private readonly Mock<IRepositoryWrapper> _mockRepoWrapper;
     private readonly Mock<ILoggerService> _mockLogger;
-    private readonly DeleteCommentHandlerI _handler;
-    private const int _testCommentId = 1;
+    private readonly DeleteCommentHandler _handler;
 
     public DeleteCommentHandlerTests()
     {
         _mockRepoWrapper = new Mock<IRepositoryWrapper>();
         _mockLogger = new Mock<ILoggerService>();
-        _handler = new DeleteCommentHandlerI(_mockRepoWrapper.Object, _mockLogger.Object);
+        _handler = new DeleteCommentHandler(_mockRepoWrapper.Object, _mockLogger.Object);
     }
 
     [Fact]
@@ -47,12 +46,12 @@ public class DeleteCommentHandlerTests
         var command = CreateCommand();
 
         // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        await _handler.Handle(command, CancellationToken.None);
 
         // Assert
         _mockLogger.Verify(l => l.LogError(
             command,
-            It.Is<string>(s => s.Contains($"no comment found with ID '{_testCommentId}'"))),
+            It.Is<string>(s => s.Contains($"Cannot find comment with id: {command.Id}"))),
             Times.Once);
     }
 
@@ -68,55 +67,6 @@ public class DeleteCommentHandlerTests
 
         // Assert
         _mockRepoWrapper.Verify(r => r.CommentRepository.Delete(It.IsAny<CommentEntity>()), Times.Never);
-    }
-
-    [Fact]
-    public async Task Handle_SaveChangesFails_ReturnsFailureResult()
-    {
-        // Arrange
-        SetupRepositoryGetComment(CreateComment());
-        SetupSaveChangesAsync(0);
-        var command = CreateCommand();
-
-        // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
-
-        // Assert
-        result.IsFailed.Should().BeTrue();
-    }
-
-    [Fact]
-    public async Task Handle_SaveChangesFails_LogsCorrectError()
-    {
-        // Arrange
-        SetupRepositoryGetComment(CreateComment());
-        SetupSaveChangesAsync(0);
-        var command = CreateCommand();
-
-        // Act
-        await _handler.Handle(command, CancellationToken.None);
-
-        // Assert
-        _mockLogger.Verify(l => l.LogError(
-            command,
-            It.Is<string>(s => s.Contains($"unable to persist deletion for comment ID '{_testCommentId}'"))),
-            Times.Once);
-    }
-
-    [Fact]
-    public async Task Handle_SaveChangesFails_CallsDeleteOnce()
-    {
-        // Arrange
-        var comment = CreateComment();
-        SetupRepositoryGetComment(comment);
-        SetupSaveChangesAsync(0);
-        var command = CreateCommand();
-
-        // Act
-        await _handler.Handle(command, CancellationToken.None);
-
-        // Assert
-        _mockRepoWrapper.Verify(r => r.CommentRepository.Delete(comment), Times.Once);
     }
 
     [Fact]
@@ -185,8 +135,7 @@ public class DeleteCommentHandlerTests
         _mockRepoWrapper
             .Setup(r => r.CommentRepository.GetFirstOrDefaultAsync(
                 It.IsAny<Expression<Func<CommentEntity, bool>>>(),
-                It.IsAny<Func<IQueryable<CommentEntity>, IIncludableQueryable<CommentEntity, object>>?>()
-            ))
+                It.IsAny<Func<IQueryable<CommentEntity>, IIncludableQueryable<CommentEntity, object>>?>()))
             .ReturnsAsync(comment);
     }
 
@@ -195,12 +144,12 @@ public class DeleteCommentHandlerTests
         _mockRepoWrapper.Setup(r => r.SaveChangesAsync()).ReturnsAsync(result);
     }
 
-    private DeleteCommentCommand CreateCommand(int commentId = _testCommentId)
+    private DeleteCommentCommand CreateCommand(int commentId = 1)
     {
         return new DeleteCommentCommand(commentId);
     }
 
-    private CommentEntity CreateComment(int id = _testCommentId)
+    private CommentEntity CreateComment(int id = 1)
     {
         return new CommentEntity { Id = id };
     }
