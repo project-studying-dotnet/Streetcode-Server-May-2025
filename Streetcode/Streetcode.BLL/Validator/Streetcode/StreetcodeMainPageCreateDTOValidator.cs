@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using global::Streetcode.BLL.DTO.Streetcode;
+using Streetcode.BLL.DTO.Streetcode;
 
 namespace Streetcode.BLL.Validator.Streetcode;
 
