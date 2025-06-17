@@ -46,6 +46,15 @@ public class UsersController : BaseApiController
     }
 
     [HttpPost]
+    public async Task<IActionResult> Logout([FromBody] LogoutRequestDTO request,
+        CancellationToken cancellationToken)
+    {
+        var result = await _authService.LogoutAsync(request, cancellationToken);
+
+        return HandleResult(result);
+    }
+
+    [HttpPost]
     public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestDTO request, 
         CancellationToken cancellationToken)
     {
