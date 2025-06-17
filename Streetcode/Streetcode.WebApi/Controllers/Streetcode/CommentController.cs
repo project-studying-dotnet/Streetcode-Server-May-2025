@@ -43,9 +43,10 @@ public class CommentController : BaseApiController
 
     [HttpPut("{id:int}")]
     [Authorize]
-    public async Task<IActionResult> Update([FromRoute] int id, [FromBody] CommentDTO comment)
+    public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateCommentDTO comment)
     {
-        return HandleResult(await Mediator.Send(new UpdateCommentCommand(id, comment)));
+        comment.Id = id;
+        return HandleResult(await Mediator.Send(new UpdateCommentCommand(comment)));
     }
 
     [HttpDelete("{id:int}")]
@@ -54,4 +55,4 @@ public class CommentController : BaseApiController
     {
         return HandleResult(await Mediator.Send(new DeleteCommentCommand(id)));
     }
-} 
+}

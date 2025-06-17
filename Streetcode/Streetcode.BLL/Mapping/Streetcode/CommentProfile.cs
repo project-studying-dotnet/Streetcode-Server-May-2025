@@ -2,6 +2,7 @@ using AutoMapper;
 using Streetcode.BLL.DTO.Streetcode;
 using Streetcode.BLL.DTO.Streetcode.Comment;
 using Streetcode.DAL.Entities.Streetcode;
+using AdminCommentDTO = Streetcode.BLL.DTO.Streetcode.Comment.AdminCommentDTO;
 
 namespace Streetcode.BLL.Mapping.Streetcode;
 
