@@ -28,6 +28,8 @@ builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
+builder.Services.AddQuartzJobs();
+
 builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestDTOValidator>();
 
 builder.Services.AddAutoMapper(typeof(UserProfile));
