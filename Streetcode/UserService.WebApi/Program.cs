@@ -28,6 +28,8 @@ builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
+builder.Services.AddScoped<IUserRegistrationPublisher, UserRegistrationPublisher>();
+
 builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestDTOValidator>();
 
 builder.Services.AddAutoMapper(typeof(UserProfile));
@@ -50,6 +52,8 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 builder.Services.AddJwtAuthentication(builder.Configuration);
 
 builder.Services.AddSwaggerWithJwt();
+
+builder.Services.AddAzureServiceBusIntegration(builder.Configuration);
 
 var app = builder.Build();
 

@@ -30,6 +30,7 @@ public class AuthServiceTests
     private readonly AuthService _authService;
     private readonly Mock<ITokenService> _tokenServiceMock = new();
     private readonly Mock<IValidator<LoginRequestDTO>> _validator = new();
+    private readonly Mock<IUserRegistrationPublisher> _registrationPublisherMock;
 
     public AuthServiceTests()
     {
@@ -40,13 +41,15 @@ public class AuthServiceTests
         _userManagerMock = new Mock<UserManager<User>>(
             userStoreMock.Object, null, null, null, null, null, null, null, null
         );
+        _registrationPublisherMock = new Mock<IUserRegistrationPublisher>();
 
         _authService = new AuthService(
             _mapperMock.Object,
             _loggerMock.Object,
             _userManagerMock.Object,
             _tokenServiceMock.Object,
-            _validator.Object);
+            _validator.Object,
+            _registrationPublisherMock.Object);
     }
 
     [Fact]

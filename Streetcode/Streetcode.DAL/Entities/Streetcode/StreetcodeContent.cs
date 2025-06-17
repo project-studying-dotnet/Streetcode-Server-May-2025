@@ -63,6 +63,7 @@ public class StreetcodeContent
     public Text? Text { get; set; }
 
     public Audio? Audio { get; set; }
+    public string? BriefDescription { get; set; }
 
     public List<StatisticRecord> StatisticRecords { get; set; } = new();
 
