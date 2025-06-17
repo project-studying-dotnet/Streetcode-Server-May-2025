@@ -20,15 +20,18 @@ public class TokenService : ITokenService
     private readonly JwtSettings _jwtSettings;
     private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly UserManager<User> _userManager;
+    private readonly ILogger<TokenService> _logger;
 
     public TokenService(
         IOptions<JwtSettings> jwtOptions,
         IRefreshTokenRepository refreshTokenRepository,
-        UserManager<User> userManager)
+        UserManager<User> userManager,
+        ILogger<TokenService> logger)
     {
         _jwtSettings = jwtOptions.Value;
         _refreshTokenRepository = refreshTokenRepository;
         _userManager = userManager;
+        _logger = logger;
     }
 
     public async Task<Result<TokenResponseDTO>> GenerateTokensAsync(User user, CancellationToken cancellationToken)
@@ -150,6 +153,26 @@ public class TokenService : ITokenService
         {
             return Result.Fail<bool>("Failed to save revoke RefreshToken.");
         }
+    }
+
+    public async Task<Result<int>> RevokeExpiredRefreshTokensAsync(CancellationToken cancellationToken = default)
+    {
+        var now = DateTime.UtcNow;
+        _logger.LogInformation($"Starting bulk revoke of expired refresh tokens at {now}");
+
+        var revokedCount = await _refreshTokenRepository
+            .BulkRevokeExpiredTokensAsync(now, cancellationToken);
+
+        if (revokedCount == 0)
+        {
+            _logger.LogInformation("No expired refresh tokens found to revoke.");
+        }
+        else
+        {
+            _logger.LogInformation($"Completed bulk revoke of expired refresh tokens. Total revoked: {revokedCount}");
+        }
+
+        return Result.Ok(revokedCount);
     }
 
     private string CreateJwtAccessToken(User user, IEnumerable<string> userRoles, DateTime expiresAt)
