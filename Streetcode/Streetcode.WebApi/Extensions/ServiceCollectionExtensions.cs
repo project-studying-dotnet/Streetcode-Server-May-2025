@@ -1,3 +1,4 @@
+using Azure.Storage.Blobs;
 using FluentResults;
 using StackExchange.Redis;
 using Hangfire;
@@ -5,6 +6,7 @@ using MediatR;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Streetcode.BLL.Interfaces.Logging;
 using Streetcode.BLL.Services.Logging;
@@ -60,11 +62,11 @@ public static class ServiceCollectionExtensions
 
         if (environment.IsDevelopment())
         {
-            services.AddScoped<IBlobService, AzureBlobService>();
+            services.AddScoped<IBlobService, BlobService>();
         }
         else
         {
-            services.AddScoped<IBlobService, BlobService>();
+            services.AddScoped<IBlobService, AzureBlobService>();
         }
     }
 
@@ -107,6 +109,17 @@ public static class ServiceCollectionExtensions
         }
         
         services.Configure<AzureBlobSettings>(configuration.GetSection("AzureBlobStorage"));
+        services.AddSingleton(provider =>
+        {
+            var config = provider.GetRequiredService<IOptions<AzureBlobSettings>>().Value;
+            return new BlobServiceClient(config.ConnectionString);
+        });
+        services.AddSingleton(provider =>
+        {
+            var config = provider.GetRequiredService<IOptions<AzureBlobSettings>>().Value;
+            var blobServiceClient = provider.GetRequiredService<BlobServiceClient>();
+            return blobServiceClient.GetBlobContainerClient(config.ContainerName);
+        });
         
         services.AddHangfire(config =>
         {

@@ -33,8 +33,11 @@ public class AzureBlobService : IBlobService
             .Replace(".", "_")
             .Replace(":", "_");
         string hashedBlobName = HashFunction(createdFileName);
+        
+        byte[] encryptedBytes = await EncryptFileAsync(bytes, createdFileName);
 
-        using var stream = new MemoryStream(bytes);
+        using var stream = new MemoryStream(encryptedBytes);
+        stream.Position = 0;
         BlobClient blobClient = _containerClient.GetBlobClient(hashedBlobName);
         await blobClient.UploadAsync(stream, overwrite: true);
 
@@ -61,10 +64,11 @@ public class AzureBlobService : IBlobService
     
     public async Task<string> FindFileInStorageAsBase64Async(string name)
     {
-        BlobClient blobClient = _containerClient.GetBlobClient(name);
+        var blobName = name.Split('.')[0]; 
+        BlobClient blobClient = _containerClient.GetBlobClient(blobName);
         if (!await blobClient.ExistsAsync())
         {
-            throw new FileNotFoundException($"File '{name}' not found");
+            throw new FileNotFoundException($"File '{blobName}' not found");
         }
 
         using var memoryStream = new MemoryStream();
@@ -121,5 +125,32 @@ public class AzureBlobService : IBlobService
         }
 
         return decryptedBytes;
+    }
+    
+    private async Task<byte[]> EncryptFileAsync(byte[] imageBytes, string blobName)
+    {
+        byte[] keyBytes = Encoding.UTF8.GetBytes(_keyCrypt);
+
+        byte[] iv = new byte[16];
+        using (var rng = new RNGCryptoServiceProvider())
+        {
+            rng.GetBytes(iv);
+        }
+
+        byte[] encryptedBytes;
+        using (Aes aes = Aes.Create())
+        {
+            aes.KeySize = 256;
+            aes.Key = keyBytes;
+            aes.IV = iv;
+            ICryptoTransform encryptor = aes.CreateEncryptor();
+            encryptedBytes = encryptor.TransformFinalBlock(imageBytes, 0, imageBytes.Length);
+        }
+
+        byte[] encryptedData = new byte[iv.Length + encryptedBytes.Length];
+        Buffer.BlockCopy(iv, 0, encryptedData, 0, iv.Length);
+        Buffer.BlockCopy(encryptedBytes, 0, encryptedData, iv.Length, encryptedBytes.Length);
+
+        return encryptedData;
     }
 }
