@@ -20,4 +20,17 @@ public class BaseApiController : ControllerBase
             Errors = result.Errors.Select(e => e.Message)
         });
     }
+
+    protected IActionResult HandleResult(Result result)
+    {
+        if (result.IsSuccess)
+        {
+            return NoContent();
+        }
+
+        return BadRequest(new
+        {
+            Errors = result.Errors.Select(e => e.Message)
+        });
+    }
 }
