@@ -15,15 +15,13 @@ public class GetAllToponymsHandlerTests
 {
     private readonly Mock<IRepositoryWrapper> _repositoryWrapperMock = new();
     private readonly Mock<IMapper> _mapperMock = new();
-    private readonly Mock<ILoggerService> _loggerMock = new();
     private readonly GetAllToponymsHandler _handler;
 
     public GetAllToponymsHandlerTests()
     {
         _handler = new GetAllToponymsHandler(
             _repositoryWrapperMock.Object,
-            _mapperMock.Object,
-            _loggerMock.Object);
+            _mapperMock.Object);
     }
 
     [Fact]
