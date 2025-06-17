@@ -25,6 +25,17 @@ public class RefreshTokenRepository : IRefreshTokenRepository
             .SingleOrDefaultAsync(rt => rt.Token == token, cancellationToken);
     }
 
+    public async Task<int> BulkRevokeExpiredTokensAsync(
+        DateTime now,
+        CancellationToken cancellationToken)
+    {
+        return await _dbContext.RefreshTokens
+            .Where(rt => !rt.IsRevoked && rt.ExpiresAt < now)
+            .ExecuteUpdateAsync(updates => updates
+                    .SetProperty(rt => rt.IsRevoked, rt => true),
+                cancellationToken);
+    }
+
     public Task UpdateAsync(RefreshToken refreshToken, CancellationToken cancellationToken)
     {
         _dbContext.RefreshTokens.Update(refreshToken);
