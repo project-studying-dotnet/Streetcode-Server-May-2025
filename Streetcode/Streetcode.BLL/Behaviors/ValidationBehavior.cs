@@ -1,5 +1,3 @@
-using System.Reflection;
-using FluentResults;
 using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
@@ -9,12 +7,11 @@ namespace Streetcode.BLL.Behaviors;
 public sealed class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
 {
-    private readonly IReadOnlyCollection<IValidator<TRequest>> _validators;
+    private readonly IEnumerable<IValidator<TRequest>> _validators;
 
     public ValidationBehavior(IEnumerable<IValidator<TRequest>> validators)
     {
-        _validators = validators as IReadOnlyCollection<IValidator<TRequest>>
-                      ?? validators.ToArray();
+        _validators = validators;
     }
 
     public async Task<TResponse> Handle(
@@ -22,19 +19,16 @@ public sealed class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<
         RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
-        if (_validators.Count == 0)
+        var failures = await ValidateAsync(request, cancellationToken);
+
+        if (failures.Any())
         {
-            return await next().ConfigureAwait(false);
+            throw new ValidationException(failures);
         }
 
-        var failures = await ValidateAsync(request, cancellationToken).ConfigureAwait(false);
+        var response = await next();
 
-        if (failures.Count == 0)
-        {
-            return await next().ConfigureAwait(false);
-        }
-
-        return BuildFailureResult(failures);
+        return response;
     }
 
     private async Task<List<ValidationFailure>> ValidateAsync(
@@ -54,35 +48,5 @@ public sealed class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<
         failures.AddRange(allFailures);
 
         return failures;
-    }
-
-    private static TResponse BuildFailureResult(IReadOnlyCollection<ValidationFailure> failures)
-    {
-        var errors = failures.Select(f => new Error(f.ErrorMessage));
-
-        if (typeof(TResponse) == typeof(Result))
-        {
-            return (TResponse)(object)Result.Fail(errors);
-        }
-
-        if (typeof(TResponse).IsGenericType
-            && typeof(TResponse).GetGenericTypeDefinition() == typeof(Result<>))
-        {
-            var payloadType = typeof(TResponse).GetGenericArguments()[0];
-
-            var failMethod = typeof(Result)
-                .GetMethods(BindingFlags.Public | BindingFlags.Static)
-                .First(m => m is { Name: nameof(Result.Fail), IsGenericMethodDefinition: true }
-                            && m.GetParameters().Length == 1);
-
-            var genericFail = failMethod.MakeGenericMethod(payloadType);
-            /*TODO - instead of catching a ValidationException through
-            ValidationExceptionHandler, 500 is returned instead*/
-            var instance = genericFail.Invoke(null, new object?[] { errors });
-
-            return (TResponse)instance!;
-        }
-
-        throw new ValidationException(failures);
     }
 }
