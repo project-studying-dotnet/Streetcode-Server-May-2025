@@ -8,6 +8,8 @@ public interface IRefreshTokenRepository
 
     Task<RefreshToken?> GetByTokenAsync(string token, CancellationToken cancellationToken);
 
+    Task<int> BulkRevokeExpiredTokensAsync(DateTime now, CancellationToken cancellationToken);
+
     Task UpdateAsync(RefreshToken refreshToken, CancellationToken cancellationToken);
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);

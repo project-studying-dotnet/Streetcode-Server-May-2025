@@ -155,6 +155,26 @@ public class TokenService : ITokenService
         }
     }
 
+    public async Task<Result<int>> RevokeExpiredRefreshTokensAsync(CancellationToken cancellationToken = default)
+    {
+        var now = DateTime.UtcNow;
+        _logger.LogInformation($"Starting bulk revoke of expired refresh tokens at {now}");
+
+        var revokedCount = await _refreshTokenRepository
+            .BulkRevokeExpiredTokensAsync(now, cancellationToken);
+
+        if (revokedCount == 0)
+        {
+            _logger.LogInformation("No expired refresh tokens found to revoke.");
+        }
+        else
+        {
+            _logger.LogInformation($"Completed bulk revoke of expired refresh tokens. Total revoked: {revokedCount}");
+        }
+
+        return Result.Ok(revokedCount);
+    }
+    
     public async Task<Result<int>> DeleteRevokedRefreshTokensAsync(
         CancellationToken cancellationToken = default)
     {
