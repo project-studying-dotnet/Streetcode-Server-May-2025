@@ -11,4 +11,6 @@ public interface IRefreshTokenRepository
     Task UpdateAsync(RefreshToken refreshToken, CancellationToken cancellationToken);
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+
+    Task<int> BulkDeleteRevokedTokensAsync(CancellationToken cancellationToken = default);
 }
