@@ -11,7 +11,6 @@ namespace Streetcode.BLL.Behaviors;
 public sealed class CacheBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> 
     where TRequest : IRequest<TResponse>, ICacheable
     where TResponse : ResultBase
-
 {
     private readonly IDistributedCache? _cache;
     private readonly IDatabase? _redisDb;
