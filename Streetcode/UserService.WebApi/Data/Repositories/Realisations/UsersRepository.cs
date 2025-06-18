@@ -11,10 +11,11 @@ public class UsersRepository : IUsersRepository
     {
         _context = context;
     }
-    public async Task<User> AddAsync(User user, CancellationToken cancellationToken)
+
+    public async Task<User> AddAsync(User newUser, CancellationToken cancellationToken)
     {
-        await _context.Users.AddAsync(user, cancellationToken);
-        return user;
+        await _context.Users.AddAsync(newUser, cancellationToken);
+        return newUser;
     }
 
     public async Task<int> SaveChangesAsync()

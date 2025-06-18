@@ -174,6 +174,26 @@ public class TokenService : ITokenService
 
         return Result.Ok(revokedCount);
     }
+    
+    public async Task<Result<int>> DeleteRevokedRefreshTokensAsync(
+        CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation($"Starting bulk delete of revoked refresh tokens at {DateTime.UtcNow}");
+
+        var deletedCount = await _refreshTokenRepository
+            .BulkDeleteRevokedTokensAsync(cancellationToken);
+
+        if (deletedCount == 0)
+        {
+            _logger.LogInformation("No revoked refresh tokens found to delete.");
+        }
+        else
+        {
+            _logger.LogInformation($"Completed bulk delete of revoked refresh tokens. Total deleted: {deletedCount}");
+        }
+
+        return Result.Ok(deletedCount);
+    }
 
     private string CreateJwtAccessToken(User user, IEnumerable<string> userRoles, DateTime expiresAt)
     {

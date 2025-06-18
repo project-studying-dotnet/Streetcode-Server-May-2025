@@ -7,6 +7,8 @@ using Streetcode.BLL.MediatR.Streetcode.Comment.Delete;
 using Streetcode.BLL.MediatR.Streetcode.Comment.GetByStreetcodeId;
 using Streetcode.BLL.MediatR.Streetcode.Comment.GetPending;
 using Streetcode.BLL.MediatR.Streetcode.Comment.Update;
+using Streetcode.BLL.MediatR.Streetcode.Comment.GetById;
+using Streetcode.DAL.Enums;
 
 namespace Streetcode.WebApi.Controllers.Streetcode;
 
@@ -15,38 +17,42 @@ public class CommentController : BaseApiController
     [HttpGet("{streetcodeId:int}")]
     public async Task<IActionResult> GetByStreetcodeId([FromRoute] int streetcodeId)
     {
-        var result = await Mediator.Send(new GetCommentsByStreetcodeIdQuery(streetcodeId));
-        return HandleResult(result);
+        return HandleResult(await Mediator.Send(new GetCommentsByStreetcodeIdQuery(streetcodeId)));
+    }
+
+    [HttpGet("pending")]
+    [Authorize(Roles = $"{nameof(UserRole.Administrator)},{nameof(UserRole.MainAdministrator)}")]
+    public async Task<IActionResult> GetPending()
+    {
+        return HandleResult(await Mediator.Send(new GetPendingCommentsQuery()));
+    }
+
+    [HttpGet("{id:int}")]
+    [Authorize(Roles = $"{nameof(UserRole.Administrator)},{nameof(UserRole.MainAdministrator)}")]
+    public async Task<IActionResult> GetById([FromRoute] int id)
+    {
+        return HandleResult(await Mediator.Send(new GetCommentByIdQuery(id)));
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromRoute] CreateCommentDTO comment)
+    [Authorize]
+    public async Task<IActionResult> Create([FromBody] CreateCommentDTO comment)
     {
-        var result = await Mediator.Send(new CreateCommentCommand(comment));
-        return HandleResult(result);
+        return HandleResult(await Mediator.Send(new CreateCommentCommand(comment)));
     }
 
-    [HttpDelete("{commentId:int}")]
-    public async Task<IActionResult> Delete([FromRoute] int commentId)
+    [HttpPut("{id:int}")]
+    [Authorize]
+    public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateCommentDTO comment)
     {
-        var result = await Mediator.Send(new DeleteCommentCommand(commentId));
-
-        return HandleResult(result);
+        comment.Id = id;
+        return HandleResult(await Mediator.Send(new UpdateCommentCommand(comment)));
     }
 
-    [HttpGet("admin/pending")]
-    public async Task<IActionResult> GetPendingComments()
+    [HttpDelete("{id:int}")]
+    [Authorize(Roles = $"{nameof(UserRole.Administrator)},{nameof(UserRole.MainAdministrator)}")]
+    public async Task<IActionResult> Delete([FromRoute] int id)
     {
-        var result = await Mediator.Send(new GetPendingCommentsQuery());
-
-        return HandleResult(result);
+        return HandleResult(await Mediator.Send(new DeleteCommentCommand(id)));
     }
-
-    [HttpPut]
-    public async Task<IActionResult> Update([FromBody] UpdateCommentDTO updateCommentDto)
-    {
-        var result = await Mediator.Send(new UpdateCommentCommand(updateCommentDto));
-
-        return HandleResult(result);
-    }
-} 
+}

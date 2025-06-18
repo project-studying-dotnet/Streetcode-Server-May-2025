@@ -47,4 +47,11 @@ public class RefreshTokenRepository : IRefreshTokenRepository
     {
         return await _dbContext.SaveChangesAsync(cancellationToken);
     }
+
+    public async Task<int> BulkDeleteRevokedTokensAsync(CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.RefreshTokens
+            .Where(rt => rt.IsRevoked)
+            .ExecuteDeleteAsync(cancellationToken);
+    }
 }
