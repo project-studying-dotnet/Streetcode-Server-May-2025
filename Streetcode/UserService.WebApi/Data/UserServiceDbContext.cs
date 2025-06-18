@@ -19,10 +19,10 @@ public class UserServiceDbContext : IdentityDbContext<User>
     public DbSet<User> Users { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder builder)
     {
-        base.OnModelCreating(modelBuilder);
+        base.OnModelCreating(builder);
 
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(UserServiceDbContext).Assembly);
+        builder.ApplyConfigurationsFromAssembly(typeof(UserServiceDbContext).Assembly);
     }
 }
