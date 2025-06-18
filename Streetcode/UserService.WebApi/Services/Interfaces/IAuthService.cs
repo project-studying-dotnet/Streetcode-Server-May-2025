@@ -12,5 +12,7 @@ public interface IAuthService
     Task<Result<TokenResponseDTO>> LoginAsync(LoginRequestDTO loginDTO, CancellationToken cancellationToken);
 
     Task<Result<TokenResponseDTO>> RefreshTokenAsync(RefreshTokenRequestDTO request, CancellationToken cancellationToken);
+
+    Task<Result> LogoutAsync(LogoutRequestDTO request, CancellationToken cancellationToken);
 }
 

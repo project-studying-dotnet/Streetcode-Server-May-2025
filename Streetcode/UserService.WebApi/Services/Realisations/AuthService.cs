@@ -154,6 +154,35 @@ public class AuthService : IAuthService
         return result;
     }
 
+    public async Task<Result> LogoutAsync(LogoutRequestDTO request, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(request.RefreshToken))
+        {
+            const string errorMsg = "Refresh token is null or empty";
+            _logger.LogError("Logout failed: {Error}", errorMsg);
+
+            return Result.Fail(errorMsg);
+        }
+
+        var revokeResult = await _tokenService
+            .RevokeRefreshTokenAsync(request.RefreshToken, cancellationToken);
+
+        if (revokeResult.IsFailed)
+        {
+            _logger.LogError(
+                "Logout failed when revoking refresh token: {Errors}",
+                string.Join("; ", revokeResult.Errors.Select(e => e.Message))
+            );
+
+            return Result.Fail("Logout failed")
+                .WithErrors(revokeResult.Errors);
+        }
+
+        _logger.LogInformation("User logged out successfully.");
+
+        return Result.Ok();
+    }
+
     private static string MaskEmail(string email)
     {
         if (string.IsNullOrEmpty(email) || !email.Contains('@'))
