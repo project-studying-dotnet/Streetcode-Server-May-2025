@@ -5,12 +5,12 @@ using Streetcode.DAL.Repositories.Interfaces.Base;
 
 namespace Streetcode.BLL.MediatR.Streetcode.Comment.Delete;
 
-public class DeleteCommentHandlerI : IRequestHandler<DeleteCommentCommand, Result<Unit>>
+public class DeleteCommentHandler : IRequestHandler<DeleteCommentCommand, Result<Unit>>
 {
     private readonly IRepositoryWrapper _repositoryWrapper;
     private readonly ILoggerService _logger;
 
-    public DeleteCommentHandlerI(IRepositoryWrapper repositoryWrapper, ILoggerService logger)
+    public DeleteCommentHandler(IRepositoryWrapper repositoryWrapper, ILoggerService logger)
     {
         _repositoryWrapper = repositoryWrapper;
         _logger = logger;
@@ -18,27 +18,16 @@ public class DeleteCommentHandlerI : IRequestHandler<DeleteCommentCommand, Resul
 
     public async Task<Result<Unit>> Handle(DeleteCommentCommand request, CancellationToken cancellationToken)
     {
-        var commentId = request.CommentId;
-
-        var comment = await _repositoryWrapper.CommentRepository.GetFirstOrDefaultAsync(c => c.Id == commentId);
+        var comment = await _repositoryWrapper.CommentRepository.GetFirstOrDefaultAsync(c => c.Id == request.Id);
         if (comment is null)
         {
-            var errorMsg = $"Comment deletion failed: no comment found with ID '{commentId}'.";
+            string errorMsg = $"Cannot find comment with id: {request.Id}";
             _logger.LogError(request, errorMsg);
-
-            return Result.Fail(errorMsg);
+            return Result.Fail<Unit>(errorMsg);
         }
 
         _repositoryWrapper.CommentRepository.Delete(comment);
-
-        var changesSaved = await _repositoryWrapper.SaveChangesAsync() > 0;
-        if (!changesSaved)
-        {
-            var errorMsg = $"Comment deletion failed: unable to persist deletion for comment ID '{commentId}'.";
-            _logger.LogError(request, errorMsg);
-
-            return Result.Fail(new Error(errorMsg));
-        }
+        await _repositoryWrapper.SaveChangesAsync();
 
         return Result.Ok(Unit.Value);
     }
