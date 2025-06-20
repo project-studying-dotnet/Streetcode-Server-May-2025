@@ -88,13 +88,13 @@ public static class ServiceCollectionExtensions
         if (environment.IsDevelopment())
         {
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CacheBehavior<,>));
-            
+
             var redisConnectionString = configuration["Redis:ConnectionString"];
             if (string.IsNullOrWhiteSpace(redisConnectionString))
             {
                 throw new InvalidOperationException("Redis connection string must be provided in Development environment.");
             }
-            
+
             services.AddSingleton<IConnectionMultiplexer>(
                 ConnectionMultiplexer.Connect(redisConnectionString!));
             services.AddSingleton<ICacheInvalidationService, CacheInvalidationService>();
@@ -107,20 +107,7 @@ public static class ServiceCollectionExtensions
         {
             services.AddScoped<ICacheInvalidationService, NoOpCacheInvalidatonService>();
         }
-        
-        services.Configure<AzureBlobSettings>(configuration.GetSection("AzureBlobStorage"));
-        services.AddSingleton(provider =>
-        {
-            var config = provider.GetRequiredService<IOptions<AzureBlobSettings>>().Value;
-            return new BlobServiceClient(config.ConnectionString);
-        });
-        services.AddSingleton(provider =>
-        {
-            var config = provider.GetRequiredService<IOptions<AzureBlobSettings>>().Value;
-            var blobServiceClient = provider.GetRequiredService<BlobServiceClient>();
-            return blobServiceClient.GetBlobContainerClient(config.ContainerName);
-        });
-        
+
         services.AddHangfire(config =>
         {
             config.UseSqlServerStorage(connectionString);

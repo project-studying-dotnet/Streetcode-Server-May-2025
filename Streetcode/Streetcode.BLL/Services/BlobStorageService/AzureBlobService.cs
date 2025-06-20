@@ -34,12 +34,7 @@ public class AzureBlobService : IBlobService
             .Replace(":", "_");
         string hashedBlobName = HashFunction(createdFileName);
         
-        byte[] encryptedBytes = await EncryptFileAsync(bytes, createdFileName);
-
-        using var stream = new MemoryStream(encryptedBytes);
-        stream.Position = 0;
-        BlobClient blobClient = _containerClient.GetBlobClient(hashedBlobName);
-        await blobClient.UploadAsync(stream, overwrite: true);
+        await EncryptFileAsync(bytes, hashedBlobName, mimeType);
 
         return hashedBlobName;
     }
@@ -64,11 +59,10 @@ public class AzureBlobService : IBlobService
     
     public async Task<string> FindFileInStorageAsBase64Async(string name)
     {
-        var blobName = name.Split('.')[0]; 
-        BlobClient blobClient = _containerClient.GetBlobClient(blobName);
+        BlobClient blobClient = _containerClient.GetBlobClient(name);
         if (!await blobClient.ExistsAsync())
         {
-            throw new FileNotFoundException($"File '{blobName}' not found");
+            throw new FileNotFoundException($"File '{name}' not found");
         }
 
         using var memoryStream = new MemoryStream();
@@ -127,7 +121,7 @@ public class AzureBlobService : IBlobService
         return decryptedBytes;
     }
     
-    private async Task<byte[]> EncryptFileAsync(byte[] imageBytes, string blobName)
+    private async Task EncryptFileAsync(byte[] imageBytes, string name, string mimeType)
     {
         byte[] keyBytes = Encoding.UTF8.GetBytes(_keyCrypt);
 
@@ -150,7 +144,12 @@ public class AzureBlobService : IBlobService
         byte[] encryptedData = new byte[iv.Length + encryptedBytes.Length];
         Buffer.BlockCopy(iv, 0, encryptedData, 0, iv.Length);
         Buffer.BlockCopy(encryptedBytes, 0, encryptedData, iv.Length, encryptedBytes.Length);
-
-        return encryptedData;
+        
+        var fileName = $"{name}.{mimeType}";
+        
+        BlobClient blobClient = _containerClient.GetBlobClient(fileName);
+        using var stream = new MemoryStream(encryptedBytes);
+        stream.Position = 0;
+        await blobClient.UploadAsync(stream, overwrite: true);
     }
 }

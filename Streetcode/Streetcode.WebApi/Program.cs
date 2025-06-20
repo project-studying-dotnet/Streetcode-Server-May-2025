@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Host.ConfigureApplication();
 
 builder.Services.AddCommunication(builder.Configuration);
+builder.Services.AddAzureBlobStorage(builder.Configuration);
 builder.Services.AddApplicationServices(builder.Configuration, builder.Environment);
 builder.Services.AddSwaggerServices();
 builder.Services.AddCustomServices(builder.Environment);

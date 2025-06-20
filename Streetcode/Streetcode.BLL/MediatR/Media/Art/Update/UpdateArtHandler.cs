@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FluentResults;
+using MediatR;
 using Streetcode.BLL.DTO.Media.Art;
 using Streetcode.BLL.DTO.Media.Images;
 using Streetcode.BLL.Interfaces.BlobStorage;
@@ -9,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Streetcode.BLL.MediatR.Media.Art.Update;
 
-public class UpdateArtHandler
+public class UpdateArtHandler : IRequestHandler<UpdateArtCommand, Result<ArtDTO>>
 {
     private readonly IRepositoryWrapper _repositoryWrapper;
     private readonly IMapper _mapper;
