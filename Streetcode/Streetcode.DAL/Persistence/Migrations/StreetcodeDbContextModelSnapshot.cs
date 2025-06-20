@@ -593,6 +593,9 @@ namespace Streetcode.DAL.Persistence.Migrations
                     b.Property<int?>("AudioId")
                         .HasColumnType("int");
 
+                    b.Property<string>("BriefDescription")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")

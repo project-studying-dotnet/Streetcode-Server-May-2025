@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using System.IdentityModel.Tokens.Jwt;
 using UserService.WebApi.DTO.Auth.Requests;
 using UserService.WebApi.DTO.Auth.Responses;
+using UserService.WebApi.DTO.Messaging;
 using UserService.WebApi.DTO.Users;
 using UserService.WebApi.Entities.Users;
 using UserService.WebApi.Services.Interfaces;
@@ -19,18 +20,22 @@ public class AuthService : IAuthService
     private readonly ITokenService _tokenService;
     private readonly IValidator<LoginRequestDTO> _loginValidator;
 
+    private readonly IUserRegistrationPublisher _registrationPublisher;
+
     public AuthService(
         IMapper mapper,
         ILogger<AuthService> logger,
         UserManager<User> userManager,
         ITokenService tokenService,
-        IValidator<LoginRequestDTO> loginValidator)
+        IValidator<LoginRequestDTO> loginValidator,
+        IUserRegistrationPublisher registrationPublisher)
     {
         _mapper = mapper;
         _logger = logger;
         _userManager = userManager;
         _tokenService = tokenService;
         _loginValidator = loginValidator;
+        _registrationPublisher = registrationPublisher;
     }
 
     public async Task<Result<User>> Register(RegisterUserDTO registerUserDTO, CancellationToken cancellationToken)
@@ -52,7 +57,13 @@ public class AuthService : IAuthService
             return Result.Fail<User>($"Failed to create user: {errors}");
         }
 
+        var eventDto = _mapper.Map<UserRegisteredEventDTO>(newUser);
+
+        await _registrationPublisher
+            .PublishUserRegisteredAsync(eventDto, cancellationToken);
+
         _logger.LogInformation("Created user with id {UserId}", newUser.Id);
+
         return Result.Ok(newUser);
     }
 
@@ -141,6 +152,35 @@ public class AuthService : IAuthService
             result.Value.AccessTokenExpiresAt);
 
         return result;
+    }
+
+    public async Task<Result> LogoutAsync(LogoutRequestDTO request, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(request.RefreshToken))
+        {
+            const string errorMsg = "Refresh token is null or empty";
+            _logger.LogError("Logout failed: {Error}", errorMsg);
+
+            return Result.Fail(errorMsg);
+        }
+
+        var revokeResult = await _tokenService
+            .RevokeRefreshTokenAsync(request.RefreshToken, cancellationToken);
+
+        if (revokeResult.IsFailed)
+        {
+            _logger.LogError(
+                "Logout failed when revoking refresh token: {Errors}",
+                string.Join("; ", revokeResult.Errors.Select(e => e.Message))
+            );
+
+            return Result.Fail("Logout failed")
+                .WithErrors(revokeResult.Errors);
+        }
+
+        _logger.LogInformation("User logged out successfully.");
+
+        return Result.Ok();
     }
 
     private static string MaskEmail(string email)

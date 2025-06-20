@@ -19,11 +19,15 @@ public class StreetcodeProfile : Profile
                 .MapFrom(e => e.Text != null ? e.Text.Title : null))
             .ForPath(dto => dto.ImageId, conf => conf
                 .MapFrom(e => e.Images.Select(i => i.Id).LastOrDefault()));
+
+        CreateMap<StreetcodeMainPageCreateDTO, StreetcodeContent>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.BriefDescription, opt => opt.MapFrom(src => src.BriefDescription));
     }
 
     private static StreetcodeType GetStreetcodeType(StreetcodeContent streetcode)
     {
-        if(streetcode is EventStreetcode)
+        if (streetcode is EventStreetcode)
         {
             return StreetcodeType.Event;
         }

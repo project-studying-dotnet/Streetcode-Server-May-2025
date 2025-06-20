@@ -10,9 +10,22 @@ public class BaseApiController : ControllerBase
     {
         if (result.IsSuccess)
         {
-            return result.Value == null
+            return EqualityComparer<T>.Default.Equals(result.Value, default)
                 ? NotFound()
                 : Ok(result.Value);
+        }
+
+        return BadRequest(new
+        {
+            Errors = result.Errors.Select(e => e.Message)
+        });
+    }
+
+    protected IActionResult HandleResult(Result result)
+    {
+        if (result.IsSuccess)
+        {
+            return NoContent();
         }
 
         return BadRequest(new

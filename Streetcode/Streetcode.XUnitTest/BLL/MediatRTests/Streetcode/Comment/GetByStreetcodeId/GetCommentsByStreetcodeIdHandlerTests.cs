@@ -15,15 +15,13 @@ public class GetCommentsByStreetcodeIdHandlerTests
 {
     private readonly Mock<IRepositoryWrapper> _repositoryMock = new();
     private readonly Mock<IMapper> _mapperMock = new();
-    private readonly Mock<ILoggerService> _loggerMock = new();
     private readonly GetCommentsByStreetcodeIdHandler _handler;
 
     public GetCommentsByStreetcodeIdHandlerTests()
     {
         _handler = new GetCommentsByStreetcodeIdHandler(
             _repositoryMock.Object,
-            _mapperMock.Object,
-            _loggerMock.Object);
+            _mapperMock.Object);
     }
 
     [Fact]

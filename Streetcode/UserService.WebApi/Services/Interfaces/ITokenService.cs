@@ -11,4 +11,8 @@ public interface ITokenService
     Task<Result<TokenResponseDTO>> RefreshAccessTokenAsync(string refreshToken, CancellationToken cancellationToken);
 
     Task<Result<bool>> RevokeRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken);
+
+    Task<Result<int>> RevokeExpiredRefreshTokensAsync(CancellationToken cancellationToken);
+  
+    Task<Result<int>> DeleteRevokedRefreshTokensAsync(CancellationToken cancellationToken);
 }

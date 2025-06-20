@@ -1,4 +1,5 @@
 using Azure.Storage.Blobs;
+using Azure.Messaging.ServiceBus;
 using FluentResults;
 using StackExchange.Redis;
 using Hangfire;
@@ -41,7 +42,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
     }
 
-    public static void AddCustomServices(this IServiceCollection services, IWebHostEnvironment environment)
+    public static void AddCustomServices(this IServiceCollection services)
     {
         services.AddLocalization(options => options.ResourcesPath = "Resources");
 
@@ -53,21 +54,13 @@ public static class ServiceCollectionExtensions
         services.AddValidatorsFromAssemblies(currentAssemblies);
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
+        services.AddScoped<IBlobService, BlobService>();
         services.AddScoped<ILoggerService, LoggerService>();
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IPaymentService, PaymentService>();
         services.AddScoped<IInstagramService, InstagramService>();
         services.AddScoped<ITextService, AddTermsToTextService>();
         services.AddScoped<INewsService, NewsService>();
-
-        if (environment.IsDevelopment())
-        {
-            services.AddScoped<IBlobService, BlobService>();
-        }
-        else
-        {
-            services.AddScoped<IBlobService, AzureBlobService>();
-        }
     }
 
     public static void AddApplicationServices(this IServiceCollection services, ConfigurationManager configuration, IWebHostEnvironment environment)
@@ -88,13 +81,13 @@ public static class ServiceCollectionExtensions
         if (environment.IsDevelopment())
         {
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CacheBehavior<,>));
-
+            
             var redisConnectionString = configuration["Redis:ConnectionString"];
             if (string.IsNullOrWhiteSpace(redisConnectionString))
             {
                 throw new InvalidOperationException("Redis connection string must be provided in Development environment.");
             }
-
+            
             services.AddSingleton<IConnectionMultiplexer>(
                 ConnectionMultiplexer.Connect(redisConnectionString!));
             services.AddSingleton<ICacheInvalidationService, CacheInvalidationService>();
@@ -107,7 +100,7 @@ public static class ServiceCollectionExtensions
         {
             services.AddScoped<ICacheInvalidationService, NoOpCacheInvalidatonService>();
         }
-
+        
         services.AddHangfire(config =>
         {
             config.UseSqlServerStorage(connectionString);
