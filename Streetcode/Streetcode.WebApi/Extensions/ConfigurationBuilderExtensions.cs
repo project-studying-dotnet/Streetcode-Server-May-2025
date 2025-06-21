@@ -8,7 +8,7 @@ public static class ConfigurationBuilderExtensions
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
             .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
             .AddEnvironmentVariables("STREETCODE_")
-            .AddUserSecrets<Program>(optional: environment == "Local");
+            .AddUserSecrets<Program>(optional: true);
 
         return builder;
     }
