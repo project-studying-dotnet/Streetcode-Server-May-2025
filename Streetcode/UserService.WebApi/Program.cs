@@ -37,8 +37,6 @@ builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestDTOValidator>()
 
 builder.Services.AddAutoMapper(typeof(UserProfile));
 
-builder.Services.AddSwaggerGen();
-
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
