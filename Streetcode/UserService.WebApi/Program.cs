@@ -15,7 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-builder.Services.AddCommunication(builder.Configuration);
+builder.Services.AddCommunication(builder.Configuration, builder.Environment);
 
 builder.Services.AddAutoMapper(typeof(Program));
 
