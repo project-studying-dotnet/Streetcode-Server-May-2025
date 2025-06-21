@@ -78,7 +78,7 @@ public static class ServiceCollectionExtensions
             });
         });
 
-        if (environment.IsDevelopment())
+        if (environment.EnvironmentName == "Experimental")
         {
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CacheBehavior<,>));
             
