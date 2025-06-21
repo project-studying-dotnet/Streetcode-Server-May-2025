@@ -58,6 +58,8 @@ builder.Services.AddSwaggerWithJwt();
 
 builder.Services.AddAzureServiceBusIntegration(builder.Configuration);
 
+builder.Services.AddSwaggerServices();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
