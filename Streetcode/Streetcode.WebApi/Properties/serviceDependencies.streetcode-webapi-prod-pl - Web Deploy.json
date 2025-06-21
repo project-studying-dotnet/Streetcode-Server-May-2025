@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "apis1": {
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ApiManagement/service/apim-streetcode-prod-pl/apis/streetcode-webapi-prod-pl",
+      "type": "apis.azure"
+    }
+  }
+}
