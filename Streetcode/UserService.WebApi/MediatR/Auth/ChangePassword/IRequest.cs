@@ -1,6 +1,4 @@
-﻿namespace UserService.WebApi.MediatR.Auth.ChangePassword
+﻿namespace UserService.WebApi.MediatR.Auth.ChangePassword;
+public interface IRequest<T>
 {
-    public interface IRequest<T>
-    {
-    }
 }
