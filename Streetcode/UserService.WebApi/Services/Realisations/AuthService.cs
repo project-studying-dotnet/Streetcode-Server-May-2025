@@ -183,6 +183,29 @@ public class AuthService : IAuthService
         return Result.Ok();
     }
 
+    public async Task<Result> ChangePasswordAsync(string userEmail, string oldPassword, string newPassword, CancellationToken cancellationToken)
+    {
+        var user = await _userManager.FindByEmailAsync(userEmail);
+
+        if (user is null)
+            return Result.Fail("User not found.");
+
+        var result = await _userManager.ChangePasswordAsync(user, oldPassword, newPassword);
+
+        if (!result.Succeeded)
+        {
+            var errors = result.Errors.Select(e => e.Description);
+            return Result.Fail(string.Join("; ", errors));
+        }
+
+        return Result.Ok();
+    }
+
+    public async Task<Result> ChangePasswordAsync(ChangePasswordRequestDTO dto, CancellationToken cancellationToken)
+    {
+        return await ChangePasswordAsync(dto.Email, dto.OldPassword, dto.NewPassword, cancellationToken);
+    }
+
     private static string MaskEmail(string email)
     {
         if (string.IsNullOrEmpty(email) || !email.Contains('@'))

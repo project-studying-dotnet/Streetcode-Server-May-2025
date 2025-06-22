@@ -14,5 +14,8 @@ public interface IAuthService
     Task<Result<TokenResponseDTO>> RefreshTokenAsync(RefreshTokenRequestDTO request, CancellationToken cancellationToken);
 
     Task<Result> LogoutAsync(LogoutRequestDTO request, CancellationToken cancellationToken);
+
+    Task<Result> ChangePasswordAsync(string userEmail, string oldPassword, string newPassword, CancellationToken cancellationToken);
+    Task<Result> ChangePasswordAsync(ChangePasswordRequestDTO dto, CancellationToken cancellationToken);
 }
 
