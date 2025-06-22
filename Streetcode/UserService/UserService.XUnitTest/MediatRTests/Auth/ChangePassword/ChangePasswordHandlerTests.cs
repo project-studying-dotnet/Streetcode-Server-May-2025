@@ -63,4 +63,31 @@ public class ChangePasswordHandlerTests
         result.Errors.Should().ContainSingle(e => e.Message == "Old password is incorrect.");
         mockAuthService.Verify(s => s.ChangePasswordAsync(dto, It.IsAny<CancellationToken>()), Times.Once);
     }
+
+    [Fact]
+    public async Task Handle_SameOldAndNewPassword_ReturnsFailure()
+    {
+        // Arrange
+        var dto = new ChangePasswordRequestDTO
+        {
+            Email = "test@example.com",
+            OldPassword = "OldPass123!",
+            NewPassword = "OldPass123!"  // Старий та новий пароль однакові
+        };
+
+        var mockAuthService = new Mock<IAuthService>();
+        mockAuthService
+            .Setup(s => s.ChangePasswordAsync(dto, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Result.Fail("New password cannot be the same as the old password."));
+
+        var handler = new ChangePasswordHandler(mockAuthService.Object);
+
+        // Act
+        var result = await handler.Handle(new ChangePasswordCommand(dto), CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeFalse();
+        result.Errors.Should().ContainSingle(e => e.Message == "New password cannot be the same as the old password.");
+        mockAuthService.Verify(s => s.ChangePasswordAsync(dto, It.IsAny<CancellationToken>()), Times.Once);
+    }
 }
