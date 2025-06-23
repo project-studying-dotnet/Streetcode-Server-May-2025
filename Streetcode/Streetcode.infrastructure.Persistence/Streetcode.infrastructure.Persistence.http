@@ -1,6 +1,0 @@
-@Streetcode.infrastructure.Persistence_HostAddress = http://localhost:5049
-
-GET {{Streetcode.infrastructure.Persistence_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
