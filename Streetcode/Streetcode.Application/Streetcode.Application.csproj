@@ -9,8 +9,11 @@
     <ItemGroup>
       <Folder Include="Behaviors\" />
       <Folder Include="DTO's\" />
+      <Folder Include="Mapping\" />
       <Folder Include="MediatR\" />
+      <Folder Include="Resources\" />
       <Folder Include="ServiceInterfaces\" />
+      <Folder Include="Specifications\" />
       <Folder Include="Validators\" />
     </ItemGroup>
 
