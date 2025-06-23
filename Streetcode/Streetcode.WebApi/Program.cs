@@ -1,4 +1,5 @@
 using Hangfire;
+using Microsoft.Azure.Amqp.Framing;
 using Streetcode.BLL.Services.BlobStorageService;
 using Streetcode.WebApi.Extensions;
 using Streetcode.WebApi.Middlewares;
@@ -8,7 +9,7 @@ using Streetcode.WebApi.Utils;
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.ConfigureApplication();
 
-builder.Services.AddCommunication(builder.Configuration);
+builder.Services.AddCommunication(builder.Configuration, builder.Environment);
 builder.Services.AddApplicationServices(builder.Configuration, builder.Environment);
 builder.Services.AddSwaggerServices();
 builder.Services.AddCustomServices();
@@ -23,7 +24,7 @@ builder.Services.ConfigureSerilog(builder);
 
 var app = builder.Build();
 
-if (app.Environment.EnvironmentName == "Local")
+if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Local") || app.Environment.IsEnvironment("Experimental"))
 {
     app.UseSwagger();
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebAPIv5 v1"));

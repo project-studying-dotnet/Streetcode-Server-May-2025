@@ -1,10 +1,8 @@
 using Azure.Messaging.ServiceBus;
-using FluentResults;
 using StackExchange.Redis;
 using Hangfire;
 using MediatR;
 using FluentValidation;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
@@ -26,7 +24,6 @@ using Streetcode.BLL.Services.Instagram;
 using Streetcode.BLL.Interfaces.Text;
 using Streetcode.BLL.Services.Text;
 using Streetcode.BLL.Behaviors;
-using Serilog.Events;
 using Streetcode.BLL.Interfaces.Cache;
 using Streetcode.BLL.Interfaces.News;
 using Streetcode.BLL.Services.Cache;
@@ -78,7 +75,7 @@ public static class ServiceCollectionExtensions
             });
         });
 
-        if (environment.IsDevelopment())
+        if (environment.EnvironmentName == "Experimental")
         {
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CacheBehavior<,>));
             

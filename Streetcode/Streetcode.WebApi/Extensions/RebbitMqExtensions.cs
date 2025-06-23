@@ -4,21 +4,24 @@ namespace Streetcode.WebApi.Extensions;
 
 public static class RebbitMqExtensions
 {
-    public static IServiceCollection AddCommunication(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddCommunication(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
     {
-        services.AddMassTransit(busConfigurator =>
+        if (environment.EnvironmentName == "Experimental")
         {
-            busConfigurator.UsingRabbitMq((context, configurator) =>
+            services.AddMassTransit(busConfigurator =>
             {
-                configurator.Host(new Uri(configuration["MessageBroker:Host"]!), h =>
+                busConfigurator.UsingRabbitMq((context, configurator) =>
                 {
-                    h.Username(configuration["MessageBroker:Username"]!);
-                    h.Password(configuration["MessageBroker:Password"]!);
-                });
+                    configurator.Host(new Uri(configuration["MessageBroker:Host"]!), h =>
+                    {
+                        h.Username(configuration["MessageBroker:Username"]!);
+                        h.Password(configuration["MessageBroker:Password"]!);
+                    });
 
-                configurator.ConfigureEndpoints(context);
+                    configurator.ConfigureEndpoints(context);
+                });
             });
-        });
+        }
 
         return services;
     }

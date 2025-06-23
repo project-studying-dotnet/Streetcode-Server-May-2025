@@ -15,7 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-builder.Services.AddCommunication(builder.Configuration);
+builder.Services.AddCommunication(builder.Configuration, builder.Environment);
 
 builder.Services.AddAutoMapper(typeof(Program));
 
@@ -37,8 +37,6 @@ builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestDTOValidator>()
 
 builder.Services.AddAutoMapper(typeof(UserProfile));
 
-builder.Services.AddSwaggerGen();
-
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
@@ -57,6 +55,8 @@ builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddSwaggerWithJwt();
 
 builder.Services.AddAzureServiceBusIntegration(builder.Configuration);
+
+builder.Services.AddSwaggerServices();
 
 var app = builder.Build();
 

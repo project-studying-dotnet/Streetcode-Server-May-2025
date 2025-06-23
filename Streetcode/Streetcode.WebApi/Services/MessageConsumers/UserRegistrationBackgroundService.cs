@@ -63,10 +63,9 @@ public class UserRegistrationBackgroundService : BackgroundService
         }
         else
         {
-            // Delegate business processing to the business layer
             await _mediator.Send(
                 new NotifyRegistrationCommand(
-                    new Streetcode.BLL.DTO.Messaging.UserRegisteredEventDTO
+                    new UserRegisteredEventDTO
                     {
                         UserId = dto.UserId,
                         Email = dto.Email,
@@ -78,7 +77,6 @@ public class UserRegistrationBackgroundService : BackgroundService
                 args.CancellationToken);
         }
 
-        // Complete the message so it is not received again
         await args.CompleteMessageAsync(args.Message, args.CancellationToken);
     }
 
