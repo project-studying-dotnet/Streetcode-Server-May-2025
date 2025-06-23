@@ -5,9 +5,9 @@ using Streetcode.DAL.Repositories.Realizations.Base;
 
 namespace Streetcode.DAL.Repositories.Realizations.Analytics;
 
-public class StatisticRecordsRepository : RepositoryBase<StatisticRecord>, IStatisticRecordRepository
+public class StatisticRecordRepository : RepositoryBase<StatisticRecord>, IStatisticRecordRepository
 {
-    public StatisticRecordsRepository(StreetcodeDbContext context)
+    public StatisticRecordRepository(StreetcodeDbContext context)
         : base(context)
     {
     }

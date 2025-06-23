@@ -5,9 +5,9 @@ using Streetcode.DAL.Repositories.Realizations.Base;
 
 namespace Streetcode.DAL.Repositories.Realizations.Partners;
 
-public class PartnerStreetodeRepository : RepositoryBase<StreetcodePartner>, IPartnerStreetcodeRepository
+public class PartnerStreetcodeRepository : RepositoryBase<StreetcodePartner>, IPartnerStreetcodeRepository
 {
-    public PartnerStreetodeRepository(StreetcodeDbContext context)
+    public PartnerStreetcodeRepository(StreetcodeDbContext context)
         : base(context)
     {
     }
