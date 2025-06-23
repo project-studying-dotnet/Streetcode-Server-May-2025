@@ -1,4 +1,4 @@
-name: Build and deploy .NET Core application to Web App streetcode-webapi-prod-pl with API Management Service apim-streetcode-prod-pl-streetcode-webapi-prod-pl
+name: CI/CD WebAPI (prod)
 on:
   push:
     branches:
