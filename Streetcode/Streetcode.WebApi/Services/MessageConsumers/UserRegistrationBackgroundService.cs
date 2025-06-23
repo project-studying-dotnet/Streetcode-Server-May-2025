@@ -65,7 +65,7 @@ public class UserRegistrationBackgroundService : BackgroundService
         {
             await _mediator.Send(
                 new NotifyRegistrationCommand(
-                    new Streetcode.BLL.DTO.Messaging.UserRegisteredEventDTO
+                    new UserRegisteredEventDTO
                     {
                         UserId = dto.UserId,
                         Email = dto.Email,
