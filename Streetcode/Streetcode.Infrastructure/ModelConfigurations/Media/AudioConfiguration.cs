@@ -1,3 +1,7 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Streetcode.Domain.Models.Media;
+
 namespace Streetcode.Infrasttructure.ModelConfigurations.Media;
 
 public class AudioConfiguration : IEntityTypeConfiguration<Audio>
