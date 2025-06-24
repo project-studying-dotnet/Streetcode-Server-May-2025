@@ -279,6 +279,86 @@ public class AuthServiceTests
         result.Value.Should().BeEquivalentTo(tokenResponse);
     }
 
+    [Fact]
+    public async Task ForgotPassword_UserExists_SendsEmailAndReturnsSuccess()
+    {
+        // Arrange
+        var request = new ForgotPasswordDto { Email = "user@example.com" };
+        var user = new User { Email = request.Email };
+        var fakeToken = "test-token";
+
+        _userManagerMock.Setup(um => um.FindByEmailAsync(request.Email))
+            .ReturnsAsync(user);
+
+        _userManagerMock.Setup(um => um.GeneratePasswordResetTokenAsync(user))
+            .ReturnsAsync(fakeToken);
+
+        _configuration.Setup(c => c["FrontendBaseUrl"])
+            .Returns("http://localhost:5002");
+
+        // Act
+        var result = await _authService.ForgotPassword(request);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        _emailSender.Verify(e => e.SendEmailAsync(
+            user.Email,
+            It.Is<string>(s => s.Contains("Password reset")),
+            It.Is<string>(html => html.Contains("http://localhost:5002/reset-password?token="))),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task ResetPassword_ValidToken_ResetsPasswordAndReturnsSuccess()
+    {
+        // Arrange
+        var request = new ResetPasswordDto
+        {
+            Email = "user@example.com",
+            Token = "valid-token",
+            NewPassword = "NewPassword123!"
+        };
+
+        var user = new User { Email = request.Email };
+
+        _userManagerMock.Setup(um => um.FindByEmailAsync(request.Email))
+            .ReturnsAsync(user);
+
+        _userManagerMock.Setup(um => um.ResetPasswordAsync(user, request.Token, request.NewPassword))
+            .ReturnsAsync(IdentityResult.Success);
+
+        // Act
+        var result = await _authService.ResetPassword(request);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+    }
+
+
+    [Fact]
+    public async Task ResetPassword_UserNotFound_ReturnsFail()
+    {
+        // Arrange
+        var request = new ResetPasswordDto
+        {
+            Email = "unknown@example.com",
+            Token = "any",
+            NewPassword = "NewPassword123!"
+        };
+
+        _userManagerMock.Setup(um => um.FindByEmailAsync(request.Email))
+            .ReturnsAsync(null as User);
+
+        // Act
+        var result = await _authService.ResetPassword(request);
+
+        // Assert
+        result.IsSuccess.Should().BeFalse();
+        result.Errors.Should().Contain(e => e.Message.Contains("User not found"));
+    }
+
+
+
     private void SetupSuccessfulLogin(LoginRequestDTO dto, User user)
     {
         _validator.Setup(v => v.ValidateAsync(dto, default))
