@@ -61,7 +61,7 @@ jobs:
     - name: Azure Login
       uses: azure/login@v2
       with:
-        creds: ${{ secrets.apim_streetcode_prod_pl_SPN }}
+        creds: ${{ secrets.USERSERVICE_SPN }}
     - name: Deploy to Azure WebApp
       uses: azure/webapps-deploy@v2
       with:
