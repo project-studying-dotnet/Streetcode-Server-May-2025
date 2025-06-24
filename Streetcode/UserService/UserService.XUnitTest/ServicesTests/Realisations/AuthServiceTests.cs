@@ -109,9 +109,16 @@ public class AuthServiceTests
         var newUserDto = new RegisterUserDTO { Email = "validkobilinskiyn@gmail.com", Password = "Password123!" };
         var newUser = new User { Id = "id-nikita-123", Email = newUserDto.Email };
 
+        var tokenDto = new TokenResponseDTO
+        {
+            AccessToken = "access",
+            RefreshToken = "refresh",
+            AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(15)
+        };
+
         _userManagerMock
             .Setup(um => um.FindByEmailAsync(newUserDto.Email))
-            .ReturnsAsync(null as User); 
+            .ReturnsAsync(null as User);
 
         _mapperMock
             .Setup(m => m.Map<User>(newUserDto))
@@ -121,12 +128,16 @@ public class AuthServiceTests
             .Setup(um => um.CreateAsync(newUser, newUserDto.Password))
             .ReturnsAsync(IdentityResult.Success);
 
+        _tokenServiceMock
+            .Setup(ts => ts.GenerateTokensAsync(newUser, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Result.Ok(tokenDto));
+
         // Act
         var result = await _authService.Register(newUserDto, CancellationToken.None);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        result.Value.Should().BeEquivalentTo(newUser);
+        result.Value.Should().BeEquivalentTo(tokenDto);
     }
 
     [Fact]
