@@ -46,9 +46,6 @@ jobs:
     - name: Install Swashbuckle CLI .NET Global Tool
       run: dotnet tool install --global Swashbuckle.AspNetCore.Cli --version ${{ env.SWASHBUCLE_ASPNET_CORE_CLI_PACKAGE_VERSION }}
       working-directory: ${{ env.WORKING_DIRECTORY }}
-    - name: Generate OpenAPI spec (Windows)
-      working-directory: ${{ env.WORKING_DIRECTORY }}
-      run: dotnet tool install --global Swashbuckle.AspNetCore.Cli --version ${{ env.SWASHBUCLE_ASPNET_CORE_CLI_PACKAGE_VERSION }}; echo "$Env:USERPROFILE\.dotnet\tools" >> $Env:GITHUB_PATH; dotnet swagger tofile --output "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}\swagger.json" --startupAssembly Streetcode.WebApi --startupType Program "${{ env.API_IMPORT_DLL }}" "${{ env.API_IMPORT_VERSION }}"
     - name: Publish Artifacts
       uses: actions/upload-artifact@v4
       with:
