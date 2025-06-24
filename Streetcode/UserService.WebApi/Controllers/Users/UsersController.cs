@@ -71,7 +71,7 @@ public class UsersController : BaseApiController
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto request)
     {
         var result = await _authService.ResetPassword(request);
-
+    }
     [HttpPost("change-password")]
     [Authorize]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestDTO request, CancellationToken cancellationToken)
