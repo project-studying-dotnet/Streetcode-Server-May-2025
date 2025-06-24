@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading;
 using UserService.WebApi.DTO.Auth.Requests;
 using UserService.WebApi.DTO.Users;
 using UserService.WebApi.Services.Interfaces;
@@ -58,6 +59,21 @@ public class UsersController : BaseApiController
         return HandleResult(result);
     }
 
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto request)
+    {
+        var result = await _authService.ForgotPassword(request);
+
+        return HandleResult(result);
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto request)
+    {
+        var result = await _authService.ResetPassword(request);
+
+        return HandleResult(result);
+    }
     [HttpPost("change-password")]
     [Authorize]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestDTO request, CancellationToken cancellationToken)
@@ -68,6 +84,7 @@ public class UsersController : BaseApiController
             return Unauthorized();
 
         var result = await _authService.ChangePasswordAsync(request.Email, request.OldPassword, request.NewPassword, cancellationToken);
+
 
         return HandleResult(result);
     }
