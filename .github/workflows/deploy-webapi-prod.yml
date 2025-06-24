@@ -20,6 +20,8 @@ env:
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 8.0.x
   WORKING_DIRECTORY: Streetcode/Streetcode.WebApi
+  PUBLISH_DIRECTORY: publish
+  BUILD_DLL: bin/Release/net8.0/Streetcode.WebApi.dll
 jobs:
   build:
     runs-on: windows-latest
@@ -46,6 +48,16 @@ jobs:
       working-directory: ${{ env.WORKING_DIRECTORY }}
     - name: Generate Open API Specification Document
       run: swagger tofile --output "${{ env.API_IMPORT_SPECIFICATION_PATH }}" "${{ env.API_IMPORT_DLL }}" "${{ env.API_IMPORT_VERSION }}"
+    - name: Generate Open API Specification Document
+      working-directory: ${{ env.WORKING_DIRECTORY }}
+      run: dotnet tool install --global Swashbuckle.AspNetCore.Cli \
+        --version ${{ env.SWASHBUCLE_ASPNET_CORE_CLI_PACKAGE_VERSION }}
+        swagger tofile \
+        --output "${{ env.PUBLISH_DIRECTORY }}/swagger.json" \
+        --startupAssembly Streetcode.WebApi \
+        --startupType Program \
+        "${{ env.BUILD_DLL }}" \
+        "${{ env.API_IMPORT_VERSION }}"
     - name: Publish Artifacts
       uses: actions/upload-artifact@v4
       with:
