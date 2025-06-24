@@ -38,13 +38,13 @@ public class AuthService : IAuthService
         _registrationPublisher = registrationPublisher;
     }
 
-    public async Task<Result<User>> Register(RegisterUserDTO registerUserDTO, CancellationToken cancellationToken)
+    public async Task<Result<TokenResponseDTO>> Register(RegisterUserDTO registerUserDTO, CancellationToken cancellationToken)
     {
         var existingUser = await _userManager.FindByEmailAsync(registerUserDTO.Email);
 
         if (existingUser != null)
         {
-            return Result.Fail<User>("User with this email already exists");
+            return Result.Fail<TokenResponseDTO>("User with this email already exists");
         }
 
         var newUser = _mapper.Map<User>(registerUserDTO);
@@ -54,7 +54,7 @@ public class AuthService : IAuthService
         {
             var errors = string.Join(", ", result.Errors.Select(e => e.Description));
             _logger.LogError($"Failed to create user: {errors}");
-            return Result.Fail<User>($"Failed to create user: {errors}");
+            return Result.Fail<TokenResponseDTO>($"Failed to create user: {errors}");
         }
 
         var eventDto = _mapper.Map<UserRegisteredEventDTO>(newUser);
@@ -64,7 +64,17 @@ public class AuthService : IAuthService
 
         _logger.LogInformation("Created user with id {UserId}", newUser.Id);
 
-        return Result.Ok(newUser);
+        var tokenResult = await _tokenService.GenerateTokensAsync(newUser, cancellationToken);
+        if (tokenResult.IsFailed)
+        {
+            _logger.LogError("Token generation failed after registration: {Errors}",
+                string.Join("; ", tokenResult.Errors.Select(e => e.Message)));
+
+            return Result.Fail<TokenResponseDTO>("Token generation failed")
+                         .WithErrors(tokenResult.Errors);
+        }
+
+        return tokenResult;
     }
 
     public async Task<Result<TokenResponseDTO>> LoginAsync(LoginRequestDTO loginDTO, CancellationToken cancellationToken)

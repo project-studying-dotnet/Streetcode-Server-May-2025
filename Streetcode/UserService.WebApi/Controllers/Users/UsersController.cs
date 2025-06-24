@@ -27,13 +27,7 @@ public class UsersController : BaseApiController
 
         var result = await _authService.Register(registerUserDTO, cancellationToken);
 
-        if (result.IsSuccess)
-        {
-            var responseDto = _mapper.Map<UserResponseDTO>(result.Value);
-            return Ok(responseDto);
-        }
-
-        return BadRequest(new { Error = result.Errors.FirstOrDefault()?.Message });
+        return HandleResult(result);
     }
 
     [HttpPost]

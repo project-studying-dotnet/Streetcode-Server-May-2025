@@ -7,7 +7,7 @@ using UserService.WebApi.Entities.Users;
 namespace UserService.WebApi.Services.Interfaces;
 public interface IAuthService
 {
-    Task<Result<User>> Register(RegisterUserDTO registerUserDTO, CancellationToken cancellationToken);
+    Task<Result<TokenResponseDTO>> Register(RegisterUserDTO registerUserDTO, CancellationToken cancellationToken);
 
     Task<Result<TokenResponseDTO>> LoginAsync(LoginRequestDTO loginDTO, CancellationToken cancellationToken);
 
