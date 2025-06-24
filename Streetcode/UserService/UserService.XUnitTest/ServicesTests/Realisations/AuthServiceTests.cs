@@ -4,9 +4,10 @@ using FluentResults;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Newtonsoft.Json.Linq;
 using UserService.WebApi.DTO.Auth.Requests;
 using UserService.WebApi.DTO.Auth.Responses;
 using UserService.WebApi.DTO.Users;
@@ -31,6 +32,8 @@ public class AuthServiceTests
     private readonly Mock<ITokenService> _tokenServiceMock = new();
     private readonly Mock<IValidator<LoginRequestDTO>> _validator = new();
     private readonly Mock<IUserRegistrationPublisher> _registrationPublisherMock;
+    private readonly Mock<IEmailSender> _emailSender;
+    private readonly Mock<IConfiguration> _configuration;
 
     public AuthServiceTests()
     {
@@ -42,6 +45,9 @@ public class AuthServiceTests
             userStoreMock.Object, null, null, null, null, null, null, null, null
         );
         _registrationPublisherMock = new Mock<IUserRegistrationPublisher>();
+        _emailSender = new Mock<IEmailSender>();
+        _configuration = new Mock<IConfiguration>();
+
 
         _authService = new AuthService(
             _mapperMock.Object,
@@ -49,7 +55,9 @@ public class AuthServiceTests
             _userManagerMock.Object,
             _tokenServiceMock.Object,
             _validator.Object,
-            _registrationPublisherMock.Object);
+            _registrationPublisherMock.Object,
+            _emailSender.Object,
+            _configuration.Object);
     }
 
     [Fact]
