@@ -1,4 +1,5 @@
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using UserService.WebApi.Data;
@@ -20,7 +21,8 @@ builder.Services.AddCommunication(builder.Configuration, builder.Environment);
 builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddDbContext<UserServiceDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+    sqlOptions => sqlOptions.EnableRetryOnFailure()));
 
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
@@ -51,6 +53,14 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
     .AddDefaultTokenProviders();
 
 builder.Services.AddJwtAuthentication(builder.Configuration);
+
+builder.Services.AddAuthentication()
+    .AddGoogle(options =>
+    {
+        options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+        options.CallbackPath = "/signin-google";
+    });
 
 builder.Services.AddSwaggerWithJwt();
 
