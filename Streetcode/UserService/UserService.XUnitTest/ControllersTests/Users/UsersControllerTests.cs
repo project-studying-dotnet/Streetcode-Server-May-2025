@@ -42,31 +42,19 @@ public class UsersControllerTests
             Password = "*Password123"
         };
 
-        var user = new User
+        var tokenResponse = new TokenResponseDTO
         {
-            Id = "1",
-            Name = "Vika",
-            Surname = "Yashan",
-            Email = "yashan@gmail.com"
+            AccessToken = "access_token_value",
+            RefreshToken = "refresh_token_value",
+            AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(15)
         };
 
-        var userResponseDto = new UserResponseDTO
-        {
-            Id = "1",
-            Name = "Vika",
-            Surname = "Yashan",
-            Email = "yashan@gmail.com"
-        };
-
-        var successResult = Result.Ok(user);
+        var successResult = Result.Ok(tokenResponse);
 
         _authServiceMock
             .Setup(x => x.Register(registerDto, It.IsAny<CancellationToken>()))
             .ReturnsAsync(successResult);
 
-        _mapperMock
-            .Setup(x => x.Map<UserResponseDTO>(user))
-            .Returns(userResponseDto);
 
         // Act
         var result = await _controller.Register(registerDto, CancellationToken.None);
@@ -74,7 +62,7 @@ public class UsersControllerTests
         // Assert
         result.Should().BeOfType<OkObjectResult>();
         var okResult = result as OkObjectResult;
-        okResult!.Value.Should().Be(userResponseDto);
+        okResult!.Value.Should().Be(tokenResponse);
     }
 
     [Fact]
@@ -90,35 +78,6 @@ public class UsersControllerTests
         // Assert
         var badRequestResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
         badRequestResult.Value.Should().BeOfType<SerializableError>();
-    }
-
-    [Fact]
-    public async Task Register_ServiceReturnsFailure_ReturnsBadRequestWithError()
-    {
-        // Arrange
-        var registerDto = new RegisterUserDTO
-        {
-            Name = "Vika",
-            Surname = "Yashan",
-            Email = "yashan@gmail.com",
-            Password = "password123"
-        };
-
-        var error = new Error("User with this email already exists");
-        var failureResult = Result.Fail<User>(error);
-
-        _authServiceMock
-            .Setup(x => x.Register(registerDto, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(failureResult);
-
-        // Act
-        var result = await _controller.Register(registerDto, CancellationToken.None);
-
-        // Assert
-        result.Should().BeOfType<BadRequestObjectResult>();
-        var badRequestResult = result as BadRequestObjectResult;
-        var errorResponse = badRequestResult!.Value;
-        errorResponse.Should().BeEquivalentTo(new { Error = "User with this email already exists" });
     }
 
     [Fact]

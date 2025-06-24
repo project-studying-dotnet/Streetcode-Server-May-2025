@@ -7,7 +7,7 @@ using UserService.WebApi.Entities.Users;
 namespace UserService.WebApi.Services.Interfaces;
 public interface IAuthService
 {
-    Task<Result<User>> Register(RegisterUserDTO registerUserDTO, CancellationToken cancellationToken);
+    Task<Result<TokenResponseDTO>> Register(RegisterUserDTO registerUserDTO, CancellationToken cancellationToken);
 
     Task<Result<TokenResponseDTO>> LoginAsync(LoginRequestDTO loginDTO, CancellationToken cancellationToken);
 
@@ -15,8 +15,13 @@ public interface IAuthService
 
     Task<Result> LogoutAsync(LogoutRequestDTO request, CancellationToken cancellationToken);
 
+
     Task<Result> ForgotPassword(ForgotPasswordDto request);
 
     Task<Result> ResetPassword(ResetPasswordDto request);
+
+    Task<Result> ChangePasswordAsync(string userEmail, string oldPassword, string newPassword, CancellationToken cancellationToken);
+    Task<Result> ChangePasswordAsync(ChangePasswordRequestDTO dto, CancellationToken cancellationToken);
+
 }
 
