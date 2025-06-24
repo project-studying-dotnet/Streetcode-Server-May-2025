@@ -223,6 +223,9 @@ public class AuthService : IAuthService
         if (!result.Succeeded)
         {
             return Result.Fail("Something went wrong");
+        }
+        return Result.Ok();
+    }
 
     public async Task<Result> ChangePasswordAsync(string userEmail, string oldPassword, string newPassword, CancellationToken cancellationToken)
     {
