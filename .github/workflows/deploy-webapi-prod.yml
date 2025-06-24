@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 env:
   AZURE_WEBAPP_NAME: streetcode-webapi-prod-pl
-  AZURE_WEBAPP_PACKAGE_PATH: Streetcode.WebApi\publish
+  AZURE_WEBAPP_PACKAGE_PATH: Streetcode/Streetcode.WebApi/publish
   AZURE_APIM_RESOURCE_PATH: /webapi
   AZURE_APIM_RESOURCEGROUP: streetcode-resource-group
   AZURE_APIM_SERVICENAME: apim-streetcode-prod-pl
@@ -14,12 +14,12 @@ env:
   AZURE_APIM_APPSERVICEURL: https://streetcode-webapi-prod-pl-fnaqhre3etc8bfas.polandcentral-01.azurewebsites.net
   SWASHBUCLE_ASPNET_CORE_CLI_PACKAGE_VERSION: 5.6.3
   SWASHBUCKLE_DOTNET_CORE_VERSION: 3.1.x
-  API_IMPORT_SPECIFICATION_PATH: Streetcode.WebApi\publish\swagger.json
-  API_IMPORT_DLL: Streetcode.WebApi\bin\Release\net8.0\Streetcode.WebApi.dll
+  API_IMPORT_SPECIFICATION_PATH: Streetcode/Streetcode.WebApi/publish/swagger.json
+  API_IMPORT_DLL: Streetcode/Streetcode.WebApi/bin/Release/net8.0/Streetcode.WebApi.dll
   API_IMPORT_VERSION: v1
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 8.0.x
-  WORKING_DIRECTORY: Streetcode.WebApi
+  WORKING_DIRECTORY: Streetcode/Streetcode.WebApi
 jobs:
   build:
     runs-on: windows-latest
