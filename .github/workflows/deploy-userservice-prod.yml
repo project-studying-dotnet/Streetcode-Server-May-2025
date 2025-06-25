@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 env:
   AZURE_WEBAPP_NAME: streetcode-userservice-prod-pl
-  AZURE_WEBAPP_PACKAGE_PATH: UserService.WebApi\publish
+  AZURE_WEBAPP_PACKAGE_PATH: Streetcode/UserService.WebApi/publish
   AZURE_APIM_RESOURCE_PATH: /user-service
   AZURE_APIM_RESOURCEGROUP: streetcode-resource-group
   AZURE_APIM_SERVICENAME: apim-streetcode-prod-pl
@@ -14,12 +14,12 @@ env:
   AZURE_APIM_APPSERVICEURL: https://streetcode-userservice-prod-pl-aveceqgpdjbra5ek.polandcentral-01.azurewebsites.net
   SWASHBUCLE_ASPNET_CORE_CLI_PACKAGE_VERSION: 5.6.3
   SWASHBUCKLE_DOTNET_CORE_VERSION: 3.1.x
-  API_IMPORT_SPECIFICATION_PATH: UserService.WebApi\publish\swagger.json
-  API_IMPORT_DLL: UserService.WebApi\bin\Release\net8.0\UserService.WebApi.dll
+  API_IMPORT_SPECIFICATION_PATH: UserService.WebApi/publish/swagger.json
+  API_IMPORT_DLL: Streetcode/UserService.WebApi/bin/Release/net8.0/UserService.WebApi.dll
   API_IMPORT_VERSION: v1
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 8.0.x
-  WORKING_DIRECTORY: UserService.WebApi
+  WORKING_DIRECTORY: Streetcode/UserService.WebApi
 jobs:
   build:
     runs-on: windows-latest
@@ -44,8 +44,6 @@ jobs:
     - name: Install Swashbuckle CLI .NET Global Tool
       run: dotnet tool install --global Swashbuckle.AspNetCore.Cli --version ${{ env.SWASHBUCLE_ASPNET_CORE_CLI_PACKAGE_VERSION }}
       working-directory: ${{ env.WORKING_DIRECTORY }}
-    - name: Generate Open API Specification Document
-      run: swagger tofile --output "${{ env.API_IMPORT_SPECIFICATION_PATH }}" "${{ env.API_IMPORT_DLL }}" "${{ env.API_IMPORT_VERSION }}"
     - name: Publish Artifacts
       uses: actions/upload-artifact@v4
       with:
@@ -63,14 +61,12 @@ jobs:
     - name: Azure Login
       uses: azure/login@v2
       with:
-        creds: ${{ secrets.apim_streetcode_prod_pl_SPN }}
+        creds: ${{ secrets.USERSERVICE_SPN }}
     - name: Deploy to Azure WebApp
       uses: azure/webapps-deploy@v2
       with:
         app-name: ${{ env.AZURE_WEBAPP_NAME }}
         package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
-    - name: Import API into Azure API Management
-      run: az apim api import --path "${{ env.AZURE_APIM_RESOURCE_PATH }}" --resource-group "${{ env.AZURE_APIM_RESOURCEGROUP }}" --service-name "${{ env.AZURE_APIM_SERVICENAME }}" --api-id "${{ env.AZURE_APIM_API_ID }}" --service-url "${{ env.AZURE_APIM_APPSERVICEURL }}" --specification-path "${{ env.API_IMPORT_SPECIFICATION_PATH }}" --specification-format OpenApi --subscription-required false
     - name: logout
       run: >
         az logout
