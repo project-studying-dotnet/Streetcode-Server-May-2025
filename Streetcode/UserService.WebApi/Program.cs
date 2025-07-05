@@ -1,6 +1,7 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using UserService.WebApi.Data;
 using UserService.WebApi.Data.Repositories.Interfaces;
@@ -29,6 +30,8 @@ builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+
+builder.Services.AddScoped<IEmailSender, EmailSender>();
 
 builder.Services.AddHangfireServerWithSqlStorage(builder.Configuration);
 builder.Services.AddQuartzJobs();

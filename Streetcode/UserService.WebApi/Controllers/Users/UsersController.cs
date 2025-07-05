@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading;
 using UserService.WebApi.DTO.Auth.Requests;
 using UserService.WebApi.DTO.Users;
 using UserService.WebApi.Services.Interfaces;
@@ -29,13 +31,7 @@ public class UsersController : BaseApiController
 
         var result = await _authService.Register(registerUserDTO, cancellationToken);
 
-        if (result.IsSuccess)
-        {
-            var responseDto = _mapper.Map<UserResponseDTO>(result.Value);
-            return Ok(responseDto);
-        }
-
-        return BadRequest(new { Error = result.Errors.FirstOrDefault()?.Message });
+        return HandleResult(result);
     }
 
     [HttpPost]
@@ -87,6 +83,36 @@ public class UsersController : BaseApiController
         CancellationToken cancellationToken)
     {
         var result = await _authService.RefreshTokenAsync(request, cancellationToken);
+
+        return HandleResult(result);
+    }
+
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto request)
+    {
+        var result = await _authService.ForgotPassword(request);
+
+        return HandleResult(result);
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto request)
+    {
+        var result = await _authService.ResetPassword(request);
+
+        return HandleResult(result);
+    }
+    [HttpPost("change-password")]
+    [Authorize]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestDTO request, CancellationToken cancellationToken)
+    {
+        var email = User.Identity?.Name;
+
+        if (string.IsNullOrEmpty(email))
+            return Unauthorized();
+
+        var result = await _authService.ChangePasswordAsync(request.Email, request.OldPassword, request.NewPassword, cancellationToken);
+
 
         return HandleResult(result);
     }

@@ -4,9 +4,10 @@ using FluentResults;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Newtonsoft.Json.Linq;
 using UserService.WebApi.DTO.Auth.Requests;
 using UserService.WebApi.DTO.Auth.Responses;
 using UserService.WebApi.DTO.Users;
@@ -31,6 +32,8 @@ public class AuthServiceTests
     private readonly Mock<ITokenService> _tokenServiceMock = new();
     private readonly Mock<IValidator<LoginRequestDTO>> _validator = new();
     private readonly Mock<IUserRegistrationPublisher> _registrationPublisherMock;
+    private readonly Mock<IEmailSender> _emailSender;
+    private readonly Mock<IConfiguration> _configuration;
 
     public AuthServiceTests()
     {
@@ -42,6 +45,9 @@ public class AuthServiceTests
             userStoreMock.Object, null, null, null, null, null, null, null, null
         );
         _registrationPublisherMock = new Mock<IUserRegistrationPublisher>();
+        _emailSender = new Mock<IEmailSender>();
+        _configuration = new Mock<IConfiguration>();
+
 
         _authService = new AuthService(
             _mapperMock.Object,
@@ -49,7 +55,9 @@ public class AuthServiceTests
             _userManagerMock.Object,
             _tokenServiceMock.Object,
             _validator.Object,
-            _registrationPublisherMock.Object);
+            _registrationPublisherMock.Object,
+            _emailSender.Object,
+            _configuration.Object);
     }
 
     [Fact]
@@ -109,9 +117,16 @@ public class AuthServiceTests
         var newUserDto = new RegisterUserDTO { Email = "validkobilinskiyn@gmail.com", Password = "Password123!" };
         var newUser = new User { Id = "id-nikita-123", Email = newUserDto.Email };
 
+        var tokenDto = new TokenResponseDTO
+        {
+            AccessToken = "access",
+            RefreshToken = "refresh",
+            AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(15)
+        };
+
         _userManagerMock
             .Setup(um => um.FindByEmailAsync(newUserDto.Email))
-            .ReturnsAsync(null as User); 
+            .ReturnsAsync(null as User);
 
         _mapperMock
             .Setup(m => m.Map<User>(newUserDto))
@@ -121,12 +136,16 @@ public class AuthServiceTests
             .Setup(um => um.CreateAsync(newUser, newUserDto.Password))
             .ReturnsAsync(IdentityResult.Success);
 
+        _tokenServiceMock
+            .Setup(ts => ts.GenerateTokensAsync(newUser, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Result.Ok(tokenDto));
+
         // Act
         var result = await _authService.Register(newUserDto, CancellationToken.None);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        result.Value.Should().BeEquivalentTo(newUser);
+        result.Value.Should().BeEquivalentTo(tokenDto);
     }
 
     [Fact]
@@ -270,6 +289,86 @@ public class AuthServiceTests
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().BeEquivalentTo(tokenResponse);
     }
+
+    [Fact]
+    public async Task ForgotPassword_UserExists_SendsEmailAndReturnsSuccess()
+    {
+        // Arrange
+        var request = new ForgotPasswordDto { Email = "user@example.com" };
+        var user = new User { Email = request.Email };
+        var fakeToken = "test-token";
+
+        _userManagerMock.Setup(um => um.FindByEmailAsync(request.Email))
+            .ReturnsAsync(user);
+
+        _userManagerMock.Setup(um => um.GeneratePasswordResetTokenAsync(user))
+            .ReturnsAsync(fakeToken);
+
+        _configuration.Setup(c => c["FrontendBaseUrl"])
+            .Returns("http://localhost:5002");
+
+        // Act
+        var result = await _authService.ForgotPassword(request);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        _emailSender.Verify(e => e.SendEmailAsync(
+            user.Email,
+            It.Is<string>(s => s.Contains("Password reset")),
+            It.Is<string>(html => html.Contains("http://localhost:5002/reset-password?token="))),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task ResetPassword_ValidToken_ResetsPasswordAndReturnsSuccess()
+    {
+        // Arrange
+        var request = new ResetPasswordDto
+        {
+            Email = "user@example.com",
+            Token = "valid-token",
+            NewPassword = "NewPassword123!"
+        };
+
+        var user = new User { Email = request.Email };
+
+        _userManagerMock.Setup(um => um.FindByEmailAsync(request.Email))
+            .ReturnsAsync(user);
+
+        _userManagerMock.Setup(um => um.ResetPasswordAsync(user, request.Token, request.NewPassword))
+            .ReturnsAsync(IdentityResult.Success);
+
+        // Act
+        var result = await _authService.ResetPassword(request);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+    }
+
+
+    [Fact]
+    public async Task ResetPassword_UserNotFound_ReturnsFail()
+    {
+        // Arrange
+        var request = new ResetPasswordDto
+        {
+            Email = "unknown@example.com",
+            Token = "any",
+            NewPassword = "NewPassword123!"
+        };
+
+        _userManagerMock.Setup(um => um.FindByEmailAsync(request.Email))
+            .ReturnsAsync(null as User);
+
+        // Act
+        var result = await _authService.ResetPassword(request);
+
+        // Assert
+        result.IsSuccess.Should().BeFalse();
+        result.Errors.Should().Contain(e => e.Message.Contains("User not found"));
+    }
+
+
 
     private void SetupSuccessfulLogin(LoginRequestDTO dto, User user)
     {

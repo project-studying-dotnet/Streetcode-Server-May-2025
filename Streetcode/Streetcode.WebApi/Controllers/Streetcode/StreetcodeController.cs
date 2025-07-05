@@ -11,6 +11,7 @@ using Streetcode.BLL.DTO.AdditionalContent.Filter;
 using Streetcode.BLL.MediatR.Streetcode.Streetcode.GetShortById;
 using Streetcode.BLL.MediatR.Streetcode.Streetcode.GetAllStreetcodesMainPage;
 using Streetcode.BLL.MediatR.Streetcode.Streetcode.UpdateMainPage;
+using Streetcode.BLL.MediatR.Streetcode.Streetcode.GetByIds;
 
 namespace Streetcode.WebApi.Controllers.Streetcode;
 
@@ -74,5 +75,11 @@ public class StreetcodeController : BaseApiController
     public async Task<IActionResult> Update([FromBody] StreetcodeMainPageDTO StreetcodeMainPageDTO)
     {
         return HandleResult(await Mediator.Send(new UpdateMainCommand(StreetcodeMainPageDTO)));
+    }
+
+    [HttpPost("getByIds")]
+    public async Task<IActionResult> GetByIds([FromBody] IEnumerable<int> ids)
+    {
+        return HandleResult(await Mediator.Send(new GetStreetcodesByIdsQuery(ids)));
     }
 }
