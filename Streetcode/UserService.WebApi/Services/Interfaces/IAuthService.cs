@@ -1,4 +1,5 @@
 ﻿using FluentResults;
+using System.Security.Claims;
 using UserService.WebApi.DTO.Auth.Requests;
 using UserService.WebApi.DTO.Auth.Responses;
 using UserService.WebApi.DTO.Users;
@@ -10,6 +11,8 @@ public interface IAuthService
     Task<Result<TokenResponseDTO>> Register(RegisterUserDTO registerUserDTO, CancellationToken cancellationToken);
 
     Task<Result<TokenResponseDTO>> LoginAsync(LoginRequestDTO loginDTO, CancellationToken cancellationToken);
+
+    Task<Result<TokenResponseDTO>> ExternalLoginAsync(ClaimsPrincipal principal, CancellationToken cancellationToken);
 
     Task<Result<TokenResponseDTO>> RefreshTokenAsync(RefreshTokenRequestDTO request, CancellationToken cancellationToken);
 

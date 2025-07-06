@@ -4,6 +4,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using UserService.WebApi.DTO.Auth.Requests;
 using UserService.WebApi.DTO.Auth.Responses;
 using UserService.WebApi.DTO.Messaging;
@@ -285,4 +286,53 @@ public class AuthService : IAuthService
             return "unknown-user";
         }
     }
+
+    public async Task<Result<TokenResponseDTO>> ExternalLoginAsync(ClaimsPrincipal principal, CancellationToken cancellationToken)
+    {
+        var email = principal.FindFirstValue(ClaimTypes.Email);
+        var name = principal.FindFirstValue(ClaimTypes.Name);
+        var surname = principal.FindFirstValue(ClaimTypes.Surname);
+
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            const string errorMsg = "Google did not return email";
+            _logger.LogError(errorMsg);
+            return Result.Fail<TokenResponseDTO>(errorMsg);
+        }
+
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user == null)
+        {
+            user = new User
+            {
+                Email = email,
+                UserName = email,
+                Name = name ?? email,
+                Surname = surname ?? email,
+                EmailConfirmed = true
+            };
+
+            var createResult = await _userManager.CreateAsync(user);
+            if (!createResult.Succeeded)
+            {
+                var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
+                _logger.LogError("Failed to create user from Google: {Errors}", errors);
+                return Result.Fail<TokenResponseDTO>("Failed to create user from Google");
+            }
+
+            var eventDto = _mapper.Map<UserRegisteredEventDTO>(user);
+            await _registrationPublisher.PublishUserRegisteredAsync(eventDto, cancellationToken);
+        }
+
+        var tokenResult = await _tokenService.GenerateTokensAsync(user, cancellationToken);
+        if (tokenResult.IsFailed)
+        {
+            _logger.LogError("Token generation failed after Google login: {Errors}", string.Join("; ", tokenResult.Errors.Select(e => e.Message)));
+            return Result.Fail<TokenResponseDTO>("Token generation failed")
+                .WithErrors(tokenResult.Errors);
+        }
+
+        return tokenResult;
+    }
+
 }

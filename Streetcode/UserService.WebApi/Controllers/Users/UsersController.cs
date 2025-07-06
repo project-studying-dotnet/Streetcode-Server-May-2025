@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading;
@@ -40,6 +42,32 @@ public class UsersController : BaseApiController
 
         return HandleResult(result);
     }
+
+    [HttpGet("external-login")]
+    public IActionResult ExternalLogin([FromQuery] string returnUrl = "/")
+    {
+        var properties = new AuthenticationProperties
+        {
+            RedirectUri = Url.Action(nameof(ExternalLoginCallback), new { returnUrl })
+        };
+
+        return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+    }
+
+    [HttpGet("external-login-callback")]
+    public async Task<IActionResult> ExternalLoginCallback([FromQuery] string returnUrl = "/")
+    {
+        var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
+
+        if (!result.Succeeded || result.Principal == null)
+        {
+            return BadRequest("Google login failed");
+        }
+
+        var tokenResult = await _authService.ExternalLoginAsync(result.Principal, CancellationToken.None);
+        return HandleResult(tokenResult);
+    }
+
 
     [HttpPost]
     public async Task<IActionResult> Logout([FromBody] LogoutRequestDTO request,
